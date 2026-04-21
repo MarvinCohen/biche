@@ -1,0 +1,354 @@
+/*
+ * Feuille de style principale de Biche.
+ * Organisation : variables → reset → layout → composants → pages spécifiques
+ */
+
+/* ============================================================
+   VARIABLES — Design System Biche.
+   (Palette et typographie extraites des maquettes HTML)
+   ============================================================ */
+:root {
+  /* Couleurs principales */
+  --color-dark:    #2e2926;   /* Brun foncé — boutons, textes, footer */
+  --color-nude:    #f7f5f2;   /* Beige nude — fond principal */
+  --color-cream:   #f6f4f1;   /* Crème légèrement plus sombre */
+  --color-sand:    #e8e2d8;   /* Sable — hero accueil */
+  --color-accent:  #b8a898;   /* Beige rosé — accents, étoiles, fidélité */
+  --color-muted:   #8e8480;   /* Gris chaud — textes secondaires */
+  --color-border:  #e2dbd2;   /* Bord des cartes */
+  --color-bg-dark: #241e1c;   /* Fond extérieur sombre */
+
+  /* Typographie */
+  --font-serif:     'Cormorant Garamond', serif;   /* Titres élégants */
+  --font-sans:      'Inter', sans-serif;            /* Corps de texte */
+
+  /* Espacements */
+  --section-padding: 44px 20px;
+  --border-radius-card: 20px;
+  --border-radius-pill: 40px;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg-dark);
+  min-height: 100vh;
+  padding: 24px 12px;
+  color: var(--color-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   LAYOUT — conteneur phone (max 420px, mockup mobile)
+   ============================================================ */
+.wrap {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.phone {
+  background: var(--color-nude);
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+/* ============================================================
+   NAVIGATION — barre du haut fixée
+   ============================================================ */
+.nav {
+  background: rgba(247, 245, 242, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  border-bottom: 0.5px solid #e4ddd6;
+}
+
+.logo-mini {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-dark);
+  font-style: italic;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Bouton burger (menu) */
+.burger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  width: 22px;
+}
+
+.burger span {
+  height: 1.5px;
+  background: var(--color-dark);
+  border-radius: 1px;
+  display: block;
+}
+
+.burger span:last-child { width: 60%; }
+
+/* ============================================================
+   BOUTONS — styles réutilisables
+   ============================================================ */
+
+/* Bouton primaire (fond sombre) */
+.btn-primary {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  padding: 13px 28px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* Bouton secondaire (contour) */
+.btn-ghost {
+  background: transparent;
+  color: var(--color-dark);
+  border: 1px solid var(--color-dark);
+  border-radius: var(--border-radius-pill);
+  padding: 11px 24px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* Bouton de navigation (dans la nav) */
+.btn-nav {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 9px 18px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  text-decoration: none;
+}
+
+/* ============================================================
+   SECTIONS — conteneurs de contenu
+   ============================================================ */
+.sec {
+  padding: var(--section-padding);
+  background: #fff;
+}
+
+.sec-alt   { background: var(--color-nude); }
+.sec-cream { background: var(--color-cream); }
+.sec-nude  { background: var(--color-nude); }
+.sec-dark  { background: var(--color-dark); }
+
+/* Étiquette de section (petit texte en majuscules) */
+.s-tag {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Titre de section */
+.s-h2 {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  color: var(--color-dark);
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* Sous-titre de section */
+.s-sub {
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: var(--color-bg-dark);
+  padding: 36px 20px 28px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  color: var(--color-accent);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.footer-tag {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.footer-links a {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.footer-copy {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 1px;
+}
+
+/* ============================================================
+   FLASH MESSAGES — notifications Rails
+   ============================================================ */
+.flash {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 100;
+  max-width: 380px;
+  text-align: center;
+}
+
+.flash--notice {
+  background: var(--color-dark);
+  color: #fff;
+}
+
+.flash--alert {
+  background: #c47a7a;
+  color: #fff;
+}
+
+/* ============================================================
+   CARROUSEL — composant réutilisable (prestations, shop)
+   ============================================================ */
+.carousel {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0 20px 20px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar { display: none; }
+
+/* Indicateur de swipe */
+.swipe-hint {
+  text-align: center;
+  font-size: 10px;
+  color: var(--color-accent);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Points de navigation du carrousel */
+.car-dots { display: flex; gap: 6px; margin: 0 10px; }
+
+.car-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: all 0.2s;
+}
+
+.car-dot.active {
+  background: var(--color-dark);
+  width: 22px;
+  border-radius: 3px;
+}
+
+.car-arrow {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.carousel-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  align-items: center;
+}

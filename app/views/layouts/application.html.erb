@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <!-- Titre de la page (chaque vue peut le personnaliser avec content_for :title) -->
+    <title><%= content_for(:title).present? ? "#{content_for(:title)} — Biche." : "Biche. — Technicienne du regard · Bordeaux" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="description" content="Biche. — Technicienne du regard à Bordeaux. Extensions de cils, rehaussement, soins sur-mesure au Calao Studio.">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <!-- Polices Google : Cormorant Garamond (titres élégants) + Inter (texte courant) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Feuilles de style de l'application -->
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <!-- Slot pour les balises head spécifiques à chaque page (meta, scripts, etc.) -->
+    <%= yield :head %>
+  </head>
+
+  <body>
+    <!-- Messages flash (erreurs Devise, confirmations d'actions) -->
+    <% if notice.present? %>
+      <div class="flash flash--notice"><%= notice %></div>
+    <% end %>
+    <% if alert.present? %>
+      <div class="flash flash--alert"><%= alert %></div>
+    <% end %>
+
+    <!-- Contenu principal de chaque page -->
+    <%= yield %>
+  </body>
+</html>
