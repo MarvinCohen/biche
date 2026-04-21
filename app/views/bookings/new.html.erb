@@ -1,2 +1,379 @@
-<h1>Bookings#new</h1>
-<p>Find me in app/views/bookings/new.html.erb</p>
+<% content_for :title, "Réservation" %>
+
+<%#
+  ============================================================
+  VUE — Formulaire de réservation (4 étapes)
+  Contrôlé par app/javascript/controllers/booking_controller.js
+  Le controller Stimulus gère : navigation, calendrier, créneaux AJAX, récap
+  ============================================================
+%>
+
+<%# Le formulaire englobe les 4 étapes. On passe au controller Stimulus :
+    - creneaux-url-value : l'URL de l'endpoint AJAX pour charger les créneaux
+    - prestation-id-value : la prestation pré-sélectionnée si l'URL contient ?prestation_id=X
+%>
+<%= form_with model: @booking,
+              url: bookings_path,
+              html: {
+                data: {
+                  controller: "booking",
+                  booking_creneaux_url_value: creneaux_bookings_path,
+                  booking_prestation_id_value: params[:prestation_id].to_i
+                }
+              } do |f| %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <% if user_signed_in? %>
+          <%= link_to espace_cliente_root_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% end %>
+        <div class="burger"><span></span><span></span><span></span></div>
+      </div>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Agenda</p>
+      <h1 class="ph-title">Prendre<br>rendez-vous</h1>
+      <p class="ph-intro">Réservez votre soin en quelques étapes. Confirmation automatique par email.</p>
+    </div>
+
+    <%# ---- BARRE DE PROGRESSION — 4 cercles mis à jour par le JS (showStep) ---- %>
+    <div class="steps-bar">
+
+      <%# Cercle étape 1 — Soin %>
+      <div class="bk-step">
+        <div class="step-num active" data-booking-target="stepIndicator">1</div>
+        <div class="step-label active">Soin</div>
+      </div>
+      <div class="step-line"></div>
+
+      <%# Cercle étape 2 — Date %>
+      <div class="bk-step">
+        <div class="step-num todo" data-booking-target="stepIndicator">2</div>
+        <div class="step-label">Date</div>
+      </div>
+      <div class="step-line"></div>
+
+      <%# Cercle étape 3 — Paiement %>
+      <div class="bk-step">
+        <div class="step-num todo" data-booking-target="stepIndicator">3</div>
+        <div class="step-label">Paiement</div>
+      </div>
+      <div class="step-line"></div>
+
+      <%# Cercle étape 4 — Confirmation %>
+      <div class="bk-step">
+        <div class="step-num todo" data-booking-target="stepIndicator">4</div>
+        <div class="step-label">Confirmation</div>
+      </div>
+
+    </div>
+
+    <%# ==============================================================
+        ÉTAPE 1 — CHOIX DE LA PRESTATION
+        data-booking-target="step" : visible/cachée par showStep() du JS
+    =============================================================== %>
+    <div class="sec bk-step-section" data-booking-target="step">
+      <p class="s-tag">Étape 1</p>
+      <h2 class="s-h2">Choisir votre soin</h2>
+
+      <%# Liste de toutes les prestations disponibles (chargées par le controller Rails) %>
+      <div class="presta-select">
+        <% @prestations.each do |prestation| %>
+          <%#
+            Chaque option passe ses données en data-attributes pour que le JS puisse
+            les lire sans faire d'appel serveur. Lus par doSelectPrestation() :
+            - data-prestation-id   → stocké dans selectedPrestationId
+            - data-prestation-nom  → stocké dans selectedPrestationNom (pour le récap)
+            - data-prestation-prix → stocké dans selectedPrestationPrix (pour le récap)
+            - data-prestation-duree→ stocké dans selectedPrestationDuree (pour heure de fin)
+          %>
+          <div class="presta-option"
+               data-booking-target="prestationOption"
+               data-action="click->booking#selectPrestation"
+               data-prestation-id="<%= prestation.id %>"
+               data-prestation-nom="<%= prestation.nom %>"
+               data-prestation-prix="<%= prestation.prix_euros %>"
+               data-prestation-duree="<%= prestation.duree_minutes %>">
+
+            <div class="presta-option-left">
+              <div class="presta-option-name"><%= prestation.nom %></div>
+              <%# Catégorie et durée sous le nom %>
+              <div class="presta-option-meta">
+                <%= prestation.categorie.capitalize %> · <%= prestation.duree_formatee %>
+              </div>
+            </div>
+
+            <%# Prix à droite, en euros entiers %>
+            <div class="presta-option-price">
+              <%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %>
+            </div>
+
+            <%# Cercle radio visuel — la classe "checked" est ajoutée par le JS %>
+            <div class="radio-circle"></div>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Input caché — valeur mise à jour par doSelectPrestation() %>
+      <%= f.hidden_field :prestation_id, data: { booking_target: "prestationId" } %>
+
+      <%# Bouton Suivant — déclenche nextStep() qui valide que selectedPrestationId est renseigné %>
+      <div class="bk-nav-row bk-nav-row--right">
+        <button class="btn-bk-next" data-action="click->booking#nextStep">
+          Suivant — Choisir une date
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 7 L11 7 M7 3 L11 7 L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <%# ==============================================================
+        ÉTAPE 2 — CALENDRIER ET CRÉNEAUX
+        Cachée au départ (style="display:none"), révélée par showStep(1)
+    =============================================================== %>
+    <div class="sec sec-cream bk-step-section" data-booking-target="step" style="display:none">
+      <p class="s-tag">Étape 2</p>
+      <h2 class="s-h2">Choisir une date</h2>
+
+      <%# --- Calendrier généré dynamiquement par renderCalendar() --- %>
+      <div class="calendar">
+
+        <%# Navigation mois précédent / suivant %>
+        <div class="cal-nav">
+          <button class="cal-arrow" data-action="click->booking#prevMonth">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 3 L5 7 L9 11" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <%# Libellé du mois ("Avril 2026") — mis à jour par renderCalendar() %>
+          <div class="cal-month" data-booking-target="calMonth">Chargement...</div>
+
+          <button class="cal-arrow" data-action="click->booking#nextMonth">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3 L9 7 L5 11" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <%# En-têtes des colonnes (Lundi → Dimanche, format français) %>
+        <div class="cal-days-header">
+          <div class="cal-day-name">L</div>
+          <div class="cal-day-name">M</div>
+          <div class="cal-day-name">M</div>
+          <div class="cal-day-name">J</div>
+          <div class="cal-day-name">V</div>
+          <div class="cal-day-name">S</div>
+          <div class="cal-day-name">D</div>
+        </div>
+
+        <%# Grille des jours — innerHTML rempli par renderCalendar() %>
+        <div class="cal-days" data-booking-target="calDays"></div>
+      </div>
+
+      <%# Input caché pour la date sélectionnée — rempli par selectDate() %>
+      <%= f.hidden_field :date, data: { booking_target: "dateInput" } %>
+
+      <%# Label au-dessus des créneaux — mis à jour par loadCreneaux() %>
+      <div class="slots-label" data-booking-target="dateLabel">
+        Choisissez une date dans le calendrier
+      </div>
+
+      <%# Grille des créneaux — innerHTML rempli par renderCreneaux() après l'appel AJAX %>
+      <div class="slots-grid" data-booking-target="slotsGrid"></div>
+
+      <%# Input caché pour l'heure sélectionnée (ex: "10h30") — rempli par selectSlot() %>
+      <%= f.hidden_field :heure, data: { booking_target: "heureInput" } %>
+
+      <%# Boutons navigation %>
+      <div class="bk-nav-row">
+        <button class="btn-bk-prev" data-action="click->booking#prevStep">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M11 7 L3 7 M7 11 L3 7 L7 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Retour
+        </button>
+        <button class="btn-bk-next" data-action="click->booking#nextStep">
+          Suivant — Garantie
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 7 L11 7 M7 3 L11 7 L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <%# ==============================================================
+        ÉTAPE 3 — MODE DE GARANTIE
+    =============================================================== %>
+    <div class="sec bk-step-section" data-booking-target="step" style="display:none">
+      <p class="s-tag">Étape 3</p>
+      <h2 class="s-h2">Mode de garantie</h2>
+
+      <%# Deux options de garantie — cliquables, gérées par selectPayment() %>
+      <div class="payment-opts">
+
+        <%# Option 1 : acompte 30% prélevé immédiatement via Stripe %>
+        <div class="payment-opt"
+             data-booking-target="paymentOpt"
+             data-action="click->booking#selectPayment"
+             data-payment="acompte">
+          <div class="payment-opt-title">Acompte</div>
+          <div class="payment-opt-sub">30% prélevé à la réservation, déduit du total</div>
+        </div>
+
+        <%# Option 2 : empreinte CB — pas de prélèvement sauf annulation tardive %>
+        <div class="payment-opt"
+             data-booking-target="paymentOpt"
+             data-action="click->booking#selectPayment"
+             data-payment="empreinte">
+          <div class="payment-opt-title">Empreinte</div>
+          <div class="payment-opt-sub">Carte enregistrée, prélevée en cas d'annulation tardive</div>
+        </div>
+
+      </div>
+
+      <%# Input caché pour le mode de paiement ("acompte" ou "empreinte") %>
+      <%= f.hidden_field :mode_paiement, data: { booking_target: "paymentInput" } %>
+
+      <%# Conditions de réservation — informatives uniquement %>
+      <div class="conditions-box">
+        <div class="conditions-title">Conditions à lire avant de confirmer</div>
+        <div class="condition-item">
+          <div class="cond-dot"></div>
+          <div>Annulation gratuite jusqu'à 48h avant le rendez-vous.</div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-dot"></div>
+          <div>En cas d'annulation tardive (moins de 48h), l'acompte est conservé.</div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-dot"></div>
+          <div>Retard de plus de 15 min = rendez-vous annulé sans remboursement.</div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-dot"></div>
+          <div>Arriver sans mascara ni maquillage sur les yeux.</div>
+        </div>
+      </div>
+
+      <%# Boutons navigation %>
+      <div class="bk-nav-row">
+        <button class="btn-bk-prev" data-action="click->booking#prevStep">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M11 7 L3 7 M7 11 L3 7 L7 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Retour
+        </button>
+        <button class="btn-bk-next" data-action="click->booking#nextStep">
+          Suivant — Récapitulatif
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 7 L11 7 M7 3 L11 7 L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <%# ==============================================================
+        ÉTAPE 4 — RÉCAPITULATIF ET CONFIRMATION
+        updateRecap() remplit chaque span data-booking-target="recap..."
+        avec les données saisies aux étapes précédentes
+    =============================================================== %>
+    <div class="sec sec-nude bk-step-section" data-booking-target="step" style="display:none">
+      <p class="s-tag">Étape 4</p>
+      <h2 class="s-h2">Récapitulatif</h2>
+
+      <div class="recap-box">
+        <div class="recap-title">Votre réservation</div>
+
+        <%# Chaque valeur est remplie dynamiquement par updateRecap() %>
+        <div class="recap-row">
+          <div class="recap-row-label">Prestation</div>
+          <div class="recap-row-value" data-booking-target="recapPrestation">—</div>
+        </div>
+        <div class="recap-row">
+          <div class="recap-row-label">Date</div>
+          <div class="recap-row-value" data-booking-target="recapDate">—</div>
+        </div>
+        <div class="recap-row">
+          <div class="recap-row-label">Heure</div>
+          <%# Heure de fin = heure de début + durée de la prestation en minutes %>
+          <div class="recap-row-value">
+            <span data-booking-target="recapHeure">—</span>
+            &rarr;
+            <span data-booking-target="recapHeureFin">—</span>
+          </div>
+        </div>
+        <div class="recap-row">
+          <div class="recap-row-label">Lieu</div>
+          <div class="recap-row-value">Calao Studio, Bordeaux</div>
+        </div>
+        <div class="recap-row">
+          <div class="recap-row-label">Garantie</div>
+          <div class="recap-row-value" data-booking-target="recapGarantie">—</div>
+        </div>
+
+        <hr class="recap-divider">
+
+        <%# Prix total de la prestation %>
+        <div class="recap-row">
+          <div class="recap-row-label recap-total-label">Total</div>
+          <div class="recap-total" data-booking-target="recapPrix">—</div>
+        </div>
+
+        <%# Acompte dû : 30% du prix total, calculé par updateRecap() %>
+        <div class="recap-row">
+          <div class="recap-row-label">Acompte dû</div>
+          <div class="recap-row-value" data-booking-target="recapAcompte">—</div>
+        </div>
+      </div>
+
+      <%# Bouton Retour %>
+      <div style="margin-bottom: 14px;">
+        <button class="btn-bk-prev" data-action="click->booking#prevStep">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M11 7 L3 7 M7 11 L3 7 L7 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Retour
+        </button>
+      </div>
+
+      <%# Bouton de soumission — envoie le formulaire (POST /bookings) %>
+      <%= f.submit "Confirmer et payer l'acompte", class: "confirm-btn" %>
+
+      <p class="confirm-note">
+        Un email de confirmation + rappel 24h avant vous seront envoyés automatiquement.<br>
+        Paiement sécurisé via Stripe.
+      </p>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-links">
+        <%= link_to "FAQ", faq_path %>
+        <%= link_to "Avis", avis_path %>
+        <%= link_to "Shop", shop_path %>
+        <%= link_to "Contact", contact_path %>
+      </div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>
+
+<% end %>

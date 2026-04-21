@@ -1,0 +1,20 @@
+/*
+ * Point d'entrée CSS principal — référencé dans le layout via stylesheet_link_tag :app
+ * Avec Propshaft (Rails 8), ce fichier est servi statiquement.
+ * On utilise @import pour charger chaque feuille de style de page.
+ *
+ * Ordre important : application.css (variables + reset + composants globaux) en premier,
+ * puis les styles spécifiques à chaque page.
+ */
+
+/* Styles globaux : variables, reset, layout, nav, boutons, sections, footer */
+@import "application.css";
+
+/* Styles de la page d'accueil (hero, carrousel prestations, carte fidélité) */
+@import "home.css";
+
+/* Styles de la page Prestations & tarifs */
+@import "prestations.css";
+
+/* Styles du formulaire de réservation (4 étapes, calendrier, créneaux) */
+@import "bookings.css";

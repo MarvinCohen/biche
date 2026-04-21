@@ -1,0 +1,582 @@
+/* ============================================================
+   STYLES — Page Réservation (formulaire 4 étapes)
+   ============================================================ */
+
+/* ---- BARRE DE PROGRESSION (les 4 étapes en haut) ---- */
+
+/* Conteneur horizontal de la barre d'étapes */
+.steps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Chaque "étape" : cercle + label empilés verticalement */
+.bk-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+/* Cercle numéroté de chaque étape */
+.step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Étape terminée : fond foncé avec coche ✓ (appliqué par le JS) */
+.step-num.done {
+  background: var(--color-dark);
+  color: #fff;
+}
+
+/* Étape active : fond beige rosé */
+.step-num.active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* Étape future : fond neutre clair */
+.step-num.todo {
+  background: #f0e8dc;
+  color: #a09890;
+}
+
+/* Label sous le cercle */
+.step-label {
+  font-size: 9px;
+  color: #8e8480;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Label de l'étape active : plus visible */
+.step-label.active {
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+/* Petite ligne de connexion entre les cercles */
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+  max-width: 20px;
+}
+
+/* ---- SECTION D'ÉTAPE (affichée/cachée par le JS) ---- */
+
+/* Chaque section représente une étape du formulaire */
+.bk-step-section {
+  /* Pas de style spécifique ici — la visibilité est gérée par le JS via style.display */
+}
+
+/* ---- SÉLECTION DE PRESTATION (étape 1) ---- */
+
+/* Conteneur de la liste des prestations */
+.presta-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* Chaque option de prestation cliquable */
+.presta-option {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: #fff;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+/* Option sélectionnée : bordure foncée + fond légèrement teinté */
+.presta-option.selected {
+  border: 1.5px solid var(--color-dark);
+  background: #f6f4f1;
+}
+
+/* Côté gauche : nom + meta */
+.presta-option-left {
+  flex: 1;
+}
+
+/* Nom de la prestation en serif */
+.presta-option-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  margin-bottom: 2px;
+}
+
+/* Catégorie + durée sous le nom */
+.presta-option-meta {
+  font-size: 10px;
+  color: var(--color-muted);
+  letter-spacing: 0.5px;
+}
+
+/* Prix à droite en serif */
+.presta-option-price {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-dark);
+  text-align: right;
+  margin-right: 10px;
+}
+
+/* Cercle radio visuel (remplace le <input type="radio">) */
+.radio-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #d4c5b0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+
+/* Cercle coché : bordure foncée */
+.radio-circle.checked {
+  border-color: var(--color-dark);
+}
+
+/* Point intérieur du cercle coché — pseudo-élément CSS */
+.radio-circle.checked::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-dark);
+}
+
+/* ---- CALENDRIER (étape 2) ---- */
+
+/* Conteneur du calendrier avec marge sous les créneaux */
+.calendar {
+  margin-bottom: 20px;
+}
+
+/* Ligne de navigation : flèche gauche | mois | flèche droite */
+.cal-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Mois et année ("Avril 2026") en serif */
+.cal-month {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--color-dark);
+}
+
+/* Bouton flèche précédent/suivant */
+.cal-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #fff;
+  transition: background 0.2s;
+}
+
+.cal-arrow:hover {
+  background: var(--color-nude);
+}
+
+/* En-têtes des colonnes du calendrier (L M M J V S D) */
+.cal-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+/* Lettre de chaque jour de la semaine */
+.cal-day-name {
+  text-align: center;
+  font-size: 10px;
+  color: #a09890;
+  letter-spacing: 0.5px;
+  padding: 4px 0;
+  text-transform: uppercase;
+}
+
+/* Grille des jours du mois (générée dynamiquement par le JS) */
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+/* Chaque case de jour */
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--color-dark);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+}
+
+/* Jours du mois précédent/suivant — grisés */
+.cal-day.other {
+  color: #d4c5b0;
+  cursor: default;
+}
+
+/* Dimanche et jours passés — non cliquables */
+.cal-day.unavailable {
+  color: #d4c5b0;
+  cursor: not-allowed;
+}
+
+/* Survol des jours disponibles */
+.cal-day:not(.other):not(.unavailable):hover {
+  background: var(--color-nude);
+}
+
+/* Jour sélectionné : fond foncé */
+.cal-day.selected {
+  background: var(--color-dark);
+  color: #fff;
+}
+
+/* Jour d'aujourd'hui : bordure beige rose */
+.cal-day.today {
+  border: 1px solid var(--color-accent);
+}
+
+/* ---- CRÉNEAUX HORAIRES (étape 2) ---- */
+
+/* Label au-dessus de la grille de créneaux */
+.slots-label {
+  font-size: 12px;
+  color: #6e6560;
+  margin-bottom: 12px;
+  margin-top: 4px;
+}
+
+/* Grille des créneaux disponibles */
+.slots-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  min-height: 40px; /* Évite le saut de layout pendant le chargement AJAX */
+}
+
+/* Chaque créneau cliquable */
+.slot {
+  padding: 9px 16px;
+  border-radius: 30px;
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-dark);
+  cursor: pointer;
+  background: #fff;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+/* Créneau sélectionné */
+.slot.selected {
+  background: var(--color-dark);
+  color: #fff;
+  border-color: var(--color-dark);
+}
+
+/* Créneau déjà réservé (non cliquable) */
+.slot.taken {
+  color: #d4c5b0;
+  border-color: #f0e8dc;
+  cursor: not-allowed;
+  background: #faf8f5;
+}
+
+/* ---- MODE DE GARANTIE (étape 3) ---- */
+
+/* Grille 2 colonnes pour les deux options de paiement */
+.payment-opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Chaque option de paiement cliquable */
+.payment-opt {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  background: #fff;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+/* Option sélectionnée */
+.payment-opt.selected {
+  border: 1.5px solid var(--color-dark);
+  background: #f6f4f1;
+}
+
+/* Titre de l'option (ex: "Acompte") */
+.payment-opt-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+/* Description courte sous le titre */
+.payment-opt-sub {
+  font-size: 10px;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+/* ---- CONDITIONS DE RÉSERVATION (étape 3) ---- */
+
+/* Encadré des conditions */
+.conditions-box {
+  background: #f6f4f1;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+
+/* Titre "Conditions à lire" */
+.conditions-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-dark);
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Chaque ligne de condition */
+.condition-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: #6e6560;
+  line-height: 1.5;
+}
+
+.condition-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Petit point décoratif avant chaque condition */
+.cond-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+/* ---- RÉCAPITULATIF (étape 4) ---- */
+
+/* Boîte récap avec fond légèrement teinté */
+.recap-box {
+  background: var(--color-nude);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Titre "Votre réservation" en serif */
+.recap-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-dark);
+  margin-bottom: 14px;
+}
+
+/* Chaque ligne du récap : label | valeur */
+.recap-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+/* Label à gauche (grisé) */
+.recap-row-label {
+  color: var(--color-muted);
+}
+
+/* Valeur à droite */
+.recap-row-value {
+  color: var(--color-dark);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* Ligne de séparation avant le total */
+.recap-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 12px 0;
+}
+
+/* Label "TOTAL" en lettres capitales */
+.recap-total-label {
+  font-size: 11px;
+  color: var(--color-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Montant total en grand serif */
+.recap-total {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--color-dark);
+}
+
+/* ---- BOUTON DE CONFIRMATION (soumettre le formulaire) ---- */
+
+/* Grand bouton sombre qui occupe toute la largeur */
+.confirm-btn {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: 40px;
+  padding: 16px;
+  width: 100%;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  margin-bottom: 10px;
+  transition: opacity 0.2s;
+}
+
+.confirm-btn:hover {
+  opacity: 0.88;
+}
+
+/* Note informative sous le bouton (email + Stripe) */
+.confirm-note {
+  font-size: 10px;
+  color: var(--color-muted);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ---- NAVIGATION ENTRE ÉTAPES (boutons Suivant / Retour) ---- */
+
+/* Conteneur des boutons de navigation (Retour à gauche, Suivant à droite) */
+.bk-nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  gap: 12px;
+}
+
+/* Version avec seulement le bouton Suivant (étape 1) */
+.bk-nav-row--right {
+  justify-content: flex-end;
+}
+
+/* Bouton "Suivant" : fond foncé */
+.btn-bk-next {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 20px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+
+.btn-bk-next:hover {
+  opacity: 0.88;
+}
+
+/* Bouton "Retour" : transparent avec bordure */
+.btn-bk-prev {
+  background: transparent;
+  color: var(--color-dark);
+  border: 1px solid var(--color-border);
+  border-radius: 30px;
+  padding: 11px 18px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.btn-bk-prev:hover {
+  background: var(--color-nude);
+}
+
+/* ---- PAGE DE CONFIRMATION (show.html.erb) ---- */
+
+/* Icône de validation centrée */
+.confirm-check {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Actions après confirmation (espace cliente + retour accueil) */
+.bk-confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
