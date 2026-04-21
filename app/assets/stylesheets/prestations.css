@@ -1,0 +1,319 @@
+/* ============================================================
+   STYLES — Page Prestations
+   ============================================================ */
+
+/* HEADER DE PAGE */
+.page-header {
+  position: relative;
+  padding: 110px 24px 50px;
+  text-align: center;
+  background: var(--color-nude);
+  overflow: hidden;
+}
+
+/* Formes décoratives organiques en arrière-plan */
+.ph-blob {
+  position: absolute;
+  top: 80px; right: -40px;
+  width: 140px; height: 140px;
+  background: var(--color-accent);
+  border-radius: 62% 38% 54% 46% / 48% 52% 48% 52%;
+  opacity: 0.25;
+  z-index: 1;
+}
+
+.ph-blob-2 {
+  position: absolute;
+  bottom: -40px; left: -30px;
+  width: 110px; height: 110px;
+  background: #b09e7f;
+  border-radius: 50% 50% 45% 55% / 48% 52% 48% 52%;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.ph-tag {
+  position: relative;
+  z-index: 2;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.ph-title {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-serif);
+  font-size: 42px;
+  color: var(--color-dark);
+  line-height: 1.1;
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+
+.ph-intro {
+  position: relative;
+  z-index: 2;
+  font-size: 13px;
+  color: #6e6560;
+  line-height: 1.7;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* BADGE OPTION (couleurs, strass +10€) */
+.option-badge-block {
+  background: var(--color-cream);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.option-badge {
+  background: var(--color-dark);
+  color: #fff;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.option-text {
+  font-size: 13px;
+  color: #6e6560;
+  line-height: 1.5;
+}
+
+.option-text strong {
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+/* BARRE DE FILTRE CATÉGORIES */
+.cat-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 14px 20px;
+  margin: 0 -20px;
+  scrollbar-width: none;
+}
+
+.cat-bar::-webkit-scrollbar { display: none; }
+
+.cat-pill {
+  flex-shrink: 0;
+  padding: 9px 18px;
+  border-radius: 30px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: #7a6b5c;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.cat-pill.active,
+.cat-pill:hover {
+  background: var(--color-dark);
+  color: #fff;
+  border-color: var(--color-dark);
+}
+
+/* LISTE TARIFS (extensions, rehaussement, dépose) */
+.full-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.full-item {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.full-item-left { flex: 1; min-width: 0; }
+
+.full-item-name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  margin-bottom: 3px;
+}
+
+.full-item-desc {
+  font-size: 11px;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.full-item-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.full-item-price {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--color-dark);
+  margin-bottom: 8px;
+}
+
+.full-item-btn {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 10px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* TABLEAU RETOUCHES — comparatif 2 sem / 3 sem */
+.retouche-table {
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* En-tête du tableau : vide | 2 sem. | 3 sem. */
+.retouche-header {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px;
+  background: var(--color-dark);
+  padding: 12px 16px;
+}
+
+.retouche-header-label { }
+
+.retouche-header-col {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Ligne de retouche */
+.retouche-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--color-border);
+  background: #fff;
+  align-items: center;
+}
+
+.retouche-row:nth-child(even) {
+  background: var(--color-cream);
+}
+
+.retouche-row-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+}
+
+.retouche-row-price {
+  text-align: center;
+}
+
+/* Lien-prix cliquable (redirige vers la réservation) */
+.retouche-price-link {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.retouche-price-link:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* "X" pour les retouches non disponibles (ex: Manga 3 semaines) */
+.retouche-na {
+  font-size: 14px;
+  color: #d4c5b0;
+  font-weight: 500;
+}
+
+/* BLOC GUIDE MORPHOLOGIE */
+.info-block {
+  background: var(--color-cream);
+  border-radius: 24px;
+  padding: 26px 22px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+}
+
+.info-icon {
+  width: 50px; height: 50px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--color-nude);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--color-dark);
+  margin-bottom: 8px;
+}
+
+.info-text {
+  font-size: 12px;
+  color: #7a6b5c;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.info-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 10px 20px;
+  border: 1px solid var(--color-dark);
+  border-radius: 30px;
+}

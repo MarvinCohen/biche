@@ -1,2 +1,202 @@
-<h1>Prestations#index</h1>
-<p>Find me in app/views/prestations/index.html.erb</p>
+<% content_for :title, "Prestations & tarifs" %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <% if user_signed_in? %>
+          <%= link_to espace_cliente_root_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% end %>
+        <%= link_to "Réserver", new_booking_path, class: "btn-nav" %>
+        <div class="burger"><span></span><span></span><span></span></div>
+      </div>
+    </nav>
+
+    <%# ---- HEADER DE PAGE ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <div class="ph-blob-2"></div>
+      <p class="ph-tag">Prestations</p>
+      <h1 class="ph-title">Soins du<br>regard</h1>
+      <p class="ph-intro">Chaque prestation est pensée pour révéler votre regard, en respectant votre morphologie et vos envies.</p>
+    </div>
+
+    <%# ---- OFFRE — COULEURS & STRASS ---- %>
+    <div class="sec" style="padding-top: 32px; padding-bottom: 24px;">
+      <div class="option-badge-block">
+        <span class="option-badge">Option</span>
+        <p class="option-text">Couleurs, strass… <strong>+10€</strong> sur toute pose complète</p>
+      </div>
+    </div>
+
+    <%# ---- FILTRE PAR CATÉGORIE ---- %>
+    <div class="sec" style="padding-top: 0; padding-bottom: 0; background: #fff;">
+      <div class="cat-bar">
+        <%# Onglet "Toutes" — pas de filtre actif %>
+        <a href="<%= prestations_path %>" class="cat-pill <%= params[:categorie].blank? ? 'active' : '' %>">Toutes</a>
+        <a href="<%= prestations_path(categorie: 'extensions') %>" class="cat-pill <%= params[:categorie] == 'extensions' ? 'active' : '' %>">Extensions</a>
+        <a href="<%= prestations_path(categorie: 'retouche') %>" class="cat-pill <%= params[:categorie] == 'retouche' ? 'active' : '' %>">Retouches</a>
+        <a href="<%= prestations_path(categorie: 'rehaussement') %>" class="cat-pill <%= params[:categorie] == 'rehaussement' ? 'active' : '' %>">Rehaussement</a>
+        <a href="<%= prestations_path(categorie: 'depose') %>" class="cat-pill <%= params[:categorie] == 'depose' ? 'active' : '' %>">Dépose</a>
+      </div>
+    </div>
+
+    <%# ---- EXTENSIONS — POSES COMPLÈTES ---- %>
+    <% extensions = @prestations.select { |p| p.categorie == "extensions" } %>
+    <% if extensions.any? %>
+      <div class="sec">
+        <p class="s-tag">Poses complètes</p>
+        <h2 class="s-h2">Extensions de cils</h2>
+        <div class="full-list">
+          <% extensions.each do |prestation| %>
+            <div class="full-item">
+              <div class="full-item-left">
+                <div class="full-item-name"><%= prestation.nom %></div>
+                <div class="full-item-desc"><%= prestation.duree_formatee %></div>
+              </div>
+              <div class="full-item-right">
+                <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
+                <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# ---- RETOUCHES (2 ET 3 SEMAINES) ---- %>
+    <% retouches_2sem = @prestations.select { |p| p.categorie == "retouche" && p.nom.include?("2 semaines") } %>
+    <% retouches_3sem = @prestations.select { |p| p.categorie == "retouche" && p.nom.include?("3 semaines") } %>
+    <% if retouches_2sem.any? || retouches_3sem.any? %>
+      <div class="sec sec-cream">
+        <p class="s-tag">Remplissages & Dépose</p>
+        <h2 class="s-h2">Retouches</h2>
+
+        <%# Tableau comparatif 2 sem vs 3 sem, fidèle au tarif papier %>
+        <div class="retouche-table">
+          <div class="retouche-header">
+            <div class="retouche-header-label"></div>
+            <div class="retouche-header-col">2 sem.</div>
+            <div class="retouche-header-col">3 sem.</div>
+          </div>
+
+          <%# On itère sur les retouches 2 semaines pour construire les lignes %>
+          <% retouches_2sem.each do |r2| %>
+            <%# Nom de base = "Retouche Cil à cil" (sans le " — 2 semaines") %>
+            <% nom_base = r2.nom.gsub(" — 2 semaines", "") %>
+            <%# On cherche la retouche 3 semaines correspondante %>
+            <% r3 = retouches_3sem.find { |r| r.nom.start_with?(nom_base) } %>
+
+            <div class="retouche-row">
+              <div class="retouche-row-name"><%= nom_base.gsub("Retouche ", "") %></div>
+              <%# Prix 2 semaines — toujours présent %>
+              <div class="retouche-row-price">
+                <%= link_to number_to_currency(r2.prix_euros, unit: "€", format: "%n%u", precision: 0),
+                            new_booking_path(prestation_id: r2.id),
+                            class: "retouche-price-link" %>
+              </div>
+              <%# Prix 3 semaines — X si pas disponible (ex: Manga) %>
+              <div class="retouche-row-price">
+                <% if r3 %>
+                  <%= link_to number_to_currency(r3.prix_euros, unit: "€", format: "%n%u", precision: 0),
+                              new_booking_path(prestation_id: r3.id),
+                              class: "retouche-price-link" %>
+                <% else %>
+                  <span class="retouche-na">X</span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# ---- REHAUSSEMENT ---- %>
+    <% rehaussements = @prestations.select { |p| p.categorie == "rehaussement" } %>
+    <% if rehaussements.any? %>
+      <div class="sec">
+        <p class="s-tag">Sans extension</p>
+        <h2 class="s-h2">Rehaussement</h2>
+        <div class="full-list">
+          <% rehaussements.each do |prestation| %>
+            <div class="full-item">
+              <div class="full-item-left">
+                <div class="full-item-name"><%= prestation.nom %></div>
+                <div class="full-item-desc"><%= prestation.duree_formatee %></div>
+              </div>
+              <div class="full-item-right">
+                <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
+                <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# ---- DÉPOSE ---- %>
+    <% deposes = @prestations.select { |p| p.categorie == "depose" } %>
+    <% if deposes.any? %>
+      <div class="sec sec-nude">
+        <p class="s-tag">Retrait</p>
+        <h2 class="s-h2">Dépose</h2>
+        <div class="full-list">
+          <% deposes.each do |prestation| %>
+            <div class="full-item">
+              <div class="full-item-left">
+                <div class="full-item-name"><%= prestation.nom %></div>
+                <div class="full-item-desc"><%= prestation.description %></div>
+              </div>
+              <div class="full-item-right">
+                <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
+                <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# ---- BLOC MORPHOLOGIE ---- %>
+    <div class="sec sec-cream">
+      <div class="info-block">
+        <div class="info-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M3 12 C7 6 17 6 21 12 C17 18 7 18 3 12Z" stroke="#2e2926" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="3" fill="#2e2926"/>
+          </svg>
+        </div>
+        <div class="info-title">Quelle prestation pour vous ?</div>
+        <p class="info-text">Si vous hésitez, notre guide par morphologie vous oriente vers la pose idéale.</p>
+        <%= link_to morphologie_path, class: "info-link" do %>
+          Voir le guide
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+            <path d="M3 7 L11 7 M7 3 L11 7 L7 11" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        <% end %>
+      </div>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-links">
+        <%= link_to "FAQ", faq_path %>
+        <%= link_to "Avis", avis_path %>
+        <%= link_to "Shop", shop_path %>
+        <%= link_to "Contact", contact_path %>
+      </div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

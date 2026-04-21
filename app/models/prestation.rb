@@ -14,8 +14,12 @@ class Prestation < ApplicationRecord
   validates :duree_minutes, presence: true, numericality: { greater_than: 0 }
   validates :categorie,     presence: true
 
-  # Valeurs acceptées pour la catégorie (correspond aux onglets du filtre dans les maquettes)
-  CATEGORIES = %w[extensions rehaussement retouche sourcils].freeze
+  # Valeurs acceptées pour la catégorie
+  # extensions   → poses complètes (cil à cil, volume, manga...)
+  # retouche     → remplissages 2 ou 3 semaines
+  # rehaussement → rehaussement seul ou avec teinture
+  # depose       → dépose simple ou extérieure
+  CATEGORIES = %w[extensions retouche rehaussement depose].freeze
   validates :categorie, inclusion: { in: CATEGORIES }
 
   # ============================================================
