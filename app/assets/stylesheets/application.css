@@ -352,3 +352,146 @@ body {
   margin-top: 14px;
   align-items: center;
 }
+
+/* ============================================================
+   FORMULAIRES D'AUTHENTIFICATION — Inscription & Connexion (Devise)
+   ============================================================ */
+
+/* Champ de formulaire : label + input empilés verticalement */
+.auth-field {
+  margin-bottom: 16px;
+}
+
+/* Label au-dessus de chaque input */
+.auth-label {
+  display: block;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+/* Input texte stylisé aux couleurs de Biche. */
+.auth-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--color-dark);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+/* Focus : bordure plus visible */
+.auth-input:focus {
+  border-color: var(--color-accent);
+}
+
+/* Indice de longueur minimale du mot de passe */
+.auth-hint {
+  display: block;
+  font-size: 10px;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+/* Deux colonnes côte à côte (prénom + nom) */
+.auth-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Bouton de soumission pleine largeur */
+.auth-submit {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+}
+
+/* Bloc "Se souvenir de moi" */
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Checkbox natif — on garde le style du navigateur pour la lisibilité */
+.auth-checkbox {
+  accent-color: var(--color-dark);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Label "Se souvenir de moi" */
+.auth-remember-label {
+  font-size: 12px;
+  color: #6e6560;
+  cursor: pointer;
+}
+
+/* Liens secondaires (mot de passe oublié, créer un compte) */
+.auth-links {
+  margin-top: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Style des liens d'auth */
+.auth-link {
+  color: var(--color-dark);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Texte entourant les liens ("Déjà un compte ?") */
+.auth-links p {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+/* Erreurs de validation Devise */
+#error_explanation {
+  background: #fdf2f2;
+  border: 1px solid #f0c0c0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+#error_explanation h2 {
+  font-size: 12px;
+  font-weight: 500;
+  color: #c47a7a;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#error_explanation ul {
+  list-style: none;
+  padding: 0;
+}
+
+#error_explanation ul li {
+  font-size: 12px;
+  color: #c47a7a;
+  padding: 2px 0;
+}
+
+#error_explanation ul li::before {
+  content: "· ";
+}

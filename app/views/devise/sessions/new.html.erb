@@ -1,26 +1,77 @@
-<h2>Log in</h2>
+<%#
+  ============================================================
+  VUE — Connexion (Devise sessions#new)
+  Champs : email + mot de passe
+  ============================================================
+%>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
-  </div>
+<div class="wrap">
+  <div class="phone">
 
-  <div class="field">
-    <p><%= f.label :password %></p>
-    <p><%= f.password_field :password, autocomplete: "current-password" %></p>
-  </div>
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+    </nav>
 
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <p><%= f.check_box :remember_me %></p>
-      <p><%= f.label :remember_me %></p>
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Espace cliente</p>
+      <h1 class="ph-title">Bon retour<br>parmi nous</h1>
+      <p class="ph-intro">Connectez-vous pour gérer vos rendez-vous et suivre votre programme fidélité.</p>
     </div>
-  <% end %>
 
-  <div class="actions">
-    <%= f.submit "Log in" %>
+    <%# ---- FORMULAIRE DE CONNEXION ---- %>
+    <div class="sec">
+
+      <%# form_for : génère le formulaire vers l'URL de connexion Devise %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+
+        <%# --- Email --- %>
+        <div class="auth-field">
+          <%= f.label :email, "Adresse email", class: "auth-label" %>
+          <%= f.email_field :email,
+                            autofocus: true,
+                            autocomplete: "email",
+                            placeholder: "marie@example.com",
+                            class: "auth-input" %>
+        </div>
+
+        <%# --- Mot de passe --- %>
+        <div class="auth-field">
+          <%= f.label :password, "Mot de passe", class: "auth-label" %>
+          <%= f.password_field :password,
+                               autocomplete: "current-password",
+                               placeholder: "••••••••",
+                               class: "auth-input" %>
+        </div>
+
+        <%# --- Se souvenir de moi (si le module rememberable est actif) --- %>
+        <% if devise_mapping.rememberable? %>
+          <div class="auth-remember">
+            <%= f.check_box :remember_me, class: "auth-checkbox" %>
+            <%= f.label :remember_me, "Se souvenir de moi", class: "auth-remember-label" %>
+          </div>
+        <% end %>
+
+        <%# --- Bouton de connexion --- %>
+        <%= f.submit "Se connecter", class: "btn-primary auth-submit" %>
+
+      <% end %>
+
+      <%# Liens secondaires : mot de passe oublié + créer un compte %>
+      <div class="auth-links">
+        <%= link_to "Mot de passe oublié ?", new_user_password_path, class: "auth-link" %>
+        <p>Pas encore de compte ? <%= link_to "S'inscrire", new_user_registration_path, class: "auth-link" %></p>
+      </div>
+
+    </div>
+
+    <%# ---- FOOTER MINIMALISTE ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
   </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
