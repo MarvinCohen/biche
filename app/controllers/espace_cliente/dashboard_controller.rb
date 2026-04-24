@@ -1,24 +1,30 @@
 module EspaceCliente
   # ============================================================
   # Tableau de bord — page principale de l'espace cliente
-  # Affiche : stats fidélité, prochain RDV, historique récent
+  # Charge TOUTES les données pour les 5 onglets de la vue :
+  # Fidélité / Mes RDV / Historique / Messages / Profil
+  # La carte fidélité (@fidelite_card) est chargée par BaseController
   # ============================================================
   class DashboardController < BaseController
-    # GET /espace-cliente — vue d'ensemble du compte
+
+    # GET /espace-cliente
     def index
-      # Prochain rendez-vous confirmé à venir
+      # ---- Onglet "Mes RDV" : prochain rendez-vous confirmé ----
       @prochain_rdv = current_user.prochain_rdv
 
-      # Les 3 derniers soins passés pour l'historique rapide
-      @historique_recent = current_user.bookings
-                                       .where(statut: 'termine')
-                                       .where('date < ?', Date.today)
-                                       .order(date: :desc)
-                                       .limit(3)
-                                       .includes(:prestation, :soin_historique)
+      # ---- Onglet "Historique" : tous les soins terminés, du plus récent ----
+      # includes évite les N+1 queries (prestation + note de Syam chargées en 1 requête)
+      @historique = current_user.bookings
+                                .where(statut: 'termine')
+                                .order(date: :desc)
+                                .includes(:prestation, :soin_historique)
 
-      # Messages non lus (badge de notification dans la nav)
+      # ---- Onglet "Messages" : tous les messages de la cliente ----
+      @messages = current_user.messages.recents
+
+      # ---- Badge de notifications : nombre de messages non lus ----
       @messages_non_lus_count = current_user.messages.non_lus.count
     end
+
   end
 end

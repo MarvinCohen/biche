@@ -1,0 +1,468 @@
+<% content_for :title, "Mon espace" %>
+
+<%#
+  ============================================================
+  VUE — Espace cliente (dashboard unique avec 5 onglets JS)
+  Onglets : Fidélité / Mes RDV / Historique / Messages / Profil
+  Données chargées par EspaceCliente::DashboardController#index
+  @fidelite_card chargé par BaseController (set_fidelite_card)
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%# Bouton de déconnexion Devise (méthode DELETE sur la session) %>
+        <%= link_to "Déconnexion",
+                    destroy_user_session_path,
+                    data: { turbo_method: :delete },
+                    class: "logout-btn" %>
+        <div class="burger"><span></span><span></span><span></span></div>
+      </div>
+    </nav>
+
+    <%# ---- HERO PROFIL — avatar + nom + stats rapides ---- %>
+    <div class="profile-hero">
+      <%# Cercle avec l'initiale du prénom de la cliente %>
+      <div class="avatar"><%= current_user.initiale %></div>
+
+      <div class="profile-name"><%= current_user.full_name %></div>
+      <div class="profile-since">
+        Cliente depuis <%= I18n.l(current_user.created_at.to_date, format: "%B %Y") %>
+      </div>
+
+      <%# Stats résumées : visites totales / points actifs / prochain RDV %>
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <span class="profile-stat-num"><%= @fidelite_card.visites %></span>
+          <span class="profile-stat-label">Visites</span>
+        </div>
+        <div class="profile-stat">
+          <span class="profile-stat-num"><%= @fidelite_card.points_cycle_actuel %></span>
+          <span class="profile-stat-label">Points</span>
+        </div>
+        <div class="profile-stat">
+          <%# Affiche "1" si un RDV est à venir, "0" sinon %>
+          <span class="profile-stat-num"><%= @prochain_rdv ? 1 : 0 %></span>
+          <span class="profile-stat-label">Prochain RDV</span>
+        </div>
+      </div>
+    </div>
+
+    <%# ---- BARRE DE NAVIGATION INTERNE — 5 onglets scrollables ---- %>
+    <div class="client-nav">
+      <div class="client-nav-inner">
+        <%# Chaque bouton affiche un onglet via showTab() défini en bas de page %>
+        <button class="client-nav-item active" onclick="showTab('fidelite', this)">Fidélité</button>
+        <button class="client-nav-item" onclick="showTab('rdv', this)">Mes RDV</button>
+        <button class="client-nav-item" onclick="showTab('historique', this)">Historique</button>
+        <%# Badge rouge si messages non lus %>
+        <button class="client-nav-item" onclick="showTab('messages', this)">
+          Messages
+          <% if @messages_non_lus_count > 0 %>
+            <span class="nl-count-badge"><%= @messages_non_lus_count %></span>
+          <% end %>
+        </button>
+        <button class="client-nav-item" onclick="showTab('profil', this)">Mon profil</button>
+      </div>
+    </div>
+
+    <%# ================================================================
+        ONGLET 1 — FIDÉLITÉ
+        Carte de fidélité + statistiques du programme
+    ================================================================= %>
+    <div id="tab-fidelite">
+      <div class="sec">
+        <p class="s-tag">Programme</p>
+        <h2 class="s-h2">Carte fidélité</h2>
+
+        <%# Carte visuelle style "carte de fidélité" %>
+        <div class="fidelite-card">
+          <div class="fid-top">
+            <div class="fid-logo">Biche.</div>
+            <div>
+              <div class="fid-prog-label">Progression</div>
+              <%# X / 10 — points dans le cycle actuel %>
+              <div class="fid-prog-num">
+                <%= @fidelite_card.points_cycle_actuel %> / <%= FideliteCard::VISITES_POUR_RECOMPENSE %>
+              </div>
+            </div>
+          </div>
+
+          <%# 10 points représentés par des cercles (remplis = visites validées) %>
+          <div class="fid-dots">
+            <% FideliteCard::VISITES_POUR_RECOMPENSE.times do |i| %>
+              <% if i == FideliteCard::VISITES_POUR_RECOMPENSE - 1 %>
+                <%# Dernier cercle = étoile (récompense) %>
+                <div class="fid-dot star">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="rgba(255,255,255,0.4)">
+                    <path d="M5 1l1.2 2.5 2.8.4-2 2 .5 2.8L5 7.4 2.5 8.7l.5-2.8-2-2 2.8-.4z"/>
+                  </svg>
+                </div>
+              <% elsif i < @fidelite_card.points_cycle_actuel %>
+                <%# Cercle rempli = visite déjà faite %>
+                <div class="fid-dot filled">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5 L4 7 L8 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              <% else %>
+                <%# Cercle vide = visite à venir %>
+                <div class="fid-dot"></div>
+              <% end %>
+            <% end %>
+          </div>
+
+          <%# Barre de progression (largeur dynamique en %) %>
+          <div class="fid-progress-bar">
+            <div class="fid-progress-fill" style="width: <%= @fidelite_card.progression_pourcent %>%"></div>
+          </div>
+
+          <div class="fid-bottom">
+            <div class="fid-next">
+              Encore <b><%= @fidelite_card.points_restants %> visites</b> pour une pose offerte
+            </div>
+          </div>
+        </div>
+
+        <%# Statistiques en grille 2×2 %>
+        <div class="fid-stats">
+          <div class="fid-stat-card">
+            <span class="fid-stat-num"><%= @fidelite_card.visites %></span>
+            <div class="fid-stat-label">Visites totales</div>
+          </div>
+          <div class="fid-stat-card">
+            <span class="fid-stat-num"><%= @fidelite_card.points_cycle_actuel %></span>
+            <div class="fid-stat-label">Points actifs</div>
+          </div>
+          <div class="fid-stat-card">
+            <span class="fid-stat-num"><%= @fidelite_card.recompenses_utilisees %></span>
+            <div class="fid-stat-label">Récompenses utilisées</div>
+          </div>
+          <div class="fid-stat-card">
+            <span class="fid-stat-num"><%= @fidelite_card.points_restants %></span>
+            <div class="fid-stat-label">Points restants</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# ================================================================
+        ONGLET 2 — MES RDV
+        Prochain rendez-vous + bouton pour en réserver un nouveau
+    ================================================================= %>
+    <div id="tab-rdv" style="display:none">
+
+      <div class="sec">
+        <p class="s-tag">À venir</p>
+        <h2 class="s-h2">Prochain rendez-vous</h2>
+
+        <% if @prochain_rdv %>
+          <%# Carte du prochain RDV %>
+          <div class="rdv-card">
+            <%# Bloc date (jour + mois abrégé) %>
+            <div class="rdv-date">
+              <div class="rdv-day"><%= @prochain_rdv.date.day %></div>
+              <div class="rdv-month"><%= I18n.l(@prochain_rdv.date, format: "%b") %></div>
+            </div>
+            <div class="rdv-info">
+              <div class="rdv-name"><%= @prochain_rdv.prestation.nom %></div>
+              <div class="rdv-time">
+                <%# Jour de la semaine + heure début → fin %>
+                <%= I18n.l(@prochain_rdv.date, format: "%A").capitalize %> ·
+                <%= @prochain_rdv.heure.strftime('%Hh%M') %>
+                <% if @prochain_rdv.heure_fin %>
+                  → <%= @prochain_rdv.heure_fin.strftime('%Hh%M') %>
+                <% end %>
+              </div>
+              <div class="rdv-tags">
+                <span class="rdv-tag">Calao Studio</span>
+                <span class="rdv-tag"><%= @prochain_rdv.prestation.duree_formatee %></span>
+                <span class="rdv-tag">Confirmé</span>
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:12px;color:var(--color-muted);text-align:center;margin:12px 0;letter-spacing:0.5px">
+            Rappel automatique envoyé 24h avant
+          </p>
+
+          <%# Bouton annulation %>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <%= link_to "Annuler",
+                        booking_path(@prochain_rdv),
+                        data: { turbo_method: :delete, turbo_confirm: "Annuler ce rendez-vous ?" },
+                        class: "btn-rdv-cancel" %>
+          </div>
+
+        <% else %>
+          <%# Aucun RDV à venir : invitation à réserver %>
+          <div class="rdv-empty">
+            <p class="rdv-empty-text">Vous n'avez pas de rendez-vous à venir pour le moment.</p>
+            <%= link_to "Réserver un soin →", new_booking_path, class: "btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="sec" style="background: var(--color-nude);">
+        <p class="s-tag">Nouveau</p>
+        <h2 class="s-h2">Prendre rendez-vous</h2>
+        <div class="rdv-empty">
+          <p class="rdv-empty-text">Vous avez besoin d'une retouche ? Réservez votre prochain créneau directement en ligne.</p>
+          <%= link_to "Réserver un soin →", new_booking_path, class: "btn-primary" %>
+        </div>
+      </div>
+
+    </div>
+
+    <%# ================================================================
+        ONGLET 3 — HISTORIQUE DES SOINS
+        Liste accordéon de tous les soins terminés avec note de Syam
+    ================================================================= %>
+    <div id="tab-historique" style="display:none">
+      <div class="sec">
+        <p class="s-tag">Suivi</p>
+        <h2 class="s-h2">Historique des soins</h2>
+
+        <% if @historique.any? %>
+          <div class="history-list">
+            <% @historique.each do |booking| %>
+              <%# Carte accordéon — cliquer sur le header ouvre les détails %>
+              <div class="history-card">
+                <div class="history-header" onclick="toggleHistory(this)">
+                  <div class="history-left">
+                    <div class="history-name"><%= booking.prestation.nom %></div>
+                    <div class="history-date">
+                      <%= I18n.l(booking.date, format: "%d %B %Y") %> ·
+                      <%= booking.prestation.categorie.capitalize %>
+                    </div>
+                  </div>
+                  <div class="history-right">
+                    <div class="history-price">
+                      <%= number_to_currency(booking.prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %>
+                    </div>
+                    <%# Flèche qui pivote à 180° quand la carte est ouverte %>
+                    <div class="history-toggle">
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <%# Détails cachés — visibles si la carte a la classe "open" %>
+                <div class="history-details">
+                  <% if booking.soin_historique %>
+                    <%# Grille 2×2 des paramètres techniques du soin %>
+                    <div class="detail-grid">
+                      <% if booking.soin_historique.courbure.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Courbure</div>
+                          <div class="detail-value"><%= booking.soin_historique.courbure %></div>
+                        </div>
+                      <% end %>
+                      <% if booking.soin_historique.longueur.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Longueur</div>
+                          <div class="detail-value"><%= booking.soin_historique.longueur %></div>
+                        </div>
+                      <% end %>
+                      <% if booking.soin_historique.epaisseur.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Épaisseur</div>
+                          <div class="detail-value"><%= booking.soin_historique.epaisseur %></div>
+                        </div>
+                      <% end %>
+                      <% if booking.soin_historique.technique.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Technique</div>
+                          <div class="detail-value"><%= booking.soin_historique.technique %></div>
+                        </div>
+                      <% end %>
+                    </div>
+
+                    <%# Note textuelle de Syam %>
+                    <% if booking.soin_historique.notes.present? %>
+                      <div class="detail-note">
+                        <div class="detail-note-label">Note de Syam</div>
+                        <div class="detail-note-text"><%= booking.soin_historique.notes %></div>
+                      </div>
+                    <% end %>
+                  <% end %>
+
+                  <%# Bouton pour réserver le même soin %>
+                  <%= link_to "Reprendre cette pose →",
+                              new_booking_path(prestation_id: booking.prestation_id),
+                              class: "history-rdv-btn" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <%# Aucun soin terminé pour l'instant %>
+          <div class="rdv-empty">
+            <p class="rdv-empty-text">Votre historique apparaîtra ici après votre premier rendez-vous.</p>
+            <%= link_to "Réserver un soin →", new_booking_path, class: "btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# ================================================================
+        ONGLET 4 — MESSAGES
+        Newsletters, offres, rappels RDV, message d'anniversaire
+    ================================================================= %>
+    <div id="tab-messages" style="display:none">
+      <div class="sec">
+        <p class="s-tag">Communications</p>
+        <h2 class="s-h2">Mes messages</h2>
+
+        <% if @messages.any? %>
+          <div class="newsletter-list">
+            <% @messages.each do |message| %>
+              <%# Classe CSS de l'icône selon le type de message %>
+              <% icon_class = case message.type_message
+                              when "anniversaire" then "nl-icon-birthday"
+                              when "promo"        then "nl-icon-promo"
+                              when "rappel_rdv"   then "nl-icon-promo"
+                              else "nl-icon-news"
+                              end %>
+
+              <div class="newsletter-item">
+                <%# Icône ronde colorée selon le type %>
+                <div class="nl-icon <%= icon_class %>">
+                  <% if message.type_message == "anniversaire" %>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M3 10 L15 10 L14 16 L4 16 Z" stroke="#2e2926" stroke-width="1.2"/>
+                      <path d="M9 10 L9 16" stroke="#2e2926" stroke-width="1"/>
+                      <path d="M6 10 C6 8 7 6 9 6 C11 6 12 8 12 10" stroke="#2e2926" stroke-width="1.2"/>
+                      <circle cx="9" cy="3.5" r="1" fill="#2e2926"/>
+                    </svg>
+                  <% else %>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <rect x="3" y="4" width="12" height="10" rx="2" stroke="rgba(255,255,255,0.8)" stroke-width="1.2"/>
+                      <path d="M6 8 L12 8 M6 11 L10 11" stroke="rgba(255,255,255,0.8)" stroke-width="1" stroke-linecap="round"/>
+                    </svg>
+                  <% end %>
+                </div>
+
+                <div class="nl-content">
+                  <div class="nl-title"><%= message.titre %></div>
+                  <div class="nl-date"><%= I18n.l(message.created_at.to_date, format: "%d %B %Y") %></div>
+                </div>
+
+                <%# Badge "Nouveau" si non lu, "Lu" si déjà ouvert %>
+                <span class="nl-badge <%= message.lu ? 'read' : '' %>">
+                  <%= message.lu ? "Lu" : "Nouveau" %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p style="font-size:13px;color:var(--color-muted);text-align:center;padding:24px 0;">
+            Aucun message pour le moment.
+          </p>
+        <% end %>
+      </div>
+    </div>
+
+    <%# ================================================================
+        ONGLET 5 — MON PROFIL
+        Informations personnelles + lien vers modification Devise
+    ================================================================= %>
+    <div id="tab-profil" style="display:none">
+
+      <div class="sec">
+        <p class="s-tag">Compte</p>
+        <h2 class="s-h2">Mon profil</h2>
+
+        <div class="settings-list">
+          <div class="setting-row">
+            <div class="setting-label">Prénom</div>
+            <div class="setting-value"><%= current_user.first_name %></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Nom</div>
+            <div class="setting-value"><%= current_user.last_name %></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Email</div>
+            <div class="setting-value"><%= current_user.email %></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Téléphone</div>
+            <div class="setting-value"><%= current_user.phone.presence || "—" %></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Date de naissance</div>
+            <div class="setting-value">
+              <% if current_user.birth_date %>
+                <%= I18n.l(current_user.birth_date, format: "%d %B") %>
+              <% else %>
+                —
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <%# Lien vers la page de modification Devise (email + mot de passe) %>
+        <%= link_to "Modifier mes informations", edit_user_registration_path, class: "btn-ghost", style: "display:block;text-align:center;margin-top:20px" %>
+      </div>
+
+      <%# Déconnexion %>
+      <div class="sec" style="text-align:center;background:var(--color-nude);">
+        <%= link_to "Se déconnecter",
+                    destroy_user_session_path,
+                    data: { turbo_method: :delete },
+                    class: "btn-ghost",
+                    style: "color: #c47a7a; border-color: #f0e0e0;" %>
+      </div>
+
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-links">
+        <%= link_to "FAQ", faq_path %>
+        <%= link_to "Avis", avis_path %>
+        <%= link_to "Shop", shop_path %>
+        <%= link_to "Contact", contact_path %>
+      </div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>
+
+<%# ============================================================
+    JavaScript inline — gestion des onglets et accordéon historique
+    Simple et sans dépendance, correspond au comportement du mockup
+============================================================= %>
+<script>
+  // Affiche l'onglet sélectionné et cache tous les autres
+  function showTab(tab, btn) {
+    // Liste de tous les ids d'onglets
+    var tabs = ['fidelite', 'rdv', 'historique', 'messages', 'profil'];
+    tabs.forEach(function(t) {
+      var el = document.getElementById('tab-' + t);
+      if (el) el.style.display = (t === tab) ? 'block' : 'none';
+    });
+    // Met à jour la classe "active" sur le bouton de nav
+    document.querySelectorAll('.client-nav-item').forEach(function(b) {
+      b.classList.remove('active');
+    });
+    btn.classList.add('active');
+  }
+
+  // Ouvre/ferme une carte d'historique au clic sur son header
+  function toggleHistory(header) {
+    var card = header.parentElement;
+    card.classList.toggle('open');
+  }
+</script>

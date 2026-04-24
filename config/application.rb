@@ -38,5 +38,9 @@ module Biche
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Locale par défaut : français
+    # Permet d'utiliser I18n.l(date) pour avoir "24 avril 2026" au lieu de "April 24, 2026"
+    config.i18n.default_locale = :fr
   end
 end

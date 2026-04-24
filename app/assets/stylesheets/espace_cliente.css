@@ -1,0 +1,708 @@
+/* ============================================================
+   STYLES — Espace cliente (dashboard, onglets, fidélité, historique)
+   ============================================================ */
+
+/* ---- BOUTON DE DÉCONNEXION (dans la nav) ---- */
+.logout-btn {
+  background: transparent;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 30px;
+  padding: 7px 14px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: var(--color-nude);
+}
+
+/* ---- HERO PROFIL — bloc sombre en haut ---- */
+.profile-hero {
+  background: var(--color-dark);
+  padding: 36px 24px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Cercles décoratifs en arrière-plan */
+.profile-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(184, 168, 152, 0.08);
+}
+
+.profile-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; left: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(184, 168, 152, 0.06);
+}
+
+/* Cercle avatar avec initiale du prénom */
+.avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), #8e8882);
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 28px;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+}
+
+/* Nom complet de la cliente */
+.profile-name {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: #fff;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+/* "Cliente depuis mars 2025" */
+.profile-since {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ligne de stats (Visites / Points / Prochain RDV) */
+.profile-stats {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Chaque stat : séparation par bordure droite */
+.profile-stat {
+  flex: 1;
+  text-align: center;
+  padding: 14px 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-stat:last-child {
+  border-right: none;
+}
+
+/* Nombre en grand serif doré */
+.profile-stat-num {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--color-accent);
+  display: block;
+  margin-bottom: 3px;
+}
+
+/* Label en petites capitales claires */
+.profile-stat-label {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ---- NAVIGATION INTERNE — onglets scrollables horizontalement ---- */
+.client-nav {
+  background: #fff;
+  border-bottom: 1px solid #e4ddd6;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.client-nav-inner {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.client-nav-inner::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Chaque onglet de navigation */
+.client-nav-item {
+  flex-shrink: 0;
+  padding: 13px 16px;
+  font-size: 11px;
+  color: var(--color-muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: color 0.2s, border-color 0.2s;
+  font-family: var(--font-sans);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  position: relative;
+}
+
+/* Onglet actif */
+.client-nav-item.active {
+  color: var(--color-dark);
+  border-bottom-color: var(--color-dark);
+}
+
+/* Badge de nombre de messages non lus */
+.nl-count-badge {
+  background: #c47a7a;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 9px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+/* ---- CARTE FIDÉLITÉ ---- */
+
+/* Carte sombre avec dégradé, style carte de fidélité physique */
+.fidelite-card {
+  background: linear-gradient(135deg, var(--color-dark) 0%, #4e4a46 100%);
+  border-radius: 20px;
+  padding: 24px 22px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+/* Cercle décoratif en haut à droite */
+.fidelite-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  background: rgba(184, 168, 152, 0.1);
+}
+
+/* Ligne du haut : logo Biche. + progression X/10 */
+.fid-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo "Biche." en italic sur la carte */
+.fid-logo {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.85);
+  font-style: italic;
+}
+
+/* Label "Progression" au-dessus du nombre */
+.fid-prog-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  opacity: 0.55;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+/* Nombre "4 / 10" en serif doré */
+.fid-prog-num {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--color-accent);
+  text-align: right;
+}
+
+/* Grille de 10 cercles (points) */
+.fid-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+/* Cercle vide (visite à venir) */
+.fid-dot {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cercle rempli (visite validée) — fond beige rosé */
+.fid-dot.filled {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Dernier cercle = étoile récompense */
+.fid-dot.star {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Barre de progression horizontale */
+.fid-progress-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Remplissage dynamique (largeur définie inline par Ruby) */
+.fid-progress-fill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Ligne du bas : texte encourageant */
+.fid-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* "Encore X visites pour une pose offerte" */
+.fid-next {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Chiffre en évidence (beige doré) */
+.fid-next b {
+  color: var(--color-accent);
+}
+
+/* ---- STATISTIQUES FIDÉLITÉ — grille 2×2 ---- */
+.fid-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* Chaque case de stat */
+.fid-stat-card {
+  background: #f6f4f1;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+}
+
+/* Grand nombre en serif */
+.fid-stat-num {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  color: var(--color-dark);
+  display: block;
+  margin-bottom: 3px;
+}
+
+/* Label sous le nombre */
+.fid-stat-label {
+  font-size: 10px;
+  color: var(--color-muted);
+  letter-spacing: 0.5px;
+}
+
+/* ---- CARTE RDV (prochain rendez-vous) ---- */
+.rdv-card {
+  background: #f6f4f1;
+  border-radius: 18px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  margin-bottom: 12px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+/* Bloc date carré (jour + mois) */
+.rdv-date {
+  width: 52px; height: 56px;
+  border-radius: 14px;
+  background: var(--color-dark);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Numéro du jour en grand */
+.rdv-day {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: #fff;
+  line-height: 1;
+}
+
+/* Abréviation du mois en petites lettres */
+.rdv-month {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Informations du RDV (nom prestation, heure, tags) */
+.rdv-info { flex: 1; min-width: 0; }
+
+.rdv-name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  margin-bottom: 3px;
+}
+
+.rdv-time {
+  font-size: 11px;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+/* Ligne de tags (lieu, durée, statut) */
+.rdv-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.rdv-tag {
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #fff;
+  color: #6e6560;
+  border: 1px solid var(--color-border);
+  letter-spacing: 0.5px;
+}
+
+/* Zone vide quand pas de RDV */
+.rdv-empty {
+  text-align: center;
+  padding: 24px;
+  background: #f6f4f1;
+  border-radius: 18px;
+  border: 1px dashed var(--color-border);
+}
+
+.rdv-empty-text {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-bottom: 14px;
+}
+
+/* Bouton annulation RDV (rouge discret) */
+.btn-rdv-cancel {
+  flex: 1;
+  background: transparent;
+  color: #c47a7a;
+  border: 1px solid #f0e0e0;
+  border-radius: 30px;
+  padding: 11px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  text-align: center;
+  text-decoration: none;
+  display: block;
+}
+
+/* ---- HISTORIQUE DES SOINS — accordéon ---- */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Chaque carte de soin */
+.history-card {
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Header cliquable de la carte */
+.history-header {
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.history-left { flex: 1; }
+
+/* Nom de la prestation en serif */
+.history-name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  margin-bottom: 3px;
+}
+
+/* Date et catégorie */
+.history-date {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.history-right { text-align: right; }
+
+/* Prix affiché à droite */
+.history-price {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+/* Bouton flèche qui pivote à l'ouverture */
+.history-toggle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #f6f4f1;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: auto;
+  margin-top: 4px;
+  transition: transform 0.2s, background 0.2s;
+}
+
+/* Flèche inversée + fond foncé quand ouvert */
+.history-card.open .history-toggle {
+  transform: rotate(180deg);
+  background: var(--color-dark);
+  border-color: var(--color-dark);
+}
+
+.history-card.open .history-toggle svg path {
+  stroke: #fff;
+}
+
+/* Détails du soin : cachés par défaut */
+.history-details {
+  display: none;
+  padding: 0 16px 16px;
+  border-top: 1px solid #f0ede8;
+}
+
+/* Détails visibles quand la carte a la classe "open" */
+.history-card.open .history-details {
+  display: block;
+  padding-top: 14px;
+}
+
+/* Grille 2 colonnes pour les paramètres techniques */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Chaque case de paramètre technique */
+.detail-item {
+  background: #f6f4f1;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* Label du paramètre (ex: "Courbure") */
+.detail-label {
+  font-size: 9px;
+  color: #988e88;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* Valeur du paramètre (ex: "C classique") */
+.detail-value {
+  font-size: 13px;
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+/* Bloc note de Syam */
+.detail-note {
+  background: #f6f4f1;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.detail-note-label {
+  font-size: 9px;
+  color: #988e88;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Texte de la note en italic */
+.detail-note-text {
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* Bouton "Reprendre cette pose" dans l'historique */
+.history-rdv-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 11px;
+  border: 1px solid var(--color-dark);
+  border-radius: 30px;
+  background: transparent;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  width: 100%;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* ---- MESSAGES / NEWSLETTERS ---- */
+.newsletter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Chaque message : icône + contenu + badge */
+.newsletter-item {
+  background: #f6f4f1;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Icône ronde selon le type de message */
+.nl-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Couleurs par type */
+.nl-icon-birthday { background: linear-gradient(135deg, #ddd6cc, #b8b2a8); }
+.nl-icon-promo    { background: linear-gradient(135deg, #2e2926, #5e5a56); }
+.nl-icon-news     { background: linear-gradient(135deg, #b8b2a8, #8e8882); }
+
+.nl-content { flex: 1; }
+
+/* Titre du message en serif */
+.nl-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  margin-bottom: 2px;
+}
+
+/* Date */
+.nl-date {
+  font-size: 10px;
+  color: #988e88;
+  letter-spacing: 0.5px;
+}
+
+/* Badge "Nouveau" (non lu) ou "Lu" */
+.nl-badge {
+  font-size: 9px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: var(--color-dark);
+  color: #fff;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Badge "Lu" : fond neutre grisé */
+.nl-badge.read {
+  background: #f0ede8;
+  color: var(--color-muted);
+}
+
+/* ---- PROFIL — liste des paramètres ---- */
+.settings-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chaque ligne : label | valeur */
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0ede8;
+}
+
+.setting-row:last-child { border-bottom: none; }
+
+.setting-label {
+  font-size: 13px;
+  color: var(--color-dark);
+}
+
+.setting-value {
+  font-size: 12px;
+  color: var(--color-muted);
+  text-align: right;
+}
