@@ -1,0 +1,73 @@
+<% content_for :title, @message.titre %>
+
+<%#
+  ============================================================
+  VUE — Détail d'un message
+  Données : @message chargé par EspaceCliente::MessagesController#show
+  Le controller marque automatiquement le message comme lu à l'ouverture.
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Messages", espace_cliente_messages_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HEADER DU MESSAGE (fond sombre, style page-header) ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <%# Tag indique le type de message %>
+      <p class="ph-tag">
+        <%= case @message.type_message
+            when 'anniversaire' then 'Offre anniversaire'
+            when 'promo'        then 'Promotion'
+            when 'rappel_rdv'   then 'Rappel rendez-vous'
+            else 'Actualité'
+            end %>
+      </p>
+      <h1 class="ph-title"><%= @message.titre %></h1>
+      <%# Date de réception formatée %>
+      <p class="ph-intro" style="font-size:11px; opacity:0.6;">
+        Reçu le <%= I18n.l(@message.created_at.to_date, format: "%-d %B %Y") %>
+      </p>
+    </div>
+
+    <%# ---- CONTENU DU MESSAGE ---- %>
+    <div class="sec">
+      <%# Le contenu est stocké dans la colonne "contenu" (texte libre) %>
+      <% if @message.contenu.present? %>
+        <div style="font-size: 14px; color: #4a4440; line-height: 1.8;">
+          <%# simple_format convertit les retours à la ligne en balises <p> %>
+          <%= simple_format(@message.contenu) %>
+        </div>
+      <% else %>
+        <p style="font-size: 13px; color: var(--color-muted); font-style: italic;">
+          Pas de contenu détaillé pour ce message.
+        </p>
+      <% end %>
+
+      <%# ---- ACTIONS ---- %>
+      <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 10px;">
+        <%# Si c'est une promo ou un anniversaire, proposer de réserver %>
+        <% if ['promo', 'anniversaire'].include?(@message.type_message) %>
+          <%= link_to "Profiter de l'offre", new_booking_path, class: "btn-primary" %>
+        <% end %>
+        <%= link_to "Retour aux messages", espace_cliente_messages_path, class: "btn-ghost" %>
+      </div>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

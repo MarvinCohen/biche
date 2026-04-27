@@ -9,8 +9,15 @@ module EspaceCliente
 
     # GET /espace-cliente
     def index
-      # ---- Onglet "Mes RDV" : prochain rendez-vous confirmé ----
-      @prochain_rdv = current_user.prochain_rdv
+      # ---- Onglet "Mes RDV" : tous les rendez-vous à venir ----
+      # On garde @prochain_rdv pour le bloc stats en haut (avatar)
+      @prochain_rdv  = current_user.prochain_rdv
+      # Liste complète pour l'onglet "Mes RDV" (confirmés + en attente, date future)
+      @rdvs_a_venir = current_user.bookings
+                                   .where(statut: ['confirme', 'en_attente'])
+                                   .where('date >= ?', Date.today)
+                                   .order(date: :asc, heure: :asc)
+                                   .includes(:prestation)
 
       # ---- Onglet "Historique" : tous les soins terminés, du plus récent ----
       # includes évite les N+1 queries (prestation + note de Syam chargées en 1 requête)

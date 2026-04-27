@@ -1,0 +1,2447 @@
+/*
+ * CSS des pages statiques de Biche.
+ * Couvre : À propos, FAQ, Contact, Avis, Morphologie, Galerie
+ *
+ * Les classes globales (nav, sec, s-tag, s-h2, footer, btn-*)
+ * sont déjà définies dans application.css — pas de doublon ici.
+ */
+
+/* ============================================================
+   EN-TÊTE DE PAGE — commun à FAQ, Contact, Avis, Galerie, Morphologie
+   ============================================================ */
+
+/* Zone de titre avec dégradé et blobs décoratifs */
+.page-header {
+  position: relative;
+  padding: 110px 24px 44px;
+  text-align: center;
+  background: var(--color-nude);
+  overflow: hidden;
+}
+
+/* Blob organique decoratif en haut à droite */
+.ph-blob {
+  position: absolute;
+  top: 80px;
+  right: -40px;
+  width: 130px;
+  height: 130px;
+  background: var(--color-accent);
+  border-radius: 62% 38% 54% 46% / 48% 52% 48% 52%;
+  opacity: 0.25;
+  z-index: 1;
+}
+
+/* Blob secondaire en bas à gauche */
+.ph-blob-2 {
+  position: absolute;
+  bottom: -20px;
+  left: -30px;
+  width: 100px;
+  height: 100px;
+  background: #b09e7f;
+  border-radius: 50%;
+  opacity: 0.18;
+  z-index: 1;
+}
+
+/* Étiquette de la page (ex: "FAQ") */
+.ph-tag {
+  position: relative;
+  z-index: 2;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #988e88;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+/* Grand titre de la page */
+.ph-title {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-serif);
+  font-size: 42px;
+  color: var(--color-dark);
+  line-height: 1.1;
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+
+/* Texte d'introduction sous le titre */
+.ph-intro {
+  position: relative;
+  z-index: 2;
+  font-size: 13px;
+  color: #6e6560;
+  line-height: 1.7;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   CTA BAS DE PAGE — Appel à l'action "Réserver"
+   ============================================================ */
+
+/* Section CTA centrée, fond blanc */
+.cta-sec {
+  padding: 44px 20px;
+  background: #fff;
+  text-align: center;
+}
+
+/* Grand titre du CTA (ex: "Prête à prendre rendez-vous ?") */
+.cta-big {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  color: var(--color-dark);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+/* Texte descriptif sous le titre CTA */
+.cta-sub {
+  font-size: 13px;
+  color: #6e6560;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+/* Bouton CTA principal */
+.cta-btn {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  padding: 15px 34px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* ============================================================
+   PAGE À PROPOS — Portrait, histoire, valeurs, timeline, studio
+   ============================================================ */
+
+/* Hero avec photo de Syam — fond beige avec blobs */
+.portrait-hero {
+  position: relative;
+  padding-top: 70px;
+  background: var(--color-nude);
+  overflow: hidden;
+}
+
+/* Blob decoratif du portrait (haut droite) */
+.ph-bg-blob {
+  position: absolute;
+  top: 60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: var(--color-accent);
+  border-radius: 62% 38% 54% 46% / 48% 52% 48% 52%;
+  opacity: 0.2;
+}
+
+/* Blob decoratif secondaire (bas gauche) */
+.ph-bg-blob-2 {
+  position: absolute;
+  bottom: 0;
+  left: -40px;
+  width: 150px;
+  height: 150px;
+  background: #b09e7f;
+  border-radius: 50%;
+  opacity: 0.15;
+}
+
+/* Conteneur central du portrait */
+.portrait-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 24px 40px;
+}
+
+/* Cadre de la photo de Syam (forme organique) */
+.portrait-img {
+  width: 180px;
+  height: 220px;
+  border-radius: 52% 48% 38% 62% / 42% 58% 42% 58%;
+  background: linear-gradient(145deg, #d4bfa0, #8a7362);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(58, 42, 30, 0.15);
+}
+
+/* "Fondatrice" au dessus du nom */
+.portrait-sup {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: #988e88;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Prénom de Syam en grand serif */
+.portrait-name {
+  font-family: var(--font-serif);
+  font-size: 48px;
+  color: var(--color-dark);
+  font-weight: 400;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+/* Sous-titre : rôle et lieu */
+.portrait-role {
+  font-size: 13px;
+  color: #6e6560;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* Paragraphe de texte courant (page à propos) */
+.body-text {
+  font-size: 13px;
+  color: #6e6560;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.body-text:last-child { margin-bottom: 0; }
+
+/* Citation mise en avant avec bordure gauche */
+.quote-block {
+  border-left: 2px solid var(--color-accent);
+  padding: 16px 20px;
+  margin: 24px 0;
+}
+
+.quote-text {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--color-dark);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Grille 2x2 des valeurs */
+.values-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Carte individuelle de valeur */
+.value-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 18px 14px;
+  text-align: center;
+}
+
+/* Icone circulaire dans chaque carte valeur */
+.value-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-nude);
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nom de la valeur (ex: "Précision") */
+.value-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+/* Description de la valeur */
+.value-desc {
+  font-size: 11px;
+  color: #8e8480;
+  line-height: 1.5;
+}
+
+/* Timeline du parcours de Syam */
+.timeline {
+  position: relative;
+  padding-left: 28px;
+  margin-top: 8px;
+}
+
+/* Ligne verticale de la timeline */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--color-border);
+}
+
+/* Un élément de la timeline */
+.timeline-item {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.timeline-item:last-child { margin-bottom: 0; }
+
+/* Pastille circulaire sur la ligne */
+.timeline-dot {
+  position: absolute;
+  left: -23px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 2px solid #fff;
+}
+
+/* Année ou période */
+.timeline-year {
+  font-size: 10px;
+  color: #988e88;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* Titre de l'étape */
+.timeline-title {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+/* Description de l'étape */
+.timeline-desc {
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.6;
+}
+
+/* Image principale du studio (placeholder) */
+.studio-img {
+  width: 100%;
+  height: 200px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #2e2926, #6b5849);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Grille 2 mini-images du studio */
+.studio-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Élément de la grille studio */
+.studio-item {
+  height: 120px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #b8a898, #8a7362);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studio-item-2 {
+  background: linear-gradient(145deg, #d4bfa0, #b09e7f);
+}
+
+/* Carte d'adresse avec icone de pin */
+.studio-addr {
+  background: var(--color-cream);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  border: 1px solid var(--color-border);
+}
+
+/* Cercle contenant l'icone pin */
+.studio-pin {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Nom du studio dans la carte d'adresse */
+.studio-addr-name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+/* Adresse textuelle */
+.studio-addr-text {
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.6;
+}
+
+/* Bouton "Voir sur Google Maps" */
+.maps-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--color-dark);
+  border-radius: var(--border-radius-pill);
+  background: transparent;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  width: 100%;
+  text-decoration: none;
+}
+
+/* ============================================================
+   PAGE FAQ — Accordéon de questions/réponses
+   ============================================================ */
+
+/* Liste des questions d'une section */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Item de FAQ (question + réponse pliée) */
+.faq-item {
+  background: var(--color-cream);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+/* Ligne cliquable de la question */
+.faq-q {
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  gap: 12px;
+}
+
+/* Texte de la question (serif) */
+.faq-q-text {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  line-height: 1.3;
+  flex: 1;
+}
+
+/* Cercle avec flèche rotative */
+.faq-arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+/* La flèche tourne quand l'item est ouvert */
+.faq-item.open .faq-arrow {
+  transform: rotate(180deg);
+  background: var(--color-dark);
+  border-color: var(--color-dark);
+}
+
+/* La flèche devient blanche quand fond sombre */
+.faq-item.open .faq-arrow svg path { stroke: #fff; }
+
+/* Réponse cachée par défaut, visible quand .open */
+.faq-a {
+  padding: 0 18px 18px;
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.7;
+  display: none;
+}
+
+.faq-item.open .faq-a { display: block; }
+
+/* Bouton "Contactez-moi" en bas de FAQ */
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border: 1px solid var(--color-dark);
+  border-radius: var(--border-radius-pill);
+  background: transparent;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  margin-top: 24px;
+  text-decoration: none;
+}
+
+/* ============================================================
+   PAGE CONTACT — Liens sociaux, formulaire, localisation
+   ============================================================ */
+
+/* Liste de liens rapides (Instagram, TikTok, etc.) */
+.quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* Ligne de lien rapide */
+.quick-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--color-cream);
+  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Cercle coloré contenant l'icone du réseau */
+.quick-link-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Couleurs de fond selon le réseau */
+.ql-insta  { background: linear-gradient(145deg, #b8a898, #8a7362); }
+.ql-tiktok { background: linear-gradient(145deg, #2e2926, #6b5849); }
+.ql-google { background: linear-gradient(145deg, #d4bfa0, #b09e7f); }
+.ql-mail   { background: linear-gradient(145deg, #8a7362, #6b5849); }
+
+/* Zone texte du lien rapide */
+.quick-link-text { flex: 1; }
+
+/* Nom du réseau */
+.quick-link-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  margin-bottom: 2px;
+}
+
+/* Handle ou sous-titre */
+.quick-link-sub {
+  font-size: 11px;
+  color: #8e8480;
+}
+
+/* Flèche à droite du lien */
+.quick-link-arrow { opacity: 0.4; }
+
+/* Groupe de champ de formulaire */
+.form-group { margin-bottom: 16px; }
+
+/* Label au dessus du champ */
+.form-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #988e88;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Champ texte ou email */
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  font-size: 13px;
+  color: var(--color-dark);
+  background: #fff;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.form-input:focus { border-color: var(--color-dark); }
+.form-input::placeholder { color: #c0b0a0; }
+
+/* Menu déroulant (sujet du message) */
+.form-select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  font-size: 13px;
+  color: var(--color-dark);
+  background: #fff;
+  font-family: var(--font-sans);
+  outline: none;
+  appearance: none;
+}
+
+/* Zone de texte longue (message) */
+.form-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  font-size: 13px;
+  color: var(--color-dark);
+  background: #fff;
+  font-family: var(--font-sans);
+  outline: none;
+  height: 100px;
+  resize: none;
+}
+
+.form-textarea::placeholder { color: #c0b0a0; }
+
+/* Bouton d'envoi du formulaire */
+.form-submit {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  padding: 15px;
+  width: 100%;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  margin-top: 8px;
+}
+
+/* Carte Google Maps rectangulaire — page contact */
+.map-embed-rect {
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(46, 41, 38, 0.08);
+}
+
+/* L'iframe remplit entièrement le conteneur */
+.map-embed-rect iframe {
+  display: block;
+  width: 100%;
+  height: 220px;
+  border: 0;
+}
+
+/* Placeholder de carte (Google Maps non intégré) */
+.map-block {
+  background: linear-gradient(145deg, #ddd6cc, #d4bfa0);
+  border-radius: 24px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+.map-pin-ico { width: 36px; height: 36px; }
+
+.map-lbl {
+  font-size: 11px;
+  color: #5e5550;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Carte d'adresse stylisée */
+.addr-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.addr-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* Icone circulaire dans la carte adresse */
+.addr-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Nom du lieu */
+.addr-name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+/* Adresse textuelle */
+.addr-text {
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.6;
+}
+
+/* Bouton Maps (version contact — plus petit) */
+.maps-btn-sm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border: 1px solid var(--color-dark);
+  border-radius: var(--border-radius-pill);
+  background: transparent;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  width: 100%;
+  margin-bottom: 20px;
+  text-decoration: none;
+}
+
+/* Carte des horaires */
+.hours-card {
+  background: var(--color-cream);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+}
+
+/* Titre de la section horaires */
+.hours-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-dark);
+  margin-bottom: 14px;
+}
+
+/* Ligne : jour + heure */
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0e8dc;
+  font-size: 12px;
+}
+
+.hours-row:last-child { border-bottom: none; }
+
+/* Nom du jour */
+.hours-day { color: #6e6560; }
+
+/* Heure d'ouverture */
+.hours-time {
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+/* Fermé (italique + gris) */
+.hours-closed {
+  color: #c0b0a0;
+  font-style: italic;
+}
+
+/* ============================================================
+   PAGE AVIS — Note globale, barres de répartition, cartes avis
+   ============================================================ */
+
+/* Bloc note globale sur fond sombre */
+.rating-hero {
+  background: var(--color-dark);
+  border-radius: 28px;
+  padding: 36px 24px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* Décoration circulaire en haut à droite */
+.rating-hero::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(201, 169, 138, 0.12);
+}
+
+/* Chiffre de la note (ex: "4,9") en très grand */
+.rating-score {
+  font-family: var(--font-serif);
+  font-size: 72px;
+  color: var(--color-accent);
+  line-height: 1;
+  margin-bottom: 6px;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+
+/* "/5" après la note */
+.rating-max {
+  font-size: 16px;
+  color: rgba(201, 169, 138, 0.6);
+  position: relative;
+  z-index: 1;
+}
+
+/* Étoiles dans le bloc rating */
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 14px 0 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Nombre d'avis */
+.rating-count {
+  font-size: 12px;
+  opacity: 0.65;
+  position: relative;
+  z-index: 1;
+}
+
+/* Badge "Vérifié sur Google" */
+.google-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Conteneur des barres de répartition (1-5 étoiles) */
+.rating-bars { margin-bottom: 24px; }
+
+/* Ligne d'une barre de répartition */
+.rating-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* Numéro d'étoile (ex: "5") */
+.rating-bar-label {
+  font-size: 11px;
+  color: #6e6560;
+  width: 14px;
+  flex-shrink: 0;
+}
+
+/* Piste de la barre (fond gris) */
+.rating-bar-track {
+  flex: 1;
+  height: 6px;
+  background: #f0e8dc;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* Remplissage coloré de la barre */
+.rating-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-accent);
+}
+
+/* Nombre d'avis à droite de la barre */
+.rating-bar-count {
+  font-size: 10px;
+  color: #8e8480;
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Liste de cartes d'avis clients */
+.avis-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Carte d'un avis */
+.avis-card {
+  background: var(--color-cream);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+}
+
+/* En-tête de la carte : avatar + étoiles */
+.avis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+/* Groupe avatar + nom */
+.avis-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Cercle avec initiale de l'auteur */
+.avis-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #b8a898, #8a7362);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: #fff;
+  font-weight: 400;
+}
+
+/* Nom de l'auteur de l'avis */
+.avis-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-dark);
+  margin-bottom: 2px;
+}
+
+/* Date de l'avis */
+.avis-date {
+  font-size: 10px;
+  color: #8e8480;
+}
+
+/* Étoiles de l'avis */
+.avis-stars {
+  display: flex;
+  gap: 3px;
+}
+
+/* Texte de l'avis en serif italique */
+.avis-text {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  line-height: 1.6;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+/* Tag de prestation concernée */
+.avis-tag {
+  display: inline-block;
+  background: #f0e8dc;
+  color: #6e6560;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* CTA pour voir tous les avis */
+.google-cta {
+  text-align: center;
+  margin-top: 24px;
+}
+
+/* Bouton "Voir tous les avis" (contour) */
+.google-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border: 1px solid var(--color-dark);
+  border-radius: var(--border-radius-pill);
+  background: transparent;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Encadré "Laisser un avis" */
+.laisser-avis {
+  background: var(--color-nude);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 24px;
+  border: 1px solid var(--color-border);
+}
+
+/* Titre de la section */
+.laisser-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-dark);
+  margin-bottom: 8px;
+}
+
+/* Texte explicatif */
+.laisser-sub {
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* Bouton "Laisser un avis" */
+.laisser-btn {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 24px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* ============================================================
+   PAGE MORPHOLOGIE — Guide en 3 étapes
+   ============================================================ */
+
+/* Indicateur des 3 étapes (barre du haut) */
+.steps-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 20px 24px;
+  background: #fff;
+  border-bottom: 1px solid #e4ddd6;
+}
+
+/* Colonne d'une étape */
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+
+/* Cercle de numéro d'étape */
+.step-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.step-circle.done   { background: var(--color-dark); color: #fff; }
+.step-circle.active { background: var(--color-accent); color: #fff; }
+.step-circle.todo   { background: #f0ede8; color: #a09890; }
+
+/* Label sous le numéro d'étape */
+.step-label {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-align: center;
+  color: #8e8480;
+  text-transform: uppercase;
+}
+
+.step-label.active {
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+/* Connecteur entre deux étapes */
+.step-connector {
+  height: 1px;
+  background: #e4ddd6;
+  flex: 0.5;
+  margin-bottom: 15px;
+}
+
+/* Encadré d'introduction aux techniques */
+.techniques-intro {
+  background: var(--color-cream);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+}
+
+/* Citation italic dans l'intro techniques */
+.tech-intro-text {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-dark);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+/* Sous-texte de l'intro */
+.tech-intro-sub {
+  font-size: 12px;
+  color: #8e8480;
+  line-height: 1.6;
+}
+
+/* Carrousel horizontal des techniques */
+.techniques-carousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 0 20px 16px;
+  margin: 0 -20px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.techniques-carousel::-webkit-scrollbar { display: none; }
+
+/* Carte d'une technique */
+.tech-card {
+  flex: 0 0 200px;
+  scroll-snap-align: center;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Carte sélectionnée (bordure sombre) */
+.tech-card.selected {
+  border: 1.5px solid var(--color-dark);
+}
+
+/* Image de la technique (bloc coloré) */
+.tech-card-img {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dégradés de fond selon la technique */
+.ti-naturel  { background: linear-gradient(145deg, #ddd6cc, #ccc5bb); }
+.ti-cat      { background: linear-gradient(145deg, #b8b2a8, #8e8882); }
+.ti-doll     { background: linear-gradient(145deg, #ccc5bb, #a09890); }
+.ti-intense  { background: linear-gradient(145deg, #7a7470, #5e5a56); }
+.ti-rehausse { background: linear-gradient(145deg, #e4ddd6, #ddd6cc); }
+
+/* Corps texte de la carte technique */
+.tech-card-body { padding: 12px 14px 16px; }
+
+/* Nom de la technique */
+.tech-card-name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+  margin-bottom: 4px;
+}
+
+/* Description courte */
+.tech-card-desc {
+  font-size: 11px;
+  color: #8e8480;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+/* Groupe de tags d'une technique */
+.tech-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Tag individuel */
+.tech-tag {
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--color-cream);
+  color: #6e6560;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--color-border);
+}
+
+/* Grille 2x3 des types d'yeux */
+.eye-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* Carte d'un type d'yeux (sélectionnable) */
+.eye-card {
+  background: var(--color-cream);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Carte sélectionnée */
+.eye-card.active {
+  border: 1.5px solid var(--color-dark);
+  background: #f0ede8;
+}
+
+/* Zone SVG de l'oeil */
+.eye-svg-wrap {
+  width: 80px;
+  height: 44px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nom du type d'yeux */
+.eye-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  margin-bottom: 3px;
+}
+
+/* Description brève */
+.eye-desc {
+  font-size: 10px;
+  color: #8e8480;
+  line-height: 1.4;
+}
+
+/* Carte de résultat de recommandation (fond sombre) */
+.result-card {
+  background: var(--color-dark);
+  border-radius: 24px;
+  padding: 28px 22px;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+/* Décoration circulaire en haut à droite */
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(184, 168, 152, 0.1);
+}
+
+/* Étiquette "Recommandation Biche." */
+.result-tag {
+  font-size: 10px;
+  letter-spacing: 3px;
+  opacity: 0.55;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Nom du type d'yeux sélectionné */
+.result-eye-name {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  margin-bottom: 14px;
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+
+/* Texte de recommandation personnalisée */
+.result-reco {
+  font-size: 12px;
+  opacity: 0.75;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Grille 2x2 de détails de la recommandation */
+.reco-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Bloc d'un critère (forme, courbure, etc.) */
+.reco-item {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+/* Libellé du critère */
+.reco-item-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Groupe de valeurs */
+.reco-item-values {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Une valeur individuelle (avec pastille) */
+.reco-value {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Pastille colorée devant chaque valeur */
+.reco-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+/* Bouton "Je réserve cette pose" */
+.result-btn {
+  background: var(--color-accent);
+  color: var(--color-dark);
+  border: none;
+  border-radius: 30px;
+  padding: 13px 28px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  position: relative;
+  z-index: 1;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Encadré diagnostic personnalisé (bordure gauche accent) */
+.diagnostic-box {
+  background: var(--color-cream);
+  border-radius: 18px;
+  padding: 18px 20px;
+  border-left: 3px solid var(--color-accent);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+/* Icone circulaire du diagnostic */
+.diag-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+}
+
+/* Titre du bloc diagnostic */
+.diag-title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  margin-bottom: 5px;
+}
+
+/* Texte du bloc diagnostic */
+.diag-text {
+  font-size: 11px;
+  color: #6e6560;
+  line-height: 1.6;
+}
+
+/* Carte d'un conseil (avant la pose) */
+.tip-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid var(--color-border);
+}
+
+/* Icone du conseil */
+.tip-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-cream);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Titre du conseil */
+.tip-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-dark);
+  margin-bottom: 3px;
+}
+
+/* Texte du conseil */
+.tip-text {
+  font-size: 11px;
+  color: #6e6560;
+  line-height: 1.6;
+}
+
+/* Indicateur de numéro d'étape (texte en accent) */
+.s-num {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+/* ============================================================
+   PAGE GALERIE — Filtres, collage, masonry, avant/après, vidéos
+   ============================================================ */
+
+/* Barre de filtres horizontale */
+.filter-wrap {
+  background: #fff;
+  border-bottom: 1px solid #e4ddd6;
+}
+
+/* Scroll horizontal des filtres */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 16px 20px;
+  scrollbar-width: none;
+}
+
+.filter-bar::-webkit-scrollbar { display: none; }
+
+/* Pastille de filtre (ex: "Cil à cil") */
+.filter-pill {
+  flex-shrink: 0;
+  padding: 9px 18px;
+  border-radius: 30px;
+  border: 1px solid #d4cec8;
+  background: #fff;
+  color: #6e6560;
+  font-size: 11px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+/* Pastille active */
+.filter-pill.active {
+  background: var(--color-dark);
+  color: #fff;
+  border-color: var(--color-dark);
+}
+
+/* Collage hero avec 4 blocs flottants */
+.collage-hero {
+  position: relative;
+  height: 360px;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Bloc principal (grand, forme organique) */
+.col-main {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  width: 190px;
+  height: 250px;
+  border-radius: 52% 48% 38% 62% / 42% 58% 42% 58%;
+  background: linear-gradient(145deg, #b8b2a8, #7a7470);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bloc secondaire (rond) */
+.col-sec {
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  width: 145px;
+  height: 145px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ccc5bb, #a09890);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bloc tertiaire (rectangle arrondi) */
+.col-third {
+  position: absolute;
+  bottom: 10px;
+  left: 60px;
+  width: 170px;
+  height: 110px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #ddd6cc, #b8b2a8);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bloc accent (fond sombre avec "B.") */
+.col-accent {
+  position: absolute;
+  bottom: 24px;
+  right: 28px;
+  width: 84px;
+  height: 84px;
+  border-radius: 60% 40% 50% 50% / 45% 55% 45% 55%;
+  background: var(--color-dark);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lettre "B." dans le bloc accent */
+.col-accent span {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--color-accent);
+  font-style: italic;
+}
+
+/* SVG decoratifs dans les blocs du collage */
+.col-ico { opacity: 0.35; }
+
+/* Indicateur du filtre actif */
+.filter-active-info {
+  background: var(--color-cream);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--color-border);
+}
+
+/* Pastille sombre */
+.filter-active-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-dark);
+  flex-shrink: 0;
+}
+
+/* Texte "Filtré : Cat eye" */
+.filter-active-text {
+  font-size: 11px;
+  color: #6e6560;
+}
+
+.filter-active-text b {
+  color: var(--color-dark);
+  font-weight: 500;
+}
+
+/* Lien "Tout voir" à droite */
+.filter-reset {
+  font-size: 10px;
+  color: #988e88;
+  margin-left: auto;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+
+/* Grille masonry 2 colonnes */
+.masonry {
+  columns: 2;
+  gap: 10px;
+}
+
+/* Item masonry (photo de réalisation) */
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+/* Fond de l'image — background-image défini par les classes .m1 à .m8 */
+.masonry-bg {
+  display: block;
+}
+
+/* Hauteurs variables pour effet masonry */
+.masonry-item.tall   .masonry-bg { height: 200px; }
+.masonry-item.short  .masonry-bg { height: 130px; }
+.masonry-item.medium .masonry-bg { height: 160px; }
+
+/* Photos réelles pour les items masonry — images temporaires Unsplash */
+/* URL relative sans /assets/ : Propshaft réécrit automatiquement avec le digest en prod */
+.m1 { background: url('galerie-1-cil-a-cil.jpg') center/cover no-repeat; }
+.m2 { background: url('galerie-2-volume.jpg') center/cover no-repeat; }
+.m3 { background: url('galerie-3-rehaussement.jpg') center/cover no-repeat; }
+.m4 { background: url('galerie-4-volume-russe.jpg') center/cover no-repeat; }
+.m5 { background: url('galerie-5-cil-a-cil-2.jpg') center/cover no-repeat; }
+.m6 { background: url('galerie-6-sourcils.jpg') center/cover no-repeat; }
+.m7 { background: url('galerie-7-rehaussement-2.jpg') center/cover no-repeat; }
+.m8 { background: url('galerie-8-cil-a-cil-3.jpg') center/cover no-repeat; }
+
+/* Légende en bas de chaque item masonry */
+.masonry-legend {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(46, 41, 38, 0.75));
+  padding: 20px 10px 10px;
+}
+
+/* Nom de la technique */
+.masonry-legend-text {
+  font-size: 10px;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Sous-titre (ex: "Effet naturel") */
+.masonry-legend-sub {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 1px;
+}
+
+/* Carrousel horizontal Avant/Après */
+.avap-wrap {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 0 20px 16px;
+  margin: 0 -20px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.avap-wrap::-webkit-scrollbar { display: none; }
+
+/* Carte Avant/Après */
+.avap-card {
+  flex: 0 0 300px;
+  scroll-snap-align: center;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+/* Grille 2 colonnes (Avant | Après) */
+.avap-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Chaque moitié (avant ou après) */
+.avap-side {
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.avap-side.before { background: linear-gradient(145deg, #ddd6cc, #ccc5bb); }
+.avap-side.after  { background: linear-gradient(145deg, #8e8882, #6e6a66); }
+
+/* Étiquette "Avant" ou "Après" */
+.avap-label {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.avap-label.before { background: rgba(247, 245, 242, 0.9); color: #6e6560; }
+.avap-label.after  { background: rgba(46, 41, 38, 0.85); color: #fff; }
+
+/* Pied de carte Avant/Après */
+.avap-footer {
+  padding: 12px 16px 14px;
+  background: var(--color-cream);
+}
+
+/* Nom de la pose */
+.avap-name {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-dark);
+  margin-bottom: 2px;
+}
+
+/* Meta (durée, type) */
+.avap-meta {
+  font-size: 10px;
+  color: #988e88;
+  letter-spacing: 0.5px;
+}
+
+/* Scroll horizontal des vidéos */
+.video-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.video-row::-webkit-scrollbar { display: none; }
+
+/* Carte vidéo */
+.video-card {
+  flex: 0 0 150px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+/* Thumbnail de la vidéo */
+.video-thumb {
+  height: 190px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vt1 { background: linear-gradient(145deg, #2e2926, #5e5a56); }
+.vt2 { background: linear-gradient(145deg, #7a7470, #b8b2a8); }
+.vt3 { background: linear-gradient(145deg, #a09890, #2e2926); }
+
+/* Bouton play */
+.play-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(247, 245, 242, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pied de carte vidéo */
+.video-meta {
+  padding: 11px 12px;
+  background: var(--color-cream);
+}
+
+/* Titre de la vidéo */
+.video-name {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--color-dark);
+  margin-bottom: 2px;
+}
+
+/* Durée et type */
+.video-tag {
+  font-size: 10px;
+  color: #988e88;
+  letter-spacing: 0.5px;
+}
+
+/* Section Instagram */
+.insta-sec {
+  padding: 28px 20px;
+  background: var(--color-cream);
+  text-align: center;
+}
+
+/* Titre de la section Instagram */
+.insta-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  color: var(--color-dark);
+  margin-bottom: 8px;
+}
+
+/* Texte descriptif */
+.insta-sub {
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+/* Grille 3x2 de vignettes Instagram */
+.insta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-bottom: 18px;
+}
+
+/* Vignette carrée */
+.insta-item { aspect-ratio: 1; border-radius: 10px; }
+
+/* Dégradés de couleur des vignettes */
+.ig1 { background: linear-gradient(145deg, #b8b2a8, #7a7470); }
+.ig2 { background: linear-gradient(145deg, #ccc5bb, #a09890); }
+.ig3 { background: linear-gradient(145deg, #7a7470, #5e5a56); }
+.ig4 { background: linear-gradient(145deg, #ddd6cc, #b8b2a8); }
+.ig5 { background: linear-gradient(145deg, #a09890, #7a7470); }
+.ig6 { background: linear-gradient(145deg, #2e2926, #5e5a56); }
+
+/* Handle Instagram (@atelier_b.iche) */
+.insta-handle {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-dark);
+  margin-bottom: 14px;
+  font-style: italic;
+}
+
+/* Bouton "Voir sur Instagram" */
+.insta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--color-dark);
+  border-radius: var(--border-radius-pill);
+  background: transparent;
+  font-size: 11px;
+  color: var(--color-dark);
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* ============================================================
+   PAGE SHOP — Cartes cadeaux, packs, produits, navigation interne
+   ============================================================ */
+
+/* Menu navigation sticky (Cartes cadeaux, Packs, Produits routine) */
+.shop-nav {
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 9;
+}
+
+/* Conteneur du menu avec scroll horizontal */
+.shop-nav-inner {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 20px;
+}
+
+.shop-nav-inner::-webkit-scrollbar { display: none; }
+
+/* Bouton du menu interne (ex: "Cartes cadeaux") */
+.shop-nav-item {
+  flex-shrink: 0;
+  padding: 14px 16px;
+  font-size: 11px;
+  color: #8e8480;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-family: var(--font-sans);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+/* Bouton du menu actif */
+.shop-nav-item.active {
+  color: var(--color-dark);
+  border-bottom-color: var(--color-dark);
+}
+
+.shop-nav-item:hover {
+  color: var(--color-dark);
+}
+
+/* ============================================================
+   CARTES CADEAUX — Visuel + formulaire
+   ============================================================ */
+
+/* Visuel d'exemple de carte cadeau (gradient sombre) */
+.gift-visual {
+  background: linear-gradient(135deg, var(--color-dark) 0%, #5e5a56 100%);
+  border-radius: 18px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Décoration circulaire du visuel cadeau */
+.gift-visual::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(184, 168, 152, 0.1);
+}
+
+/* Logo "Biche." sur la carte cadeau -->
+.gift-visual-logo {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.85);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+/* Montant en grand (ex: 65€) -->
+.gift-visual-amount {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  color: #fff;
+}
+
+/* Code de la carte cadeau -->
+.gift-visual-code {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 3px;
+  margin-top: 8px;
+}
+
+/* Formulaire de carte cadeau (fond sombre) -->
+.gift-card-box {
+  background: var(--color-dark);
+  border-radius: 24px;
+  padding: 30px 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Décoration circulaire du formulaire -->
+.gift-card-box::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(184, 168, 152, 0.08);
+}
+
+.gift-card-box::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(184, 168, 152, 0.06);
+}
+
+/* Badge "Carte cadeau" -->
+.gift-badge {
+  display: inline-block;
+  background: var(--color-accent);
+  color: var(--color-dark);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+/* Titre du formulaire cadeau -->
+.gift-title {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: #fff;
+  margin-bottom: 10px;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sous-titre du formulaire cadeau -->
+.gift-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Groupe de boutons montants -->
+.gift-amounts {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+/* Bouton montant (ex: 55€, 65€) -->
+.gift-amount {
+  padding: 9px 18px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-family: var(--font-serif);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+/* Bouton montant sélectionné -->
+.gift-amount.selected {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Groupe montant libre -->
+.gift-custom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Label montant libre -->
+.gift-custom-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+/* Input montant libre -->
+.gift-custom-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  font-size: 13px;
+  font-family: var(--font-sans);
+}
+
+.gift-custom-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Bouton d'achat -->
+.gift-btn {
+  background: var(--color-accent);
+  color: var(--color-dark);
+  border: none;
+  border-radius: 30px;
+  padding: 13px 28px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   PACKS MULTI-VISITES — Cartes avec checkmarks
+   ============================================================ */
+
+/* Liste des packs -->
+.packs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Carte pack -->
+.pack-card {
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Carte pack featured (bordure plus épaisse) -->
+.pack-card.featured {
+  border: 1.5px solid var(--color-dark);
+}
+
+/* En-tête de la carte pack -->
+.pack-header {
+  padding: 20px 20px 14px;
+}
+
+/* Badge du pack (Starter, Populaire, VIP) -->
+.pack-badge {
+  display: inline-block;
+  background: var(--color-dark);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+/* Badge Starter (or) -->
+.pack-badge.gold {
+  background: var(--color-accent);
+  color: var(--color-dark);
+}
+
+/* Nom du pack -->
+.pack-name {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-dark);
+  margin-bottom: 6px;
+}
+
+/* Description du pack -->
+.pack-desc {
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+/* Liste des inclusions du pack -->
+.pack-includes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+/* Item d'inclusion (ex: "3 retouches 3 semaines") -->
+.pack-include-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #4e4a46;
+}
+
+/* Checkmark circulaire -->
+.pack-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Pied de la carte pack (pricing) -->
+.pack-footer {
+  padding: 16px 20px;
+  background: var(--color-cream);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Montant principal du pack -->
+.pack-price {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--color-dark);
+}
+
+/* Ancien montant (barré) -->
+.pack-price-old {
+  font-size: 11px;
+  color: #a09890;
+  text-decoration: line-through;
+}
+
+/* Montant économisé -->
+.pack-economy {
+  font-size: 10px;
+  color: #7a9a6a;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+/* Bouton du pack -->
+.pack-btn {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 11px 22px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+}
+
+/* ============================================================
+   PRODUITS ROUTINE — Grille 2x2 avec images
+   ============================================================ */
+
+/* Grille de produits -->
+.products-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Carte produit -->
+.product-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Zone image du produit -->
+.product-img {
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dégradés d'images de produits -->
+.pi-1 { background: linear-gradient(145deg, #ddd6cc, #b8b2a8); }
+.pi-2 { background: linear-gradient(145deg, #ccc5bb, #a09890); }
+.pi-3 { background: linear-gradient(145deg, #b8b2a8, #7a7470); }
+.pi-4 { background: linear-gradient(145deg, #f6f4f1, #ddd6cc); }
+
+/* Corps de la carte produit -->
+.product-body {
+  padding: 12px 14px;
+}
+
+/* Nom du produit -->
+.product-name {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--color-dark);
+  margin-bottom: 3px;
+}
+
+/* Description du produit -->
+.product-desc {
+  font-size: 10px;
+  color: #8e8480;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+/* Pied de la carte produit (prix + bouton) -->
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Prix du produit -->
+.product-price {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--color-dark);
+}
+
+/* Bouton "Ajouter" -->
+.product-btn {
+  background: var(--color-dark);
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 7px 14px;
+  font-size: 10px;
+  cursor: pointer;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 500;
+}

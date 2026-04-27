@@ -1,2 +1,240 @@
-<h1>Pages#contact</h1>
-<p>Find me in app/views/pages/contact.html.erb</p>
+<%# Page Contact — réseaux sociaux, formulaire de message, localisation et horaires %>
+<% content_for :title, "Contact" %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <% if user_signed_in? %>
+          <%= link_to espace_cliente_root_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% else %>
+          <%= link_to new_user_session_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% end %>
+        <%= link_to "Réserver", new_booking_path, class: "btn-nav" %>
+        <div class="burger"><span></span><span></span><span></span></div>
+      </div>
+    </nav>
+
+    <%# ---- EN-TÊTE ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <div class="ph-blob-2"></div>
+      <div class="ph-tag">Contact</div>
+      <h1 class="ph-title">Nous<br>contacter</h1>
+      <p class="ph-intro">Une question, un doute, une demande particulière ? Je suis là.</p>
+    </div>
+
+    <%# ---- LIENS RAPIDES RÉSEAUX ---- %>
+    <%# Chaque lien ouvre le réseau social ou l'application email %>
+    <section class="sec">
+      <p class="s-tag">Me rejoindre</p>
+      <h2 class="s-h2">Réseaux & coordonnées</h2>
+
+      <div class="quick-links">
+
+        <%# Instagram — réseau principal de Syam %>
+        <a href="#" class="quick-link">
+          <div class="quick-link-icon ql-insta">
+            <svg width="20" height="20" viewBox="0 0 14 14" fill="none">
+              <rect x="1.5" y="1.5" width="11" height="11" rx="3" stroke="#fff" stroke-width="1.3"/>
+              <circle cx="7" cy="7" r="2.5" stroke="#fff" stroke-width="1.3"/>
+              <circle cx="10" cy="4" r="0.7" fill="#fff"/>
+            </svg>
+          </div>
+          <div class="quick-link-text">
+            <div class="quick-link-name">Instagram</div>
+            <div class="quick-link-sub">@atelier_b.iche</div>
+          </div>
+          <svg class="quick-link-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4 L10 8 L6 12" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <%# TikTok %>
+        <a href="#" class="quick-link">
+          <div class="quick-link-icon ql-tiktok">
+            <svg width="18" height="18" viewBox="0 0 13 13" fill="none">
+              <path d="M7 1v8.5a2.5 2.5 0 1 1-2.5-2.5H5" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>
+              <path d="M7 1c0 2 1.5 3.5 3.5 3.5" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="quick-link-text">
+            <div class="quick-link-name">TikTok</div>
+            <div class="quick-link-sub">@atelier_b.iche</div>
+          </div>
+          <svg class="quick-link-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4 L10 8 L6 12" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <%# Google Business — pour laisser un avis %>
+        <a href="#" class="quick-link">
+          <div class="quick-link-icon ql-google">
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="#fff">
+              <path d="M7 1l1.8 3.7 4 .6-2.9 2.8.7 4L7 10.2l-3.6 1.9.7-4L1.2 5.3l4-.6z"/>
+            </svg>
+          </div>
+          <div class="quick-link-text">
+            <div class="quick-link-name">Google Business</div>
+            <div class="quick-link-sub">Laisser un avis · 4,9/5</div>
+          </div>
+          <svg class="quick-link-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4 L10 8 L6 12" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+        <%# Email direct — href mailto: pour ouvrir le client email %>
+        <a href="mailto:contact@atelier-biche.fr" class="quick-link">
+          <div class="quick-link-icon ql-mail">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="4" width="12" height="9" rx="2" stroke="#fff" stroke-width="1.3"/>
+              <path d="M2 6 L8 10 L14 6" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="quick-link-text">
+            <div class="quick-link-name">Email</div>
+            <div class="quick-link-sub">contact@atelier-biche.fr</div>
+          </div>
+          <svg class="quick-link-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4 L10 8 L6 12" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+
+      </div>
+    </section>
+
+    <%# ---- FORMULAIRE DE CONTACT ---- %>
+    <%# Formulaire simple — à connecter à un ContactsController avec ActionMailer plus tard %>
+    <section class="sec sec-cream">
+      <p class="s-tag">Message</p>
+      <h2 class="s-h2">Écrire un message</h2>
+
+      <form>
+        <div class="form-group">
+          <label class="form-label">Votre prénom</label>
+          <input class="form-input" type="text" placeholder="Marie">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="marie@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sujet</label>
+          <select class="form-select">
+            <option>Question sur une prestation</option>
+            <option>Information tarif</option>
+            <option>Demande de modèle</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" placeholder="Votre message..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">Envoyer le message</button>
+      </form>
+    </section>
+
+    <%# ---- LOCALISATION ---- %>
+    <section class="sec">
+      <p class="s-tag">Localisation</p>
+      <h2 class="s-h2">Nous trouver</h2>
+
+      <%# Carte Google Maps embarquée — même source que la homepage %>
+      <div class="map-embed-rect">
+        <iframe
+          src="https://maps.google.com/maps?q=37+Rue+Lachassaigne,+33000+Bordeaux&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          width="100%"
+          height="220"
+          style="border: 0; display: block;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Calao Studio — 37 Rue Lachassaigne, Bordeaux">
+        </iframe>
+      </div>
+
+      <%# Carte d'adresse %>
+      <div class="addr-card">
+        <div class="addr-row">
+          <div class="addr-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1C5 1 2.5 3.5 2.5 6.5c0 4 5.5 8.5 5.5 8.5s5.5-4.5 5.5-8.5C13.5 3.5 11 1 8 1z" stroke="#fff" stroke-width="1.2" fill="none"/>
+              <circle cx="8" cy="6.5" r="2" fill="#fff"/>
+            </svg>
+          </div>
+          <div>
+            <div class="addr-name">Calao Studio</div>
+            <div class="addr-text">37 Rue Lachassaigne<br>33000 Bordeaux</div>
+          </div>
+        </div>
+      </div>
+
+      <%# Bouton d'ouverture dans Google Maps %>
+      <a href="https://maps.google.com/?q=37+Rue+Lachassaigne,+33000+Bordeaux"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="maps-btn-sm">Ouvrir dans Google Maps →</a>
+
+      <%# Horaires d'ouverture de l'atelier %>
+      <div class="hours-card">
+        <div class="hours-title">Horaires de l'atelier</div>
+        <div class="hours-row">
+          <div class="hours-day">Lundi</div>
+          <div class="hours-time">9h00 – 18h00</div>
+        </div>
+        <div class="hours-row">
+          <div class="hours-day">Mardi</div>
+          <div class="hours-time">9h00 – 18h00</div>
+        </div>
+        <div class="hours-row">
+          <div class="hours-day">Mercredi</div>
+          <div class="hours-time">9h00 – 18h00</div>
+        </div>
+        <div class="hours-row">
+          <div class="hours-day">Jeudi</div>
+          <div class="hours-time">9h00 – 18h00</div>
+        </div>
+        <div class="hours-row">
+          <div class="hours-day">Vendredi</div>
+          <div class="hours-time">9h00 – 18h00</div>
+        </div>
+        <div class="hours-row">
+          <div class="hours-day">Samedi</div>
+          <div class="hours-time">9h00 – 16h00</div>
+        </div>
+        <div class="hours-row">
+          <div class="hours-day">Dimanche</div>
+          <div class="hours-closed">Fermé</div>
+        </div>
+      </div>
+    </section>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-links">
+        <%= link_to "À propos", about_path %>
+        <%= link_to "FAQ",      faq_path %>
+        <%= link_to "Avis",     avis_path %>
+        <%= link_to "Shop",     shop_path %>
+      </div>
+      <div class="footer-copy">© 2026 Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

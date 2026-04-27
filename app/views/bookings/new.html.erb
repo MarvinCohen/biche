@@ -18,7 +18,8 @@
                 data: {
                   controller: "booking",
                   booking_creneaux_url_value: creneaux_bookings_path,
-                  booking_prestation_id_value: params[:prestation_id].to_i
+                  booking_prestation_id_value: params[:prestation_id].to_i,
+                  turbo: false  # Désactivé pour permettre la redirection vers Stripe (URL externe)
                 }
               } do |f| %>
 
@@ -89,20 +90,39 @@
       <p class="s-tag">Étape 1</p>
       <h2 class="s-h2">Choisir votre soin</h2>
 
-      <%# Liste de toutes les prestations disponibles (chargées par le controller Rails) %>
+      <%# Pills de filtre par catégorie — la pill active détermine quelles prestations sont visibles %>
+      <%# "Toutes" supprimée : on force la cliente à choisir une catégorie pour ne pas tout afficher %>
+      <div class="bk-cat-bar">
+        <span class="bk-cat-pill active" data-cat="extensions"   onclick="filterPrestations('extensions', this)">Extensions</span>
+        <span class="bk-cat-pill"        data-cat="rehaussement" onclick="filterPrestations('rehaussement', this)">Rehaussement</span>
+        <span class="bk-cat-pill"        data-cat="sourcils"     onclick="filterPrestations('sourcils', this)">Sourcils</span>
+        <span class="bk-cat-pill"        data-cat="retouche"     onclick="filterPrestations('retouche', this)">Retouches</span>
+        <span class="bk-cat-pill"        data-cat="depose"       onclick="filterPrestations('depose', this)">Dépose</span>
+      </div>
+
+      <%# Sous-filtre retouche — visible uniquement quand la pill "Retouches" est active %>
+      <%# Permet de choisir entre retouche à 2 semaines ou 3 semaines %>
+      <div class="bk-variant-bar" id="retouche-variant-bar" style="display:none;">
+        <span class="bk-variant-pill active" data-variant="2-semaines" onclick="filterVariant('2-semaines', this)">2 semaines</span>
+        <span class="bk-variant-pill"        data-variant="3-semaines" onclick="filterVariant('3-semaines', this)">3 semaines</span>
+      </div>
+
+      <%# Liste de toutes les prestations — filtrée par JS via data-cat %>
       <div class="presta-select">
         <% @prestations.each do |prestation| %>
           <%#
-            Chaque option passe ses données en data-attributes pour que le JS puisse
-            les lire sans faire d'appel serveur. Lus par doSelectPrestation() :
-            - data-prestation-id   → stocké dans selectedPrestationId
-            - data-prestation-nom  → stocké dans selectedPrestationNom (pour le récap)
-            - data-prestation-prix → stocké dans selectedPrestationPrix (pour le récap)
-            - data-prestation-duree→ stocké dans selectedPrestationDuree (pour heure de fin)
+            data-cat : utilisé par filterPrestations() pour afficher/cacher l'option
+            Les autres data-* sont lus par le controller Stimulus booking_controller.js
           %>
+          <%# data-variant : utilisé pour le sous-filtre retouche (2-semaines / 3-semaines) %>
+          <% variant = if prestation.nom.include?('2 semaines') then '2-semaines'
+                        elsif prestation.nom.include?('3 semaines') then '3-semaines'
+                        else '' end %>
           <div class="presta-option"
                data-booking-target="prestationOption"
                data-action="click->booking#selectPrestation"
+               data-cat="<%= prestation.categorie %>"
+               data-variant="<%= variant %>"
                data-prestation-id="<%= prestation.id %>"
                data-prestation-nom="<%= prestation.nom %>"
                data-prestation-prix="<%= prestation.prix_euros %>"
@@ -377,3 +397,59 @@
 </div>
 
 <% end %>
+
+<script>
+  // activeVariant — mémorise le variant retouche actif ('2-semaines' par défaut)
+  let activeVariant = '2-semaines';
+
+  // filterPrestations — affiche les options de la catégorie sélectionnée
+  // Si catégorie = 'retouche', affiche aussi le sous-filtre variant
+  function filterPrestations(cat, pill) {
+    document.querySelectorAll('.bk-cat-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+
+    const variantBar = document.getElementById('retouche-variant-bar');
+
+    if (cat === 'retouche') {
+      // Afficher le sous-filtre et appliquer le variant actif
+      variantBar.style.display = 'flex';
+      document.querySelectorAll('.presta-option').forEach(opt => {
+        const matchCat     = opt.dataset.cat === 'retouche';
+        const matchVariant = opt.dataset.variant === activeVariant;
+        opt.style.display  = (matchCat && matchVariant) ? 'flex' : 'none';
+      });
+    } else {
+      // Cacher le sous-filtre et afficher toutes les options de la catégorie
+      variantBar.style.display = 'none';
+      document.querySelectorAll('.presta-option').forEach(opt => {
+        opt.style.display = opt.dataset.cat === cat ? 'flex' : 'none';
+      });
+    }
+  }
+
+  // filterVariant — change le variant retouche affiché (2 ou 3 semaines)
+  function filterVariant(variant, pill) {
+    activeVariant = variant;
+    document.querySelectorAll('.bk-variant-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+
+    // Re-applique le filtre retouche avec le nouveau variant
+    document.querySelectorAll('.presta-option').forEach(opt => {
+      if (opt.dataset.cat !== 'retouche') return;
+      opt.style.display = opt.dataset.variant === variant ? 'flex' : 'none';
+    });
+  }
+
+  // Applique le filtre au chargement — on appelle directement car le script
+  // est en bas de page (DOM déjà prêt) et on couvre aussi la navigation Turbo
+  function initBookingFilter() {
+    const activePill = document.querySelector('.bk-cat-pill.active');
+    if (activePill) filterPrestations(activePill.dataset.cat, activePill);
+  }
+
+  // Appel immédiat (script en bas de page = DOM prêt)
+  initBookingFilter();
+
+  // Turbo : relance si on revient sur la page via navigation
+  document.addEventListener('turbo:load', initBookingFilter);
+</script>

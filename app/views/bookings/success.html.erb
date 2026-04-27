@@ -1,0 +1,71 @@
+<% content_for :title, "Réservation confirmée" %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "Mon espace", espace_cliente_root_path, class: "btn-nav" %>
+      </div>
+    </nav>
+
+    <%# ---- CONFIRMATION ---- %>
+    <div class="success-wrap">
+
+      <%# Icône check animée %>
+      <div class="success-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="22" stroke="#b8a898" stroke-width="1.5"/>
+          <path d="M14 24 L21 31 L34 17" stroke="#2e2926" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <h1 class="success-title">Acompte reçu !</h1>
+      <p class="success-sub">Votre rendez-vous est confirmé.<br>À très bientôt chez Biche.</p>
+
+      <%# Récapitulatif du booking %>
+      <div class="success-recap">
+        <div class="success-recap-row">
+          <span>Soin</span>
+          <span><%= @booking.prestation.nom %></span>
+        </div>
+        <div class="success-recap-row">
+          <span>Date</span>
+          <span><%= I18n.l(@booking.date, format: "%-d %B %Y") %></span>
+        </div>
+        <div class="success-recap-row">
+          <span>Heure</span>
+          <span><%= @booking.heure.strftime('%Hh%M') %></span>
+        </div>
+        <div class="success-recap-row">
+          <span>Lieu</span>
+          <span>Calao Studio, Bordeaux</span>
+        </div>
+        <div class="success-recap-row">
+          <span>Acompte payé</span>
+          <%# Affiche l'acompte en euros — peut être nil si webhook pas encore reçu %>
+          <span><%= @booking.acompte_cents ? number_to_currency(@booking.acompte_cents / 100.0, unit: "€", format: "%n%u", precision: 0) : "En cours…" %></span>
+        </div>
+      </div>
+
+      <%# Actions %>
+      <div class="success-actions">
+        <%= link_to "Voir mes rendez-vous", espace_cliente_rdvs_path, class: "btn-primary", style: "display:block; text-align:center;" %>
+        <div style="margin-top: 10px;">
+          <%= link_to "Retour à l'accueil", root_path, class: "btn-ghost", style: "display:block; text-align:center;" %>
+        </div>
+      </div>
+
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

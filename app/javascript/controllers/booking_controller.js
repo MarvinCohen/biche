@@ -333,8 +333,13 @@ export default class extends Controller {
     // Sélectionner le créneau cliqué
     el.classList.add("selected")
 
+    // ex: "09h30" pour l'affichage dans le récap
     this.selectedHeure = el.dataset.heure
-    this.heureInputTarget.value = this.selectedHeure
+
+    // Conversion "09h30" → "09:30:00" pour le champ time de PostgreSQL
+    // Time.parse() côté Rails attend ce format standard, pas "9h30"
+    const heureRails = this.selectedHeure.replace("h", ":") + ":00"
+    this.heureInputTarget.value = heureRails
   }
 
   // ============================================================

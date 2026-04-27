@@ -27,7 +27,9 @@
 /* ---- HERO PROFIL — bloc sombre en haut ---- */
 .profile-hero {
   background: var(--color-dark);
-  padding: 36px 24px 32px;
+  /* padding-top 72px = hauteur nav (≈50px) + espace visuel supplémentaire */
+  /* évite que l'avatar soit coupé par la barre de navigation positionnée en absolute */
+  padding: 72px 24px 32px;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -100,7 +102,7 @@
 .profile-stat {
   flex: 1;
   text-align: center;
-  padding: 14px 0;
+  padding: 8px 0;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -111,10 +113,10 @@
 /* Nombre en grand serif doré */
 .profile-stat-num {
   font-family: var(--font-serif);
-  font-size: 26px;
+  font-size: 20px;
   color: var(--color-accent);
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 /* Label en petites capitales claires */

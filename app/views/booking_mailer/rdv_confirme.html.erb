@@ -1,0 +1,67 @@
+<%#
+  EMAIL — RDV confirmé par Syam
+  Envoyé quand Syam clique "Confirmer" dans l'interface admin
+  Variables : @booking, @user, @espace_url
+%>
+
+<!-- Tag -->
+<p style="font-size:11px; color:#b8a898; letter-spacing:3px; text-transform:uppercase; margin:0 0 8px;">
+  Rendez-vous confirmé
+</p>
+
+<!-- Titre -->
+<h1 style="font-size:26px; color:#2e2926; margin:0 0 12px; font-weight:400; line-height:1.2;">
+  C'est confirmé,<br><%= @user.first_name %> !
+</h1>
+
+<p style="font-size:14px; color:#6e6560; line-height:1.7; margin:0 0 24px;">
+  Syam a confirmé votre rendez-vous. Nous avons hâte de vous accueillir au Calao Studio.
+</p>
+
+<!-- Récap RDV — fond sombre style carte -->
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#2e2926; border-radius:16px; padding:22px; margin-bottom:24px;">
+  <tr>
+    <td>
+      <div style="font-size:9px; color:#b8a898; letter-spacing:2px; text-transform:uppercase; margin-bottom:16px;">
+        Votre rendez-vous
+      </div>
+      <!-- Date en grand -->
+      <div style="font-size:28px; color:#fff; font-weight:300; margin-bottom:4px;">
+        <%= I18n.l(@booking.date, format: "%-d %B %Y") %>
+      </div>
+      <!-- Heure -->
+      <div style="font-size:15px; color:#b8a898; margin-bottom:16px;">
+        <%= @booking.heure.strftime('%Hh%M') if @booking.heure %>
+        <% if @booking.heure_fin %>→ <%= @booking.heure_fin.strftime('%Hh%M') %><% end %>
+        · <%= @booking.prestation.duree_minutes %> min
+      </div>
+      <!-- Séparateur -->
+      <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
+        <div style="font-size:13px; color:rgba(255,255,255,0.7); margin-bottom:4px;">
+          <%= @booking.prestation.nom %>
+        </div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.4);">
+          Calao Studio · 37 Rue Lachassaigne · 33000 Bordeaux
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<!-- Bouton CTA -->
+<div style="text-align:center; margin-bottom:24px;">
+  <%= link_to "Voir mon espace cliente", @espace_url,
+              style: "display:inline-block; background:#2e2926; color:#fff; text-decoration:none; padding:13px 28px; border-radius:40px; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500;" %>
+</div>
+
+<!-- Rappels -->
+<div style="border-top:1px solid #e8e2d8; padding-top:20px;">
+  <p style="font-size:11px; color:#988e88; letter-spacing:1px; text-transform:uppercase; margin:0 0 10px;">
+    À ne pas oublier
+  </p>
+  <p style="font-size:12px; color:#8e8480; line-height:1.8; margin:0;">
+    · Arrivez sans mascara ni maquillage sur les yeux.<br>
+    · Annulation gratuite jusqu'à 48h avant votre rendez-vous.<br>
+    · En cas d'empêchement : répondez à cet email ou annulez depuis votre espace.
+  </p>
+</div>

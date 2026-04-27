@@ -1,0 +1,106 @@
+<%#
+  EMAIL — Confirmation de réservation
+  Envoyé juste après la création du booking (statut "en_attente")
+  Variables : @booking, @user, @espace_url
+%>
+
+<!-- Titre de section -->
+<p style="font-size:11px; color:#b8a898; letter-spacing:3px; text-transform:uppercase; margin:0 0 8px;">
+  Réservation enregistrée
+</p>
+
+<!-- Titre principal -->
+<h1 style="font-size:26px; color:#2e2926; margin:0 0 12px; font-weight:400; line-height:1.2;">
+  Merci <%= @user.first_name %> !
+</h1>
+
+<p style="font-size:14px; color:#6e6560; line-height:1.7; margin:0 0 24px;">
+  Votre demande de rendez-vous a bien été enregistrée. Syam va confirmer votre créneau dans les plus brefs délais.
+</p>
+
+<!-- Récapitulatif du RDV -->
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f2ee; border-radius:14px; padding:20px; margin-bottom:24px; border:1px solid #e8e2d8;">
+  <tr>
+    <td style="padding-bottom:4px;">
+      <div style="font-size:9px; color:#988e88; letter-spacing:2px; text-transform:uppercase; margin-bottom:14px;">
+        Votre réservation
+      </div>
+    </td>
+  </tr>
+  <!-- Prestation -->
+  <tr>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2;">
+      <span style="font-size:12px; color:#988e88;">Prestation</span>
+    </td>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2; text-align:right;">
+      <span style="font-size:13px; color:#2e2926; font-weight:500;"><%= @booking.prestation.nom %></span>
+    </td>
+  </tr>
+  <!-- Date -->
+  <tr>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2;">
+      <span style="font-size:12px; color:#988e88;">Date</span>
+    </td>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2; text-align:right;">
+      <span style="font-size:13px; color:#2e2926; font-weight:500;">
+        <%= I18n.l(@booking.date, format: "%-d %B %Y") %>
+      </span>
+    </td>
+  </tr>
+  <!-- Heure -->
+  <tr>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2;">
+      <span style="font-size:12px; color:#988e88;">Heure</span>
+    </td>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2; text-align:right;">
+      <span style="font-size:13px; color:#2e2926; font-weight:500;">
+        <%= @booking.heure.strftime('%Hh%M') if @booking.heure %>
+        <% if @booking.heure_fin %>→ <%= @booking.heure_fin.strftime('%Hh%M') %><% end %>
+      </span>
+    </td>
+  </tr>
+  <!-- Lieu -->
+  <tr>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2;">
+      <span style="font-size:12px; color:#988e88;">Lieu</span>
+    </td>
+    <td style="padding:8px 0; border-bottom:1px solid #ece8e2; text-align:right;">
+      <span style="font-size:13px; color:#2e2926; font-weight:500;">Calao Studio, Bordeaux</span>
+    </td>
+  </tr>
+  <!-- Prix total -->
+  <tr>
+    <td style="padding:12px 0 0;">
+      <span style="font-size:12px; color:#988e88;">Total</span>
+    </td>
+    <td style="padding:12px 0 0; text-align:right;">
+      <span style="font-size:18px; color:#2e2926; font-weight:500;"><%= @booking.prestation.prix_euros %>€</span>
+    </td>
+  </tr>
+</table>
+
+<!-- Message d'attente de confirmation -->
+<div style="background:#fef9f0; border-radius:12px; padding:16px; margin-bottom:24px; border-left:3px solid #b8a898;">
+  <p style="font-size:13px; color:#6e6560; margin:0; line-height:1.6;">
+    <strong style="color:#2e2926;">En attente de confirmation</strong><br>
+    Syam vous enverra un email de confirmation dès validation. Pensez à vérifier vos spams.
+  </p>
+</div>
+
+<!-- Bouton CTA -->
+<div style="text-align:center; margin-bottom:24px;">
+  <%= link_to "Voir mon espace cliente", @espace_url,
+              style: "display:inline-block; background:#2e2926; color:#fff; text-decoration:none; padding:13px 28px; border-radius:40px; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500;" %>
+</div>
+
+<!-- À ne pas oublier -->
+<div style="border-top:1px solid #e8e2d8; padding-top:20px;">
+  <p style="font-size:11px; color:#988e88; letter-spacing:1px; text-transform:uppercase; margin:0 0 10px;">
+    À ne pas oublier
+  </p>
+  <p style="font-size:12px; color:#8e8480; line-height:1.8; margin:0;">
+    · Arrivez sans mascara ni maquillage sur les yeux.<br>
+    · Annulation gratuite jusqu'à 48h avant votre rendez-vous.<br>
+    · Un rappel vous sera envoyé la veille par email.
+  </p>
+</div>

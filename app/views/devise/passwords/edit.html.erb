@@ -1,25 +1,79 @@
-<h2>Change your password</h2>
+<% content_for :title, "Nouveau mot de passe" %>
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  <%= f.hidden_field :reset_password_token %>
+<%#
+  ============================================================
+  VUE — Réinitialisation du mot de passe (Devise passwords#edit)
+  Accessible via le lien reçu par email. Le token est dans l'URL.
+  ============================================================
+%>
 
-  <div class="field">
-    <p><%= f.label :password, "New password" %></p>
-    <% if @minimum_password_length %>
-      <p><em>(<%= @minimum_password_length %> characters minimum)</em></p>
-    <% end %>
-    <p><%= f.password_field :password, autofocus: true, autocomplete: "new-password" %></p>
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Compte</p>
+      <h1 class="ph-title">Nouveau<br>mot de passe</h1>
+      <p class="ph-intro">Choisissez un nouveau mot de passe pour accéder à votre espace cliente.</p>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="sec">
+
+      <%# Affiche les erreurs éventuelles (token expiré, mots de passe différents, etc.) %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%# form_for envoie PUT vers /users/password avec le token dans le champ caché %>
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+
+        <%# Token de réinitialisation — reçu dans l'URL par email, transmis en hidden %>
+        <%= f.hidden_field :reset_password_token %>
+
+        <%# --- Nouveau mot de passe --- %>
+        <div class="auth-field">
+          <%= f.label :password, "Nouveau mot de passe", class: "auth-label" %>
+          <% if @minimum_password_length %>
+            <span class="auth-hint"><%= @minimum_password_length %> caractères minimum</span>
+          <% end %>
+          <%= f.password_field :password,
+                               autofocus: true,
+                               autocomplete: "new-password",
+                               placeholder: "••••••••",
+                               class: "auth-input" %>
+        </div>
+
+        <%# --- Confirmation du mot de passe --- %>
+        <div class="auth-field">
+          <%= f.label :password_confirmation, "Confirmer le mot de passe", class: "auth-label" %>
+          <%= f.password_field :password_confirmation,
+                               autocomplete: "new-password",
+                               placeholder: "••••••••",
+                               class: "auth-input" %>
+        </div>
+
+        <%# --- Valider --- %>
+        <%= f.submit "Enregistrer le mot de passe", class: "btn-primary auth-submit" %>
+
+      <% end %>
+
+      <%# Lien retour connexion %>
+      <div class="auth-links">
+        <%= link_to "← Retour à la connexion", new_user_session_path, class: "auth-link" %>
+      </div>
+
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
   </div>
-
-  <div class="field">
-    <p><%= f.label :password_confirmation, "Confirm new password" %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Change my password" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

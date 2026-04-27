@@ -1,16 +1,58 @@
-<h2>Resend unlock instructions</h2>
+<% content_for :title, "Déverrouiller le compte" %>
 
-<%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+<%#
+  ============================================================
+  VUE — Renvoi des instructions de déverrouillage (Devise unlocks#new)
+  Affiché quand le compte est bloqué après trop de tentatives de connexion.
+  ============================================================
+%>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Compte</p>
+      <h1 class="ph-title">Déverrouiller<br>mon compte</h1>
+      <p class="ph-intro">Votre compte a été temporairement verrouillé. Saisissez votre email pour recevoir les instructions.</p>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="sec">
+
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post }) do |f| %>
+
+        <div class="auth-field">
+          <%= f.label :email, "Adresse email", class: "auth-label" %>
+          <%= f.email_field :email,
+                            autofocus: true,
+                            autocomplete: "email",
+                            placeholder: "marie@example.com",
+                            class: "auth-input" %>
+        </div>
+
+        <%= f.submit "Envoyer les instructions", class: "btn-primary auth-submit" %>
+
+      <% end %>
+
+      <div class="auth-links">
+        <%= link_to "← Retour à la connexion", new_user_session_path, class: "auth-link" %>
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
   </div>
-
-  <div class="actions">
-    <%= f.submit "Resend unlock instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

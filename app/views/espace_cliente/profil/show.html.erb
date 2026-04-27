@@ -1,0 +1,129 @@
+<% content_for :title, "Mon profil" %>
+
+<%#
+  ============================================================
+  VUE — Profil cliente (informations personnelles)
+  Données : @user = current_user, chargé par ProfilController#show
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Mon espace", espace_cliente_root_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HERO PROFIL ---- %>
+    <div class="profile-hero">
+      <%# Cercle avatar avec l'initiale du prénom %>
+      <div class="avatar"><%= current_user.initiale %></div>
+      <div class="profile-name"><%= current_user.full_name %></div>
+      <div class="profile-since">
+        Cliente depuis <%= I18n.l(current_user.created_at.to_date, format: "%B %Y") %>
+      </div>
+    </div>
+
+    <%# ---- INFORMATIONS PERSONNELLES ---- %>
+    <div class="sec">
+      <p class="s-tag">Mes informations</p>
+
+      <%# Liste des champs du profil en lignes label/valeur %>
+      <div class="settings-list">
+
+        <%# Prénom %>
+        <div class="setting-row">
+          <div class="setting-label">Prénom</div>
+          <div class="setting-value"><%= @user.first_name %></div>
+        </div>
+
+        <%# Nom de famille %>
+        <div class="setting-row">
+          <div class="setting-label">Nom</div>
+          <div class="setting-value"><%= @user.last_name %></div>
+        </div>
+
+        <%# Email (géré par Devise — modification via la page Devise) %>
+        <div class="setting-row">
+          <div class="setting-label">Email</div>
+          <div class="setting-value"><%= @user.email %></div>
+        </div>
+
+        <%# Téléphone (optionnel — peut être nil) %>
+        <div class="setting-row">
+          <div class="setting-label">Téléphone</div>
+          <div class="setting-value">
+            <%= @user.phone.present? ? @user.phone : "—" %>
+          </div>
+        </div>
+
+        <%# Date de naissance (optionnelle) %>
+        <div class="setting-row">
+          <div class="setting-label">Date de naissance</div>
+          <div class="setting-value">
+            <% if @user.birth_date.present? %>
+              <%= I18n.l(@user.birth_date, format: "%-d %B %Y") %>
+            <% else %>
+              —
+            <% end %>
+          </div>
+        </div>
+
+      </div>
+
+      <%# ---- ACTIONS ---- %>
+      <div style="margin-top: 24px;">
+        <%# Bouton principal : modifier prénom, nom, téléphone, date de naissance %>
+        <%= link_to "Modifier mes informations", edit_espace_cliente_profil_path, class: "btn-primary", style: "display:block; text-align:center;" %>
+
+        <%# Séparateur textuel pour distinguer clairement les deux actions %>
+        <p style="font-size: 11px; color: var(--color-muted); text-align: center; margin: 16px 0 8px; letter-spacing: 0.5px;">
+          Identifiants de connexion
+        </p>
+
+        <%# Lien secondaire discret : email et mot de passe via Devise %>
+        <%= link_to "Changer email / mot de passe →", edit_user_registration_path,
+                    style: "display:block; text-align:center; font-size:12px; color:var(--color-muted); text-decoration:underline; padding: 4px 0;" %>
+      </div>
+    </div>
+
+    <%# ---- ACTIONS DU COMPTE ---- %>
+    <div class="sec" style="padding-top: 0;">
+      <p class="s-tag">Mon compte</p>
+
+      <div class="settings-list">
+        <div class="setting-row">
+          <div class="setting-label">Membre depuis</div>
+          <div class="setting-value">
+            <%= I18n.l(current_user.created_at.to_date, format: "%-d %B %Y") %>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">Visites totales</div>
+          <div class="setting-value"><%= @fidelite_card.visites %></div>
+        </div>
+      </div>
+
+      <%# Déconnexion Devise (méthode DELETE sur la session) %>
+      <div style="margin-top: 20px;">
+        <%= link_to "Se déconnecter",
+                    destroy_user_session_path,
+                    data: { turbo_method: :delete },
+                    class: "btn-rdv-cancel",
+                    style: "display:block; text-align:center;" %>
+      </div>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

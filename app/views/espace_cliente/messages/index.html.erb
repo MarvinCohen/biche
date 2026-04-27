@@ -1,0 +1,105 @@
+<% content_for :title, "Mes messages" %>
+
+<%#
+  ============================================================
+  VUE — Liste des messages (newsletters, promos, rappels, anniversaire)
+  Données : @messages chargé par EspaceCliente::MessagesController#index
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Mon espace", espace_cliente_root_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HERO ---- %>
+    <div class="profile-hero">
+      <div class="avatar"><%= current_user.initiale %></div>
+      <div class="profile-name"><%= current_user.full_name %></div>
+      <div class="profile-since">Mes messages</div>
+    </div>
+
+    <%# ---- LISTE DES MESSAGES ---- %>
+    <div class="sec">
+      <p class="s-tag">Notifications</p>
+
+      <% if @messages.any? %>
+        <div class="newsletter-list">
+          <% @messages.each do |message| %>
+            <%# Lien vers la vue de détail (marque automatiquement comme lu) %>
+            <%= link_to espace_cliente_message_path(message), style: "text-decoration:none;" do %>
+              <div class="newsletter-item">
+
+                <%# Icône ronde selon le type de message %>
+                <div class="nl-icon nl-icon-<%= message.type_message == 'anniversaire' ? 'birthday' : (message.type_message == 'promo' ? 'promo' : 'news') %>">
+                  <%# SVG différent selon le type %>
+                  <% if message.type_message == 'anniversaire' %>
+                    <%# Cadeau pour l'anniversaire %>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <rect x="2" y="8" width="14" height="9" rx="2" stroke="#fff" stroke-width="1.3"/>
+                      <path d="M1 8h16" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/>
+                      <path d="M9 8V17" stroke="#fff" stroke-width="1.3"/>
+                      <path d="M9 8c0-2.5-3.5-2.5-3.5 0S9 8 9 8z" stroke="#fff" stroke-width="1.3"/>
+                      <path d="M9 8c0-2.5 3.5-2.5 3.5 0S9 8 9 8z" stroke="#fff" stroke-width="1.3"/>
+                    </svg>
+                  <% elsif message.type_message == 'promo' %>
+                    <%# Étiquette pour les promotions %>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M2 10l6-8 8 6-6 8-8-6z" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/>
+                    </svg>
+                  <% elsif message.type_message == 'rappel_rdv' %>
+                    <%# Cloche pour les rappels de RDV %>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M9 2a6 6 0 016 6v3l1 2H2l1-2V8a6 6 0 016-6z" stroke="#fff" stroke-width="1.3"/>
+                      <path d="M7 15a2 2 0 004 0" stroke="#fff" stroke-width="1.3"/>
+                    </svg>
+                  <% else %>
+                    <%# Étoile pour les nouvelles générales %>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                      <path d="M9 2l1.8 5.4H17L12 10.8l1.8 5.4L9 13.2l-4.8 3 1.8-5.4L1 7.4h6.2z"
+                            stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/>
+                    </svg>
+                  <% end %>
+                </div>
+
+                <%# Contenu : titre + date %>
+                <div class="nl-content">
+                  <div class="nl-title"><%= message.titre %></div>
+                  <div class="nl-date">
+                    <%# Format : "12 avril 2026" %>
+                    <%= I18n.l(message.created_at.to_date, format: "%-d %B %Y") %>
+                  </div>
+                </div>
+
+                <%# Badge lu / non lu %>
+                <span class="nl-badge <%= message.lu ? 'read' : '' %>">
+                  <%= message.lu ? 'Lu' : 'Nouveau' %>
+                </span>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+
+      <% else %>
+        <%# État vide : aucun message reçu %>
+        <div class="rdv-empty">
+          <div class="rdv-empty-text">Aucun message pour l'instant.</div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

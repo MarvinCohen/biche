@@ -1,0 +1,145 @@
+<% content_for :title, "Ma fidélité" %>
+
+<%#
+  ============================================================
+  VUE — Carte fidélité (page dédiée)
+  Données : @fidelite_card chargé par BaseController
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%# Retour au dashboard %>
+        <%= link_to "← Mon espace", espace_cliente_root_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HERO PROFIL mini ---- %>
+    <div class="profile-hero">
+      <div class="avatar"><%= current_user.initiale %></div>
+      <div class="profile-name"><%= current_user.full_name %></div>
+      <div class="profile-since">Programme fidélité</div>
+    </div>
+
+    <%# ---- CARTE FIDÉLITÉ ---- %>
+    <div class="sec">
+      <p class="s-tag">Ma carte</p>
+
+      <div class="fidelite-card">
+        <%# Ligne du haut : logo + compteur %>
+        <div class="fid-top">
+          <div class="fid-logo">Biche.</div>
+          <div>
+            <div class="fid-prog-label">Progression</div>
+            <%# points_cycle_actuel = visites modulo 10, pour le cycle en cours %>
+            <div class="fid-prog-num"><%= @fidelite_card.points_cycle_actuel %> / 10</div>
+          </div>
+        </div>
+
+        <%# 10 cercles : remplis pour les visites validées, vide/étoile pour les restants %>
+        <div class="fid-dots">
+          <% 10.times do |i| %>
+            <% if i < @fidelite_card.points_cycle_actuel %>
+              <%# Visite déjà effectuée : cercle rempli (beige doré) %>
+              <div class="fid-dot filled"></div>
+            <% elsif i == 9 %>
+              <%# Dernier cercle = récompense (étoile) %>
+              <div class="fid-dot star">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M6 1l1.2 3.6H11L8.1 6.8l1.1 3.4L6 8.3l-3.2 1.9 1.1-3.4L1 4.6h3.8z"
+                        fill="rgba(255,255,255,0.5)"/>
+                </svg>
+              </div>
+            <% else %>
+              <%# Visite à venir : cercle vide %>
+              <div class="fid-dot"></div>
+            <% end %>
+          <% end %>
+        </div>
+
+        <%# Barre de progression en % (méthode du modèle FideliteCard#progression_pourcent) %>
+        <div class="fid-progress-bar">
+          <div class="fid-progress-fill" style="width: <%= @fidelite_card.progression_pourcent %>%"></div>
+        </div>
+
+        <%# Bas de carte : message d'encouragement ou récompense disponible %>
+        <div class="fid-bottom">
+          <% if @fidelite_card.recompense_disponible? %>
+            <%# Récompense débloquée : message spécial %>
+            <div class="fid-next">🎉 <b>Pose offerte disponible !</b> Mentionnez-le lors de votre prochain RDV.</div>
+          <% else %>
+            <%# Encouragement : combien de visites restantes %>
+            <div class="fid-next">
+              Encore <b><%= @fidelite_card.points_restants %></b>
+              <%= @fidelite_card.points_restants == 1 ? "visite" : "visites" %>
+              pour une pose offerte
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%# ---- STATISTIQUES EN GRILLE 2×2 ---- %>
+      <div class="fid-stats">
+        <%# Total des visites depuis le début %>
+        <div class="fid-stat-card">
+          <span class="fid-stat-num"><%= @fidelite_card.visites %></span>
+          <span class="fid-stat-label">Visites totales</span>
+        </div>
+
+        <%# Points dans le cycle actuel (repart à 0 à chaque récompense) %>
+        <div class="fid-stat-card">
+          <span class="fid-stat-num"><%= @fidelite_card.points_cycle_actuel %></span>
+          <span class="fid-stat-label">Points ce cycle</span>
+        </div>
+
+        <%# Nombre de poses gratuites déjà obtenues %>
+        <div class="fid-stat-card">
+          <span class="fid-stat-num"><%= @fidelite_card.recompenses_utilisees %></span>
+          <span class="fid-stat-label">Poses offertes</span>
+        </div>
+
+        <%# Visites restantes avant la prochaine récompense %>
+        <div class="fid-stat-card">
+          <span class="fid-stat-num"><%= @fidelite_card.points_restants %></span>
+          <span class="fid-stat-label">Avant récompense</span>
+        </div>
+      </div>
+
+      <%# ---- RÈGLES DU PROGRAMME ---- %>
+      <div class="conditions-box" style="margin-top: 16px;">
+        <div class="conditions-title">Comment ça marche ?</div>
+        <div class="condition-item">
+          <div class="cond-dot"></div>
+          <div>Chaque soin effectué chez Biche. vous rapporte 1 point.</div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-dot"></div>
+          <div>À 10 points, une pose complète vous est offerte.</div>
+        </div>
+        <div class="condition-item">
+          <div class="cond-dot"></div>
+          <div>Les points ne sont pas cumulables avec d'autres offres.</div>
+        </div>
+      </div>
+
+      <%# CTA : revenir au dashboard ou réserver %>
+      <div class="bk-confirm-actions" style="margin-top: 24px;">
+        <%= link_to "Prendre rendez-vous", new_booking_path, class: "btn-primary" %>
+        <%= link_to "Mon espace", espace_cliente_root_path, class: "btn-ghost" %>
+      </div>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<% content_for :title, "Mes rendez-vous" %>
+
+<%#
+  ============================================================
+  VUE — Liste des rendez-vous à venir
+  Données : @rdvs chargé par EspaceCliente::RdvsController#index
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Mon espace", espace_cliente_root_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HERO ---- %>
+    <div class="profile-hero">
+      <div class="avatar"><%= current_user.initiale %></div>
+      <div class="profile-name"><%= current_user.full_name %></div>
+      <div class="profile-since">Mes rendez-vous à venir</div>
+    </div>
+
+    <%# ---- LISTE DES RDV ---- %>
+    <div class="sec">
+      <p class="s-tag">Prochains soins</p>
+
+      <% if @rdvs.any? %>
+        <%# On itère sur tous les RDV à venir triés par date %>
+        <% @rdvs.each do |rdv| %>
+          <div class="rdv-card">
+
+            <%# Bloc date : jour en grand + abréviation du mois %>
+            <div class="rdv-date">
+              <div class="rdv-day"><%= rdv.date.day %></div>
+              <%# I18n.l formate la date selon la locale FR (mois en français) %>
+              <div class="rdv-month"><%= I18n.l(rdv.date, format: "%b") %></div>
+            </div>
+
+            <%# Informations du RDV : prestation, heure, tags %>
+            <div class="rdv-info">
+              <div class="rdv-name"><%= rdv.prestation.nom %></div>
+              <div class="rdv-time">
+                <%# heure est un objet Time — strftime formate en "9h00" %>
+                <%= rdv.heure.strftime('%Hh%M') if rdv.heure %>
+                <% if rdv.heure_fin %>
+                  → <%= rdv.heure_fin.strftime('%Hh%M') %>
+                <% end %>
+              </div>
+              <div class="rdv-tags">
+                <span class="rdv-tag">Calao Studio</span>
+                <span class="rdv-tag"><%= rdv.prestation.duree_minutes %> min</span>
+                <%# Badge de statut : en attente de confirmation ou confirmé %>
+                <span class="rdv-tag" style="<%= rdv.statut == 'confirme' ? 'background:#e8f5e8;color:#4a7a4a;border-color:#c8e6c8;' : '' %>">
+                  <%= rdv.statut == 'confirme' ? 'Confirmé' : 'En attente' %>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <%# Bouton d'annulation (passe le statut à 'annule' via DELETE) %>
+          <div style="margin-bottom: 16px;">
+            <%= link_to "Annuler ce rendez-vous",
+                        booking_path(rdv),
+                        class: "btn-rdv-cancel",
+                        data: {
+                          turbo_method: :delete,
+                          turbo_confirm: "Confirmer l'annulation de votre rendez-vous du #{I18n.l(rdv.date, format: '%d %B %Y')} ?"
+                        } %>
+          </div>
+        <% end %>
+
+      <% else %>
+        <%# État vide : aucun RDV à venir %>
+        <div class="rdv-empty">
+          <div class="rdv-empty-text">Aucun rendez-vous à venir pour le moment.</div>
+          <%= link_to "Prendre rendez-vous", new_booking_path, class: "btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

@@ -53,12 +53,23 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Remonte les erreurs d'envoi pour les détecter rapidement en prod
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_deliveries = true
 
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  # URL de base pour les liens dans les emails (à mettre à jour avec le vrai domaine en prod)
+  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "example.com") }
+
+  # Envoi via Resend SMTP
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              "smtp.resend.com",
+    port:                 587,
+    user_name:            "resend",
+    password:             ENV["RESEND_API_KEY"],
+    authentication:       :plain,
+    enable_starttls_auto: true
+  }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {

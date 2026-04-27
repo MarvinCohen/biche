@@ -1,0 +1,155 @@
+<% content_for :title, "Historique des soins" %>
+
+<%#
+  ============================================================
+  VUE — Historique de tous les soins passés (statut 'termine')
+  Données : @soins chargé par EspaceCliente::HistoriqueController#index
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Mon espace", espace_cliente_root_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HERO ---- %>
+    <div class="profile-hero">
+      <div class="avatar"><%= current_user.initiale %></div>
+      <div class="profile-name"><%= current_user.full_name %></div>
+      <%# Affiche le nombre total de soins terminés %>
+      <div class="profile-since"><%= @soins.count %> soin<%= @soins.count > 1 ? 's' : '' %> réalisé<%= @soins.count > 1 ? 's' : '' %></div>
+    </div>
+
+    <%# ---- LISTE DES SOINS (accordéon) ---- %>
+    <div class="sec">
+      <p class="s-tag">Mes soins passés</p>
+
+      <% if @soins.any? %>
+        <div class="history-list">
+          <% @soins.each do |booking| %>
+            <%# Chaque soin est une carte accordéon — JS toggleHistory() l'ouvre/ferme %>
+            <div class="history-card" id="history-<%= booking.id %>">
+
+              <%# En-tête cliquable de la carte %>
+              <div class="history-header" onclick="toggleHistory(this.parentElement)">
+                <div class="history-left">
+                  <div class="history-name"><%= booking.prestation.nom %></div>
+                  <div class="history-date">
+                    <%# Date en français, ex: "12 avril 2026" %>
+                    <%= I18n.l(booking.date, format: "%-d %B %Y") %>
+                  </div>
+                </div>
+                <div class="history-right">
+                  <%# Prix en euros — prix_euros converti depuis les centimes %>
+                  <div class="history-price"><%= booking.prestation.prix_euros %>€</div>
+                  <%# Flèche pivotante (JS la tourne à l'ouverture) %>
+                  <div class="history-toggle">
+                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                      <path d="M1 1l4 4 4-4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <%# Détails cachés (affichés à l'ouverture) %>
+              <div class="history-details">
+                <% if booking.soin_historique.present? %>
+                  <%# Résumé technique si disponible %>
+                  <% sh = booking.soin_historique %>
+                  <% if sh.resume_technique.present? %>
+                    <div class="detail-grid">
+                      <%# Courbure %>
+                      <% if sh.courbure.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Courbure</div>
+                          <div class="detail-value"><%= sh.courbure %></div>
+                        </div>
+                      <% end %>
+                      <%# Longueur %>
+                      <% if sh.longueur.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Longueur</div>
+                          <div class="detail-value"><%= sh.longueur %></div>
+                        </div>
+                      <% end %>
+                      <%# Épaisseur %>
+                      <% if sh.epaisseur.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Épaisseur</div>
+                          <div class="detail-value"><%= sh.epaisseur %></div>
+                        </div>
+                      <% end %>
+                      <%# Technique %>
+                      <% if sh.technique.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Technique</div>
+                          <div class="detail-value"><%= sh.technique %></div>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+
+                  <%# Note de Syam — colonne "note_syam" %>
+                  <% if sh.note_syam.present? %>
+                    <div class="detail-note">
+                      <div class="detail-note-label">Note de Syam</div>
+                      <div class="detail-note-text"><%= sh.note_syam %></div>
+                    </div>
+                  <% end %>
+                <% else %>
+                  <%# Pas encore de fiche technique (Syam ne l'a pas encore remplie) %>
+                  <p style="font-size: 12px; color: var(--color-muted); font-style: italic; padding: 4px 0 8px;">
+                    Fiche technique non disponible.
+                  </p>
+                <% end %>
+
+                <%# Lien vers la page de détail complète %>
+                <%= link_to "Voir le détail →",
+                            espace_cliente_historique_path(booking),
+                            class: "history-rdv-btn",
+                            style: "margin-bottom: 4px;" %>
+
+                <%# CTA : réserver le même soin %>
+                <%= link_to "Reprendre cette pose →",
+                            new_booking_path(prestation_id: booking.prestation_id),
+                            class: "history-rdv-btn" %>
+              </div>
+
+            </div>
+          <% end %>
+        </div>
+
+      <% else %>
+        <%# État vide : aucun soin terminé %>
+        <div class="rdv-empty">
+          <div class="rdv-empty-text">Vous n'avez pas encore de soins enregistrés.</div>
+          <%= link_to "Prendre rendez-vous", new_booking_path, class: "btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>
+
+<%# ---- JS : accordéon historique (même logique que le dashboard) ---- %>
+<% content_for :head do %>
+  <script>
+    // Ouvre ou ferme une carte d'historique en toggleant la classe "open"
+    function toggleHistory(card) {
+      card.classList.toggle('open');
+    }
+  </script>
+<% end %>

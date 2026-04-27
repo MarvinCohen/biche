@@ -1,13 +1,58 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
-  </head>
+<html lang="fr">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    LAYOUT EMAIL Biche.
+    Les styles doivent être INLINE — les clients email (Gmail, Outlook...)
+    ignorent les balises <style> et les feuilles de style externes.
+    On utilise des divs avec style="" plutôt que des classes CSS.
+  -->
+</head>
+<body style="margin:0; padding:0; background:#f0ede8; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing:antialiased;">
 
-  <body>
-    <%= yield %>
-  </body>
+  <!-- Conteneur principal centré, max 480px -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0ede8; padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+
+          <!-- ===== EN-TÊTE : fond sombre avec logo ===== -->
+          <tr>
+            <td style="background:#2e2926; border-radius:20px 20px 0 0; padding:28px 32px; text-align:center;">
+              <!-- Logo Biche. en italic -->
+              <div style="font-size:28px; color:#fff; font-style:italic; letter-spacing:1px; margin-bottom:4px;">
+                Biche.
+              </div>
+              <!-- Sous-titre doré -->
+              <div style="font-size:10px; color:#b8a898; letter-spacing:3px; text-transform:uppercase;">
+                Technicienne du regard · Bordeaux
+              </div>
+            </td>
+          </tr>
+
+          <!-- ===== CONTENU : fond crème ===== -->
+          <tr>
+            <td style="background:#faf9f7; padding:32px 32px 24px; border-left:1px solid #e8e2d8; border-right:1px solid #e8e2d8;">
+              <%= yield %>
+            </td>
+          </tr>
+
+          <!-- ===== PIED DE PAGE ===== -->
+          <tr>
+            <td style="background:#2e2926; border-radius:0 0 20px 20px; padding:20px 32px; text-align:center;">
+              <div style="font-size:11px; color:rgba(255,255,255,0.45); line-height:1.8;">
+                Calao Studio · 37 Rue Lachassaigne · 33000 Bordeaux<br>
+                © <%= Date.today.year %> Biche. · Tous droits réservés
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
 </html>

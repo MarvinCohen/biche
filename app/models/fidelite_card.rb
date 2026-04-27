@@ -47,4 +47,17 @@ class FideliteCard < ApplicationRecord
     increment!(:visites)
     increment!(:points)
   end
+
+  # Vérifie si la cliente a droit à une récompense (10 visites atteintes)
+  # Utilisé dans les vues espace cliente pour afficher le badge "Pose offerte"
+  def recompense_disponible?
+    visites >= VISITES_POUR_RECOMPENSE && (visites / VISITES_POUR_RECOMPENSE) > recompenses_utilisees
+  end
+
+  # Marque une récompense comme utilisée (ex: quand Syam offre la pose)
+  # Incrémente recompenses_utilisees pour ne pas re-déclencher la récompense
+  def utiliser_recompense!
+    raise "Aucune récompense disponible" unless recompense_disponible?
+    increment!(:recompenses_utilisees)
+  end
 end

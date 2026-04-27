@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get "morphologie", to: "pages#morphologie", as: :morphologie
   get "avis",        to: "pages#avis",        as: :avis
   get "contact",     to: "pages#contact",     as: :contact
+  get "shop",        to: "pages#shop",        as: :shop
 
   # ============================================================
   # PRESTATIONS — catalogue des soins (lecture seule côté cliente)
@@ -26,6 +27,8 @@ Rails.application.routes.draw do
     collection do
       # Créneaux disponibles pour une date donnée (appelé en AJAX)
       get :creneaux
+      # Page de confirmation après paiement Stripe réussi
+      get :success
     end
   end
 
@@ -57,9 +60,34 @@ Rails.application.routes.draw do
   end
 
   # ============================================================
-  # SHOP — boutique en ligne
+  # ADMIN — interface de gestion pour Syam (accès restreint admin: true)
   # ============================================================
-  get "shop", to: "shop#index", as: :shop
+  namespace :admin do
+    # Tableau de bord : planning du jour + stats
+    root to: "dashboard#index"
+
+    # Réservations : liste (avec filtre date), détail, changement de statut
+    resources :bookings, only: [:index, :show] do
+      member do
+        patch :confirmer   # en_attente → confirme
+        patch :terminer    # confirme  → termine
+        patch :annuler     # * → annule
+      end
+    end
+
+    # Fiches techniques post-soin (créées par Syam après chaque prestation)
+    resources :soins_historiques, only: [:new, :create, :edit, :update]
+
+    # Clientes : liste et profil complet
+    resources :users, only: [:index, :show]
+
+    # Messages : envoi de newsletters / notifications aux clientes
+    resources :messages, only: [:new, :create]
+  end
+
+  # ============================================================
+  # SHOP — boutique en ligne (à connecter aux paiements Stripe plus tard)
+  # ============================================================
   resources :orders, only: [:new, :create, :show]
 
   # ============================================================

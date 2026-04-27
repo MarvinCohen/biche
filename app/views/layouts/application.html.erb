@@ -34,5 +34,120 @@
 
     <!-- Contenu principal de chaque page -->
     <%= yield %>
+
+    <%# ============================================================
+        MENU NAVIGATION BURGER — commun à toutes les pages
+        Overlay + panel latéral déclenché par .burger au clic
+        Le JS ci-dessous écoute tous les clics sur .burger globalement
+    ============================================================ %>
+
+    <%# Fond semi-transparent (cliquer dessus ferme le menu) %>
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <%# Panel menu glissant depuis la droite %>
+    <div class="nav-menu" id="nav-menu" aria-hidden="true">
+
+      <%# En-tête : logo + bouton fermer %>
+      <div class="nav-menu-header">
+        <%= link_to "Biche.", root_path, class: "nav-menu-logo" %>
+        <button class="nav-menu-close" id="nav-menu-close" aria-label="Fermer le menu">×</button>
+      </div>
+
+      <%# Liens principaux %>
+      <div class="nav-menu-links">
+        <%= link_to "Accueil",             root_path,          class: "nav-menu-link" %>
+        <%= link_to "Prestations & tarifs", prestations_path,  class: "nav-menu-link" %>
+        <%= link_to "À propos",            about_path,         class: "nav-menu-link" %>
+        <%= link_to "Galerie",             galerie_path,       class: "nav-menu-link" %>
+        <%= link_to "Guide morphologie",   morphologie_path,   class: "nav-menu-link" %>
+        <%= link_to "Avis",                avis_path,          class: "nav-menu-link" %>
+
+        <hr class="nav-menu-sep">
+
+        <%= link_to "FAQ",                 faq_path,           class: "nav-menu-link" %>
+        <%= link_to "Contact",             contact_path,       class: "nav-menu-link" %>
+        <%= link_to "Shop",                shop_path,          class: "nav-menu-link" %>
+
+        <hr class="nav-menu-sep">
+
+        <%# Liens selon l'état de connexion %>
+        <% if user_signed_in? %>
+          <%= link_to "Mon espace cliente", espace_cliente_root_path, class: "nav-menu-link" %>
+          <%= link_to "Déconnexion",
+                      destroy_user_session_path,
+                      data: { turbo_method: :delete },
+                      class: "nav-menu-link",
+                      style: "color: #c47a7a;" %>
+        <% else %>
+          <%= link_to "Se connecter",   new_user_session_path,      class: "nav-menu-link" %>
+          <%= link_to "Créer un compte", new_user_registration_path, class: "nav-menu-link" %>
+        <% end %>
+      </div>
+
+      <%# Bouton CTA principal %>
+      <%= link_to "Prendre rendez-vous", new_booking_path, class: "nav-menu-link-cta" %>
+
+      <%# Pied du menu : infos salon %>
+      <div class="nav-menu-footer">
+        <div class="nav-menu-footer-text">
+          Calao Studio<br>
+          37 Rue Lachassaigne · 33000 Bordeaux<br>
+          Lun – Sam · 9h – 18h
+        </div>
+      </div>
+
+    </div>
+
+    <%# Script global — écoute tous les .burger de toutes les pages %>
+    <script>
+      (function() {
+        // Récupère les éléments du menu
+        var overlay = document.getElementById('nav-overlay');
+        var menu    = document.getElementById('nav-menu');
+        var closeBtn = document.getElementById('nav-menu-close');
+
+        // Ouvre le menu
+        function openMenu() {
+          menu.classList.add('open');
+          overlay.classList.add('open');
+          menu.setAttribute('aria-hidden', 'false');
+          // Cherche le burger actif (la page courante peut en avoir plusieurs)
+          document.querySelectorAll('.burger').forEach(function(b) {
+            b.classList.add('open');
+          });
+        }
+
+        // Ferme le menu
+        function closeMenu() {
+          menu.classList.remove('open');
+          overlay.classList.remove('open');
+          menu.setAttribute('aria-hidden', 'true');
+          document.querySelectorAll('.burger').forEach(function(b) {
+            b.classList.remove('open');
+          });
+        }
+
+        // Délégation d'événement : écoute les clics sur n'importe quel .burger
+        // (ils sont dans les vues individuelles, pas dans ce layout)
+        document.addEventListener('click', function(e) {
+          var burger = e.target.closest('.burger');
+          if (burger) {
+            menu.classList.contains('open') ? closeMenu() : openMenu();
+          }
+        });
+
+        // Fermer via le bouton × dans le menu
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+
+        // Fermer en cliquant sur l'overlay
+        if (overlay) overlay.addEventListener('click', closeMenu);
+
+        // Fermer avec la touche Échap
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') closeMenu();
+        });
+      })();
+    </script>
+
   </body>
 </html>

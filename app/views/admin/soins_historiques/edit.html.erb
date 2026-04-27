@@ -1,0 +1,70 @@
+<% content_for :title, "Admin — Modifier fiche" %>
+
+<%#
+  ============================================================
+  VUE — Modification de la fiche technique
+  Données : @soin_historique (existant), @booking
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← RDV", admin_booking_path(@booking), class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Modifier la fiche</div>
+      <div class="admin-header-sub">
+        <%= @booking.user.full_name %> · <%= I18n.l(@booking.date, format: "%-d %B %Y") %>
+      </div>
+    </div>
+
+    <div class="admin-sec">
+      <div class="admin-sec-title"><%= @booking.prestation.nom %></div>
+
+      <%# form_with PATCH vers /admin/soins_historiques/:id %>
+      <%= form_with model: [:admin, @soin_historique], local: true do |f| %>
+
+        <div class="admin-grid-2">
+
+          <div class="admin-field">
+            <%= f.label :courbure, "Courbure", class: "admin-label" %>
+            <%= f.text_field :courbure, class: "admin-input", placeholder: "C, D, L..." %>
+          </div>
+
+          <div class="admin-field">
+            <%= f.label :longueur, "Longueur", class: "admin-label" %>
+            <%= f.text_field :longueur, class: "admin-input", placeholder: "11-13mm" %>
+          </div>
+
+          <div class="admin-field">
+            <%= f.label :epaisseur, "Épaisseur", class: "admin-label" %>
+            <%= f.text_field :epaisseur, class: "admin-input", placeholder: "0.07mm" %>
+          </div>
+
+          <div class="admin-field">
+            <%= f.label :technique, "Technique", class: "admin-label" %>
+            <%= f.text_field :technique, class: "admin-input", placeholder: "Volume 2D" %>
+          </div>
+
+        </div>
+
+        <div class="admin-field">
+          <%= f.label :note_syam, "Note personnelle", class: "admin-label" %>
+          <%= f.text_area :note_syam,
+                          class: "admin-textarea",
+                          placeholder: "Texture des cils, réactions, recommandations..." %>
+        </div>
+
+        <%= f.submit "Mettre à jour la fiche", class: "btn-admin-terminer" %>
+
+      <% end %>
+    </div>
+
+  </div>
+</div>

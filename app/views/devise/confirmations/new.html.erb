@@ -1,16 +1,60 @@
-<h2>Resend confirmation instructions</h2>
+<% content_for :title, "Renvoyer les instructions" %>
 
-<%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+<%#
+  ============================================================
+  VUE — Renvoi des instructions de confirmation (Devise confirmations#new)
+  Affiché quand la cliente n'a pas confirmé son email à l'inscription.
+  ============================================================
+%>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email", value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email) %></p>
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Compte</p>
+      <h1 class="ph-title">Confirmer<br>mon email</h1>
+      <p class="ph-intro">Saisissez votre email pour recevoir un nouveau lien de confirmation.</p>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="sec">
+
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post }) do |f| %>
+
+        <div class="auth-field">
+          <%= f.label :email, "Adresse email", class: "auth-label" %>
+          <%# Si un changement d'email est en attente, on pré-remplit avec le nouvel email %>
+          <%= f.email_field :email,
+                            autofocus: true,
+                            autocomplete: "email",
+                            placeholder: "marie@example.com",
+                            value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email),
+                            class: "auth-input" %>
+        </div>
+
+        <%= f.submit "Renvoyer les instructions", class: "btn-primary auth-submit" %>
+
+      <% end %>
+
+      <div class="auth-links">
+        <%= link_to "← Retour à la connexion", new_user_session_path, class: "auth-link" %>
+      </div>
+
+    </div>
+
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
   </div>
-
-  <div class="actions">
-    <%= f.submit "Resend confirmation instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

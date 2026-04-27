@@ -21,3 +21,9 @@
 
 /* Styles de l'espace cliente (dashboard, fidélité, historique, messages, profil) */
 @import "espace_cliente.css";
+
+/* Styles des pages statiques (À propos, FAQ, Contact, Avis, Morphologie, Galerie, Shop) */
+@import "pages.css";
+
+/* Styles de l'interface admin Syam (planning, fiches soins, clientes) */
+@import "admin.css";

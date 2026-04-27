@@ -1,0 +1,71 @@
+<%#
+  EMAIL — Rappel 24h avant le rendez-vous
+  Envoyé automatiquement la veille par la rake task
+  Variables : @booking, @user, @espace_url
+%>
+
+<!-- Tag -->
+<p style="font-size:11px; color:#b8a898; letter-spacing:3px; text-transform:uppercase; margin:0 0 8px;">
+  Rappel
+</p>
+
+<!-- Titre -->
+<h1 style="font-size:26px; color:#2e2926; margin:0 0 12px; font-weight:400; line-height:1.2;">
+  C'est demain,<br><%= @user.first_name %> !
+</h1>
+
+<p style="font-size:14px; color:#6e6560; line-height:1.7; margin:0 0 24px;">
+  Votre rendez-vous chez Biche. est demain. Voici un petit récapitulatif pour ne rien oublier.
+</p>
+
+<!-- Récap compact -->
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f2ee; border-radius:14px; padding:20px; margin-bottom:20px; border:1px solid #e8e2d8;">
+  <tr>
+    <td style="padding:7px 0; border-bottom:1px solid #ece8e2;">
+      <span style="font-size:12px; color:#988e88;">Soin</span>
+    </td>
+    <td style="padding:7px 0; border-bottom:1px solid #ece8e2; text-align:right;">
+      <span style="font-size:13px; color:#2e2926; font-weight:500;"><%= @booking.prestation.nom %></span>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:7px 0; border-bottom:1px solid #ece8e2;">
+      <span style="font-size:12px; color:#988e88;">Heure</span>
+    </td>
+    <td style="padding:7px 0; border-bottom:1px solid #ece8e2; text-align:right;">
+      <span style="font-size:13px; color:#2e2926; font-weight:500;">
+        <%= @booking.heure.strftime('%Hh%M') if @booking.heure %>
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:7px 0;">
+      <span style="font-size:12px; color:#988e88;">Adresse</span>
+    </td>
+    <td style="padding:7px 0; text-align:right;">
+      <span style="font-size:12px; color:#2e2926;">37 Rue Lachassaigne, Bordeaux</span>
+    </td>
+  </tr>
+</table>
+
+<!-- Check-list -->
+<div style="background:#faf9f7; border-radius:12px; padding:16px; margin-bottom:24px; border:1px solid #e8e2d8;">
+  <p style="font-size:10px; color:#988e88; letter-spacing:1.5px; text-transform:uppercase; margin:0 0 10px;">
+    Check-list
+  </p>
+  <p style="font-size:13px; color:#6e6560; line-height:2; margin:0;">
+    ✓ &nbsp;Pas de mascara ni maquillage sur les yeux<br>
+    ✓ &nbsp;Arriver 5 minutes avant<br>
+    ✗ &nbsp;En cas d'empêchement, contactez Syam directement
+  </p>
+</div>
+
+<!-- Bouton annulation si besoin -->
+<div style="text-align:center; margin-bottom:12px;">
+  <%= link_to "Mon espace cliente", @espace_url,
+              style: "display:inline-block; background:#2e2926; color:#fff; text-decoration:none; padding:13px 28px; border-radius:40px; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; font-weight:500;" %>
+</div>
+
+<p style="font-size:11px; color:#988e88; text-align:center; margin:0;">
+  À demain ! Syam vous attend avec impatience.
+</p>

@@ -1,0 +1,141 @@
+<% content_for :title, "Admin — Profil cliente" %>
+
+<%#
+  ============================================================
+  VUE — Profil complet d'une cliente vu par Syam
+  Données : @user, @fidelite_card, @prochain_rdv, @historique, @rdvs_futurs
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Clientes", admin_users_path, class: "admin-logout" %>
+    </nav>
+
+    <%# ---- HERO CLIENTE ---- %>
+    <div class="admin-header">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <%# Avatar initiale %>
+        <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--color-accent),#8e8882);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:22px;color:#fff;flex-shrink:0;">
+          <%= @user.initiale %>
+        </div>
+        <div>
+          <div class="admin-header-title" style="margin-bottom:2px;"><%= @user.full_name %></div>
+          <div class="admin-header-sub">
+            Cliente depuis <%= I18n.l(@user.created_at.to_date, format: "%B %Y") %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Stats rapides %>
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <span class="admin-stat-num"><%= @fidelite_card&.visites || 0 %></span>
+        <span class="admin-stat-label">Visites</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat-num"><%= @rdvs_futurs.count %></span>
+        <span class="admin-stat-label">À venir</span>
+      </div>
+      <div class="admin-stat">
+        <span class="admin-stat-num"><%= @fidelite_card&.points_cycle_actuel || 0 %></span>
+        <span class="admin-stat-label">Points</span>
+      </div>
+    </div>
+
+    <%# ---- COORDONNÉES ---- %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Coordonnées</div>
+      <div class="admin-detail-box">
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Email</div>
+          <div class="admin-detail-value" style="font-size:12px;"><%= @user.email %></div>
+        </div>
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Téléphone</div>
+          <div class="admin-detail-value"><%= @user.phone.present? ? @user.phone : "—" %></div>
+        </div>
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Anniversaire</div>
+          <div class="admin-detail-value">
+            <% if @user.birth_date.present? %>
+              <%= I18n.l(@user.birth_date, format: "%-d %B %Y") %>
+            <% else %>
+              —
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# ---- RDV À VENIR ---- %>
+    <% if @rdvs_futurs.any? %>
+      <div class="admin-sec">
+        <div class="admin-sec-title">Prochains RDV</div>
+        <% @rdvs_futurs.each do |rdv| %>
+          <%= link_to admin_booking_path(rdv), class: "admin-rdv-card" do %>
+            <div class="admin-rdv-heure" style="font-size:12px;">
+              <%= rdv.date.day %><br>
+              <span style="font-size:9px;opacity:0.7;"><%= I18n.l(rdv.date, format: "%b") %></span>
+            </div>
+            <div class="admin-rdv-info">
+              <div class="admin-rdv-prestation"><%= rdv.prestation.nom %></div>
+              <div class="admin-rdv-prestation"><%= rdv.heure.strftime('%Hh%M') if rdv.heure %></div>
+              <% badge_class = rdv.statut == 'confirme' ? 'admin-badge-confirme' : 'admin-badge-attente' %>
+              <span class="admin-badge <%= badge_class %>">
+                <%= rdv.statut == 'confirme' ? 'Confirmé' : 'En attente' %>
+              </span>
+            </div>
+            <div style="color:#c8c2bc;font-size:14px;">›</div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# ---- HISTORIQUE DES SOINS ---- %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Historique (<%= @historique.count %>)</div>
+
+      <% if @historique.any? %>
+        <% @historique.each do |booking| %>
+          <%= link_to admin_booking_path(booking), class: "admin-rdv-card" do %>
+            <div class="admin-rdv-heure" style="background:#8e8882;font-size:12px;">
+              <%= booking.date.day %><br>
+              <span style="font-size:9px;opacity:0.7;"><%= I18n.l(booking.date, format: "%b") %></span>
+            </div>
+            <div class="admin-rdv-info">
+              <div class="admin-rdv-prestation"><%= booking.prestation.nom %></div>
+              <%# Résumé technique si la fiche existe %>
+              <% if booking.soin_historique&.resume_technique.present? %>
+                <div class="admin-rdv-prestation" style="font-size:10px;color:#988e88;">
+                  <%= booking.soin_historique.resume_technique %>
+                </div>
+              <% end %>
+              <span class="admin-badge admin-badge-termine">Terminé</span>
+            </div>
+            <div style="color:#c8c2bc;font-size:14px;">›</div>
+          <% end %>
+        <% end %>
+
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">Aucun soin terminé.</div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ---- ACTION : envoyer un message à cette cliente ---- %>
+    <div class="admin-sec">
+      <%= link_to "Envoyer un message à #{@user.first_name}",
+                  new_admin_message_path(user_id: @user.id),
+                  class: "btn-admin-fiche" %>
+    </div>
+
+  </div>
+</div>

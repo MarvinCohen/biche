@@ -1,42 +1,126 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<% content_for :title, "Modifier email / mot de passe" %>
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+<%#
+  ============================================================
+  VUE — Modification email et mot de passe (Devise registrations#edit)
+  Accessible depuis l'espace cliente (lien "Changer email / mot de passe").
+  Devise exige le mot de passe actuel pour valider les changements.
+  ============================================================
+%>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Mon profil", espace_cliente_profil_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Sécurité</p>
+      <h1 class="ph-title">Email &<br>mot de passe</h1>
+      <p class="ph-intro">Modifiez vos identifiants de connexion. Votre mot de passe actuel est requis pour confirmer.</p>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="sec">
+
+      <%# Affiche les erreurs de validation %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%# form_for envoie PUT vers /users (route Devise registrations#update) %>
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+
+        <%# --- Email actuel --- %>
+        <div class="auth-field">
+          <%= f.label :email, "Adresse email", class: "auth-label" %>
+          <%= f.email_field :email,
+                            autofocus: true,
+                            autocomplete: "email",
+                            class: "auth-input" %>
+        </div>
+
+        <%# Avertissement si un changement d'email est en attente de confirmation %>
+        <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+          <p style="font-size:12px; color:var(--color-muted); margin-bottom:16px; font-style:italic;">
+            En attente de confirmation pour : <%= resource.unconfirmed_email %>
+          </p>
+        <% end %>
+
+        <%# --- Nouveau mot de passe (laisser vide pour ne pas changer) --- %>
+        <div class="auth-field">
+          <%= f.label :password, "Nouveau mot de passe", class: "auth-label" %>
+          <span class="auth-hint">Laisser vide pour conserver l'actuel</span>
+          <% if @minimum_password_length %>
+            <span class="auth-hint"><%= @minimum_password_length %> caractères minimum</span>
+          <% end %>
+          <%= f.password_field :password,
+                               autocomplete: "new-password",
+                               placeholder: "••••••••",
+                               class: "auth-input" %>
+        </div>
+
+        <%# --- Confirmation du nouveau mot de passe --- %>
+        <div class="auth-field">
+          <%= f.label :password_confirmation, "Confirmer le nouveau mot de passe", class: "auth-label" %>
+          <%= f.password_field :password_confirmation,
+                               autocomplete: "new-password",
+                               placeholder: "••••••••",
+                               class: "auth-input" %>
+        </div>
+
+        <%# Séparateur visuel — le mot de passe actuel est toujours requis par Devise %>
+        <hr style="border:none; border-top:1px solid var(--color-border); margin: 20px 0;">
+
+        <%# --- Mot de passe actuel (requis par Devise pour confirmer les changements) --- %>
+        <div class="auth-field">
+          <%= f.label :current_password, "Mot de passe actuel", class: "auth-label" %>
+          <span class="auth-hint">Obligatoire pour valider toute modification</span>
+          <%= f.password_field :current_password,
+                               autocomplete: "current-password",
+                               placeholder: "••••••••",
+                               class: "auth-input" %>
+        </div>
+
+        <%# --- Valider les changements --- %>
+        <%= f.submit "Enregistrer les modifications", class: "btn-primary auth-submit" %>
+
+      <% end %>
+
+      <%# Liens secondaires %>
+      <div class="auth-links">
+        <%= link_to "← Retour au profil", espace_cliente_profil_path, class: "auth-link" %>
+      </div>
+
+      <%# ---- ZONE DANGER : suppression du compte ---- %>
+      <div style="margin-top: 32px; padding: 16px; background: #fdf6f6; border-radius: 14px; border: 1px solid #f5c6c6;">
+        <p style="font-size: 11px; color: #c47a7a; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px;">
+          Zone dangereuse
+        </p>
+        <p style="font-size: 12px; color: #8e6060; margin-bottom: 14px; line-height: 1.6;">
+          La suppression de votre compte est définitive. Toutes vos réservations et votre historique seront perdus.
+        </p>
+        <%# button_to génère un formulaire avec méthode DELETE — turbo_confirm demande confirmation %>
+        <%= button_to "Supprimer mon compte",
+                      registration_path(resource_name),
+                      data: { turbo_confirm: "Êtes-vous sûre de vouloir supprimer votre compte ? Cette action est irréversible." },
+                      method: :delete,
+                      class: "btn-rdv-cancel",
+                      style: "width:100%; display:block;" %>
+      </div>
+
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
   </div>
-
-  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
-  <% end %>
-
-  <div class="field">
-    <p><%= f.label :password %> <i>(leave blank if you don't want to change it)</i></p>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
-    <% if @minimum_password_length %>
-      <p><em><%= @minimum_password_length %> characters minimum</em></p>
-    <% end %>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :current_password %> <i>(we need your current password to confirm your changes)</i></p>
-    <p><%= f.password_field :current_password, autocomplete: "current-password" %></p>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Update" %>
-  </div>
-<% end %>
-
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+</div>

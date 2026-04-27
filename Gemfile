@@ -50,6 +50,8 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 group :development, :test do
+  # Charge les variables d'environnement depuis .env (clés Stripe, etc.)
+  gem "dotenv-rails"
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
 
@@ -66,4 +68,7 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Ouvre les emails dans le navigateur en dev plutôt que de les envoyer vraiment
+  gem "letter_opener"
 end

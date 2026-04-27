@@ -19,7 +19,9 @@ class Message < ApplicationRecord
   # ============================================================
 
   # Messages non lus uniquement
-  scope :non_lus, -> { where(lu: false) }
+  # On inclut lu: nil car les messages créés sans valeur explicite ont lu = NULL en base
+  # where(lu: false) seul raterait ces enregistrements → on couvre false ET nil
+  scope :non_lus, -> { where(lu: [false, nil]) }
 
   # Du plus récent au plus ancien
   scope :recents, -> { order(created_at: :desc) }

@@ -1,0 +1,520 @@
+/* ============================================================
+   STYLES — Interface admin Syam
+   Style sobre et fonctionnel, différent de l'espace cliente
+   Palette : fond blanc cassé, dark brun, accents beige
+   ============================================================ */
+
+/* ---- LAYOUT GLOBAL ---- */
+
+/* Fond légèrement différent du fond espace cliente pour distinguer l'admin */
+.admin-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.admin-phone {
+  background: #faf9f7;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  min-height: 100vh;
+}
+
+/* ---- NAVIGATION ADMIN ---- */
+
+/* Barre du haut : fond sombre pour distinguer visuellement du mode cliente */
+.admin-nav {
+  background: var(--color-dark);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo "Biche. Admin" en blanc */
+.admin-nav-logo {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: #fff;
+  text-decoration: none;
+  font-style: italic;
+}
+
+/* Sous-titre "Admin" en accent beige */
+.admin-nav-logo span {
+  font-family: var(--font-sans);
+  font-size: 9px;
+  color: var(--color-accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  display: block;
+  font-style: normal;
+}
+
+/* Lien de déconnexion en blanc discret */
+.admin-logout {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: var(--font-sans);
+}
+
+/* ---- HEADER DE SECTION ---- */
+
+/* Bande sombre sous la nav : titre de la page */
+.admin-header {
+  background: var(--color-dark);
+  padding: 18px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.admin-header-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.admin-header-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.5px;
+}
+
+/* ---- STATS RAPIDES (grille 3 ou 2 colonnes) ---- */
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  background: #2e2926;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.admin-stat {
+  padding: 14px 12px;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.admin-stat:last-child {
+  border-right: none;
+}
+
+.admin-stat-num {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--color-accent);
+  display: block;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.admin-stat-label {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ---- SECTION CONTENU ---- */
+
+.admin-sec {
+  padding: 20px;
+  border-bottom: 1px solid #f0ede8;
+}
+
+.admin-sec:last-child {
+  border-bottom: none;
+}
+
+.admin-sec-title {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+
+/* ---- CARTE RDV (liste planning) ---- */
+
+/* Carte cliquable pour chaque réservation */
+.admin-rdv-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-rdv-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+/* Bloc heure à gauche */
+.admin-rdv-heure {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Infos du RDV */
+.admin-rdv-info { flex: 1; min-width: 0; }
+
+.admin-rdv-cliente {
+  font-size: 14px;
+  color: var(--color-dark);
+  font-weight: 500;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-rdv-prestation {
+  font-size: 11px;
+  color: var(--color-muted);
+  margin-bottom: 5px;
+}
+
+/* ---- BADGES DE STATUT ---- */
+
+.admin-badge {
+  font-size: 8px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* En attente de confirmation */
+.admin-badge-attente {
+  background: #fef3e2;
+  color: #c47a2a;
+  border: 1px solid #f5ddb0;
+}
+
+/* Confirmé */
+.admin-badge-confirme {
+  background: #e8f5e8;
+  color: #3a7a3a;
+  border: 1px solid #c0ddc0;
+}
+
+/* Terminé */
+.admin-badge-termine {
+  background: #f0ede8;
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* Annulé */
+.admin-badge-annule {
+  background: #fdecea;
+  color: #c47a7a;
+  border: 1px solid #f5c6c6;
+}
+
+/* ---- BOUTONS D'ACTION ---- */
+
+/* Bouton confirmer (vert discret) */
+.btn-admin-confirmer {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  border-radius: 30px;
+  background: #e8f5e8;
+  color: #3a7a3a;
+  border: 1px solid #c0ddc0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+/* Bouton terminer (brun principal) */
+.btn-admin-terminer {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  border-radius: 30px;
+  background: var(--color-dark);
+  color: #fff;
+  border: 1px solid var(--color-dark);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+/* Bouton annuler (rouge discret) */
+.btn-admin-annuler {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  border-radius: 30px;
+  background: transparent;
+  color: #c47a7a;
+  border: 1px solid #f5c6c6;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+/* Bouton fiche soin (beige accent) */
+.btn-admin-fiche {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  border-radius: 30px;
+  background: transparent;
+  color: var(--color-dark);
+  border: 1px solid var(--color-dark);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+/* ---- FICHE DÉTAIL (recap) ---- */
+
+.admin-detail-box {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.admin-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0ede8;
+}
+
+.admin-detail-row:last-child {
+  border-bottom: none;
+}
+
+.admin-detail-label {
+  font-size: 11px;
+  color: var(--color-muted);
+  letter-spacing: 0.3px;
+}
+
+.admin-detail-value {
+  font-size: 13px;
+  color: var(--color-dark);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* ---- FORMULAIRE FICHE SOIN ---- */
+
+.admin-field {
+  margin-bottom: 16px;
+}
+
+.admin-label {
+  display: block;
+  font-size: 10px;
+  color: var(--color-dark);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.admin-input,
+.admin-textarea,
+.admin-select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--color-dark);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.admin-input:focus,
+.admin-textarea:focus,
+.admin-select:focus {
+  border-color: var(--color-accent);
+}
+
+.admin-textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+}
+
+/* Grille 2 colonnes pour les champs techniques */
+.admin-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ---- LISTE CLIENTES ---- */
+
+.admin-user-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.admin-user-card:hover {
+  border-color: var(--color-accent);
+}
+
+/* Mini avatar avec initiale */
+.admin-user-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), #8e8882);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.admin-user-info { flex: 1; min-width: 0; }
+
+.admin-user-name {
+  font-size: 14px;
+  color: var(--color-dark);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.admin-user-email {
+  font-size: 11px;
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- FILTRE DATE (barre de navigation par date) ---- */
+
+.admin-date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-date-nav-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #f6f4f1;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--color-dark);
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.admin-date-nav-btn:hover {
+  background: var(--color-dark);
+  color: #fff;
+}
+
+.admin-date-label {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--color-dark);
+}
+
+/* ---- ÉTAT VIDE ---- */
+
+.admin-empty {
+  text-align: center;
+  padding: 28px 20px;
+  background: #f6f4f1;
+  border-radius: 16px;
+  border: 1px dashed var(--color-border);
+}
+
+.admin-empty-text {
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+/* ---- NOTES CLIENTE ---- */
+
+.admin-note-box {
+  background: #faf9f7;
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+  color: #6e6560;
+  line-height: 1.7;
+  font-style: italic;
+}

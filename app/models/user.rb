@@ -4,6 +4,13 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   # ============================================================
+  # SCOPES — filtres réutilisables
+  # ============================================================
+
+  # Clientes uniquement (exclut Syam qui a admin: true)
+  scope :clientes, -> { where(admin: false) }
+
+  # ============================================================
   # ASSOCIATIONS — une cliente a plusieurs réservations, etc.
   # ============================================================
   has_many :bookings, dependent: :destroy           # Ses réservations
@@ -38,9 +45,10 @@ class User < ApplicationRecord
     first_name.to_s.first.upcase
   end
 
-  # Retourne le prochain rendez-vous confirmé à venir
+  # Retourne le prochain rendez-vous à venir (confirmé OU en attente)
+  # On inclut "en_attente" car la réservation est prise, juste pas encore validée par Syam
   def prochain_rdv
-    bookings.where(statut: 'confirme').where('date >= ?', Date.today).order(:date, :heure).first
+    bookings.where(statut: ['confirme', 'en_attente']).where('date >= ?', Date.today).order(:date, :heure).first
   end
 
   private

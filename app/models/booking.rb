@@ -48,8 +48,10 @@ class Booking < ApplicationRecord
   end
 
   # Retourne l'heure de fin calculée à partir de l'heure de début + durée
+  # On utilise .minutes (ActiveSupport) car heure est un objet Time en Rails.
+  # Sans .minutes, * 60 ajouterait des secondes brutes, pas des minutes.
   def heure_fin
-    heure + prestation.duree_minutes * 60
+    heure + prestation.duree_minutes.minutes
   end
 
   # Formate la date et l'heure pour l'affichage (ex: "Sam. 18 avril 2026 · 12h00")

@@ -1,16 +1,65 @@
-<h2>Forgot your password?</h2>
+<% content_for :title, "Mot de passe oublié" %>
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+<%#
+  ============================================================
+  VUE — Mot de passe oublié (Devise passwords#new)
+  Devise envoie un email avec un lien de réinitialisation.
+  ============================================================
+%>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Compte</p>
+      <h1 class="ph-title">Mot de passe<br>oublié ?</h1>
+      <p class="ph-intro">Saisissez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.</p>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="sec">
+
+      <%# Affiche les erreurs éventuelles (email inconnu, etc.) %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%# form_for envoie POST vers /users/password %>
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+
+        <%# --- Email de rattachement du compte --- %>
+        <div class="auth-field">
+          <%= f.label :email, "Adresse email", class: "auth-label" %>
+          <%= f.email_field :email,
+                            autofocus: true,
+                            autocomplete: "email",
+                            placeholder: "marie@example.com",
+                            class: "auth-input" %>
+        </div>
+
+        <%# --- Envoyer le lien --- %>
+        <%= f.submit "Envoyer le lien", class: "btn-primary auth-submit" %>
+
+      <% end %>
+
+      <%# Liens secondaires : retour connexion + inscription %>
+      <div class="auth-links">
+        <%= link_to "← Retour à la connexion", new_user_session_path, class: "auth-link" %>
+        <p>Pas encore de compte ? <%= link_to "S'inscrire", new_user_registration_path, class: "auth-link" %></p>
+      </div>
+
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
   </div>
-
-  <div class="actions">
-    <%= f.submit "Send me password reset instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

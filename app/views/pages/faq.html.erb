@@ -1,2 +1,269 @@
-<h1>Pages#faq</h1>
-<p>Find me in app/views/pages/faq.html.erb</p>
+<%# Page FAQ — accordéon en 3 sections : Avant la pose / Après la pose / Pratique %>
+<% content_for :title, "FAQ" %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <% if user_signed_in? %>
+          <%= link_to espace_cliente_root_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% else %>
+          <%= link_to new_user_session_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% end %>
+        <%= link_to "Réserver", new_booking_path, class: "btn-nav" %>
+        <div class="burger"><span></span><span></span><span></span></div>
+      </div>
+    </nav>
+
+    <%# ---- EN-TÊTE ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <div class="ph-tag">FAQ</div>
+      <h1 class="ph-title">Questions<br>fréquentes</h1>
+      <p class="ph-intro">Tout ce que vous devez savoir avant votre première pose ou votre retouche.</p>
+    </div>
+
+    <%# ---- SECTION 1 : AVANT LA POSE ---- %>
+    <%# Accordéon JavaScript — toggleFaq() défini en bas de page %>
+    <section class="sec">
+      <p class="s-tag">Général</p>
+      <h2 class="s-h2">Avant la pose</h2>
+
+      <div class="faq-list">
+
+        <%# Première question ouverte par défaut (class "open") %>
+        <div class="faq-item open">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Comment préparer mon rendez-vous ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Arrivez les yeux démaquillés, sans mascara ni fond de teint sur les cils.
+            Évitez les huiles et crèmes grasses autour des yeux dans les 24h avant la pose.
+            Prévoyez d'être à l'heure car chaque rendez-vous est minuté.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Combien de temps dure une pose complète ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Cil à cil : 2h. Volume léger : 2h30. Volume russe : 3h. Rehaussement : 1h.
+            Prévoyez un peu de marge dans votre journée pour ne pas être stressée.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Y a-t-il des contre-indications ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Les extensions sont déconseillées en cas d'allergie connue aux cyanoacrylates (colle),
+            de traitement médical aux yeux, de chimiothérapie récente ou d'alopécie active.
+            Si vous avez un doute, contactez-moi avant de réserver.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Puis-je mettre du mascara après la pose ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Avec des extensions bien posées, le mascara n'est généralement pas nécessaire.
+            Si vous souhaitez en mettre, utilisez exclusivement un mascara water-soluble (sans huile).
+            Le mascara waterproof abîme la colle et accélère la chute des extensions.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <%# ---- SECTION 2 : APRÈS LA POSE ---- %>
+    <section class="sec sec-alt">
+      <p class="s-tag">Entretien</p>
+      <h2 class="s-h2">Après la pose</h2>
+
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Combien de temps durent les extensions ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            En moyenne 3 à 4 semaines. Les cils naturels tombent naturellement dans ce délai.
+            Une retouche toutes les 2-3 semaines permet de maintenir un résultat optimal.
+            Une bonne hygiène et des soins adaptés prolongent la durée.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Comment prendre soin de mes extensions ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Évitez l'eau pendant 24-48h après la pose. Nettoyez les cils régulièrement avec un nettoyant doux adapté.
+            Brossez-les délicatement chaque matin avec une brosse à cils propre. Évitez les huiles autour des yeux.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">À quelle fréquence faire une retouche ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Toutes les 2-3 semaines selon votre cycle pilaire. Au-delà de 4 semaines,
+            une retouche peut ne plus être suffisante et une pose complète sera nécessaire.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Les extensions abîment-elles les cils naturels ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Non, si la pose est bien réalisée et les soins bien suivis. Les extensions sont posées sur des cils
+            en phase de croissance active, sans toucher à la racine. Une dépose professionnelle est essentielle
+            pour ne pas arracher les cils naturels.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <%# ---- SECTION 3 : PRATIQUE ---- %>
+    <section class="sec">
+      <p class="s-tag">Réservation</p>
+      <h2 class="s-h2">Pratique</h2>
+
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Comment annuler ou modifier mon rendez-vous ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Depuis votre espace cliente ou par message Instagram. L'annulation est gratuite jusqu'à 48h avant.
+            En dessous de ce délai, l'acompte est conservé. En cas d'urgence, contactez-moi directement.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Quels moyens de paiement sont acceptés ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            L'acompte se règle en ligne par carte bancaire (Stripe). Le solde se règle sur place
+            le jour du rendez-vous en espèces ou carte.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <div class="faq-q-text">Où se trouve le studio exactement ?</div>
+            <div class="faq-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 4 L6 8 L10 4" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="faq-a">
+            Le Calao Studio se trouve au 37 Rue Lachassaigne, 33000 Bordeaux.
+            Accessible en transports en commun. Une fois dans le studio, suivez les indications pour l'espace beauté.
+          </div>
+        </div>
+
+      </div>
+
+      <%# Bouton vers la page Contact si la question n'est pas dans la FAQ %>
+      <div style="text-align: center;">
+        <%= link_to "Une autre question ? Contactez-moi →", contact_path, class: "contact-btn" %>
+      </div>
+    </section>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-links">
+        <%= link_to "À propos",  about_path %>
+        <%= link_to "Avis",      avis_path %>
+        <%= link_to "Shop",      shop_path %>
+        <%= link_to "Contact",   contact_path %>
+      </div>
+      <div class="footer-copy">© 2026 Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>
+
+<%# JavaScript de l'accordéon FAQ %>
+<%# toggleFaq(el) : bascule la classe "open" sur l'élément parent (.faq-item) %>
+<script>
+  function toggleFaq(el) {
+    // "el" est le div .faq-q cliqué — on remonte au .faq-item parent
+    el.parentElement.classList.toggle('open');
+  }
+</script>

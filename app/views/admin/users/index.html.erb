@@ -1,0 +1,63 @@
+<% content_for :title, "Admin — Clientes" %>
+
+<%#
+  ============================================================
+  VUE — Liste de toutes les clientes
+  Données : @users (hors admins, triées par nom)
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Dashboard", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Clientes</div>
+      <div class="admin-header-sub"><%= @users.count %> cliente<%= @users.count > 1 ? 's' : '' %></div>
+    </div>
+
+    <div class="admin-sec">
+      <% if @users.any? %>
+        <% @users.each do |user| %>
+          <%# Chaque carte est cliquable → profil de la cliente %>
+          <%= link_to admin_user_path(user), class: "admin-user-card" do %>
+            <%# Mini avatar avec initiale %>
+            <div class="admin-user-avatar"><%= user.initiale %></div>
+
+            <div class="admin-user-info">
+              <div class="admin-user-name"><%= user.full_name %></div>
+              <div class="admin-user-email"><%= user.email %></div>
+            </div>
+
+            <%# Badge fidélité : nombre de visites %>
+            <div style="text-align:right; flex-shrink:0;">
+              <% if user.fidelite_card %>
+                <span style="font-family: var(--font-serif); font-size:18px; color:var(--color-dark);">
+                  <%= user.fidelite_card.visites %>
+                </span>
+                <br>
+                <span style="font-size:9px; color:var(--color-muted); letter-spacing:0.8px; text-transform:uppercase;">
+                  visites
+                </span>
+              <% end %>
+            </div>
+
+            <div style="color:#c8c2bc; font-size:14px; margin-left:4px;">›</div>
+          <% end %>
+        <% end %>
+
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">Aucune cliente enregistrée.</div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>

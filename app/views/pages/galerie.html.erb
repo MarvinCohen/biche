@@ -1,2 +1,387 @@
-<h1>Pages#galerie</h1>
-<p>Find me in app/views/pages/galerie.html.erb</p>
+<%# Page Galerie — filtres, collage hero, masonry, avant/après, vidéos, Instagram %>
+<% content_for :title, "Galerie" %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <% if user_signed_in? %>
+          <%= link_to espace_cliente_root_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% else %>
+          <%= link_to new_user_session_path do %>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          <% end %>
+        <% end %>
+        <%= link_to "Réserver", new_booking_path, class: "btn-nav" %>
+        <div class="burger"><span></span><span></span><span></span></div>
+      </div>
+    </nav>
+
+    <%# ---- EN-TÊTE ---- %>
+    <div class="page-header" style="background: #e8e2d8;">
+      <div class="ph-blob"></div>
+      <div class="ph-blob-2"></div>
+      <div class="ph-tag">Galerie</div>
+      <h1 class="ph-title">Réalisations</h1>
+      <p class="ph-intro">Chaque regard est unique. Retrouvez les soins réalisés par Syam au Calao Studio.</p>
+    </div>
+
+    <%# ---- FILTRES ---- %>
+    <%# Scroll horizontal — chaque pill filtre la grille masonry ou scroll vers une section %>
+    <div class="filter-wrap">
+      <div class="filter-bar">
+        <div class="filter-pill active"        onclick="filterGallery('tout', this)">Tout</div>
+        <div class="filter-pill"               onclick="filterGallery('cil-a-cil', this)">Cil à cil</div>
+        <div class="filter-pill"               onclick="filterGallery('volume', this)">Volume</div>
+        <div class="filter-pill"               onclick="filterGallery('rehaussement', this)">Rehaussement</div>
+        <div class="filter-pill"               onclick="filterGallery('sourcils', this)">Sourcils</div>
+        <div class="filter-pill"               onclick="filterGallery('avant-apres', this)">Avant / Après</div>
+      </div>
+    </div>
+
+    <%# ---- COLLAGE HERO ---- %>
+    <%# Composition de blocs organiques superposés — placeholder pour vraies photos %>
+    <div class="collage-hero">
+      <div class="col-main">
+        <svg class="col-ico" width="70" height="42" viewBox="0 0 70 42" fill="none">
+          <path d="M4 21 C17 7 53 7 66 21 C53 35 17 35 4 21Z" stroke="rgba(247,245,242,0.7)" stroke-width="1.8" fill="none"/>
+          <circle cx="35" cy="21" r="9" stroke="rgba(247,245,242,0.6)" stroke-width="1.5" fill="none"/>
+          <g stroke="rgba(247,245,242,0.7)" stroke-width="1.2" stroke-linecap="round">
+            <path d="M8 15 L5 5"/><path d="M17 10 L15 1"/><path d="M27 8 L26 0"/>
+            <path d="M35 7 L35 0"/><path d="M43 8 L44 0"/><path d="M53 10 L55 1"/><path d="M62 15 L65 5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="col-sec">
+        <svg class="col-ico" width="56" height="34" viewBox="0 0 56 34" fill="none">
+          <path d="M3 17 C13 5 43 5 53 17 C43 29 13 29 3 17Z" stroke="rgba(247,245,242,0.6)" stroke-width="1.5" fill="none"/>
+          <circle cx="28" cy="17" r="7" stroke="rgba(247,245,242,0.5)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+      <div class="col-third">
+        <svg class="col-ico" width="60" height="36" viewBox="0 0 60 36" fill="none">
+          <path d="M3 18 C14 6 46 6 57 18 C46 30 14 30 3 18Z" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none"/>
+          <circle cx="30" cy="18" r="8" stroke="rgba(46,41,38,0.3)" stroke-width="1.2" fill="none"/>
+        </svg>
+      </div>
+      <div class="col-accent"><span>B.</span></div>
+    </div>
+
+    <%# ---- GRILLE MASONRY ---- %>
+    <%# Chaque item a un data-cat pour le filtre JS %>
+    <section class="sec" id="section-tout">
+      <p class="s-tag">Réalisations</p>
+      <h2 class="s-h2">Le travail de Syam</h2>
+
+      <%# Indicateur du filtre actif (caché par défaut) %>
+      <div class="filter-active-info" id="filter-info" style="display:none">
+        <div class="filter-active-dot"></div>
+        <div class="filter-active-text">Filtré : <b id="filter-label">Tout</b></div>
+        <div class="filter-reset" onclick="filterGallery('tout', null)">Tout voir</div>
+      </div>
+
+      <div class="masonry" id="masonry-grid">
+
+        <div class="masonry-item tall m1" data-cat="cil-a-cil">
+          <div class="masonry-bg m1"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Cil à cil</div>
+            <div class="masonry-legend-sub">Effet naturel</div>
+          </div>
+        </div>
+
+        <div class="masonry-item short m2" data-cat="volume">
+          <div class="masonry-bg m2"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Volume léger</div>
+            <div class="masonry-legend-sub">Effet densifié</div>
+          </div>
+        </div>
+
+        <div class="masonry-item medium m3" data-cat="rehaussement">
+          <div class="masonry-bg m3"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Rehaussement</div>
+            <div class="masonry-legend-sub">Courbure naturelle</div>
+          </div>
+        </div>
+
+        <div class="masonry-item tall m4" data-cat="volume">
+          <div class="masonry-bg m4"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Volume russe</div>
+            <div class="masonry-legend-sub">Effet intense</div>
+          </div>
+        </div>
+
+        <div class="masonry-item short m5" data-cat="cil-a-cil">
+          <div class="masonry-bg m5"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Cil à cil</div>
+            <div class="masonry-legend-sub">Pose complète</div>
+          </div>
+        </div>
+
+        <div class="masonry-item medium m6" data-cat="sourcils">
+          <div class="masonry-bg m6"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Sourcils</div>
+            <div class="masonry-legend-sub">Remodelage</div>
+          </div>
+        </div>
+
+        <div class="masonry-item short m7" data-cat="rehaussement">
+          <div class="masonry-bg m7"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Rehaussement</div>
+            <div class="masonry-legend-sub">Résultat</div>
+          </div>
+        </div>
+
+        <div class="masonry-item tall m8" data-cat="cil-a-cil">
+          <div class="masonry-bg m8"></div>
+          <div class="masonry-legend">
+            <div class="masonry-legend-text">Cil à cil</div>
+            <div class="masonry-legend-sub">Naturel & précis</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <%# ---- AVANT / APRÈS ---- %>
+    <%# Carrousel horizontal de comparaisons avant/après — id ciblé par le filtre JS %>
+    <section class="sec sec-alt" id="section-avant-apres">
+      <p class="s-tag">Transformations</p>
+      <h2 class="s-h2">Avant / Après</h2>
+      <p class="s-sub">Le résultat parle de lui-même.</p>
+
+      <div class="avap-wrap">
+
+        <%# Avant/Après 1 — Cil à cil naturel %>
+        <div class="avap-card">
+          <div class="avap-split">
+            <div class="avap-side before">
+              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                <path d="M3 15 C12 7 38 7 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M3 15 C12 23 38 23 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <circle cx="25" cy="15" r="5" stroke="rgba(46,41,38,0.3)" stroke-width="1" fill="none"/>
+              </svg>
+              <div class="avap-label before">Avant</div>
+            </div>
+            <div class="avap-side after">
+              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                <path d="M3 15 C12 3 38 3 47 15" stroke="rgba(247,245,242,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M3 15 C12 26 38 26 47 15" stroke="rgba(247,245,242,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <g stroke="rgba(247,245,242,0.8)" stroke-width="1.2" stroke-linecap="round">
+                  <path d="M10 12 L7 3"/><path d="M18 9 L16 1"/><path d="M25 8 L25 0"/><path d="M32 9 L34 1"/><path d="M40 12 L43 3"/>
+                </g>
+              </svg>
+              <div class="avap-label after">Après</div>
+            </div>
+          </div>
+          <div class="avap-footer">
+            <div class="avap-name">Cil à cil naturel</div>
+            <div class="avap-meta">Pose complète · 2h</div>
+          </div>
+        </div>
+
+        <%# Avant/Après 2 — Volume russe %>
+        <div class="avap-card">
+          <div class="avap-split">
+            <div class="avap-side before" style="background:linear-gradient(145deg,#ccc5bb,#b8b2a8)">
+              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                <path d="M3 15 C12 9 38 9 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                <path d="M3 15 C12 21 38 21 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              </svg>
+              <div class="avap-label before">Avant</div>
+            </div>
+            <div class="avap-side after" style="background:linear-gradient(145deg,#5e5a56,#2e2926)">
+              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                <path d="M3 15 C12 1 38 1 47 15" stroke="rgba(247,245,242,0.7)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <g stroke="rgba(247,245,242,0.8)" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M7 11 L4 1"/><path d="M14 7 L11 -1"/><path d="M25 6 L25 -2"/><path d="M36 7 L39 -1"/><path d="M43 11 L46 1"/>
+                </g>
+              </svg>
+              <div class="avap-label after">Après</div>
+            </div>
+          </div>
+          <div class="avap-footer">
+            <div class="avap-name">Volume russe</div>
+            <div class="avap-meta">Pose complète · 3h</div>
+          </div>
+        </div>
+
+        <%# Avant/Après 3 — Rehaussement %>
+        <div class="avap-card">
+          <div class="avap-split">
+            <div class="avap-side before" style="background:linear-gradient(145deg,#ddd6cc,#ccc5bb)">
+              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                <path d="M3 14 C12 8 38 8 47 12" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              </svg>
+              <div class="avap-label before">Avant</div>
+            </div>
+            <div class="avap-side after" style="background:linear-gradient(145deg,#7a7470,#b8b2a8)">
+              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                <path d="M3 14 C12 4 38 4 47 10" stroke="rgba(247,245,242,0.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M3 14 C12 24 38 24 47 20" stroke="rgba(247,245,242,0.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              </svg>
+              <div class="avap-label after">Après</div>
+            </div>
+          </div>
+          <div class="avap-footer">
+            <div class="avap-name">Rehaussement</div>
+            <div class="avap-meta">Soin · 1h</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <%# ---- VIDÉOS ---- %>
+    <%# Scroll horizontal de mini-cartes vidéo — placeholder, liens à brancher %>
+    <section class="sec" id="section-videos">
+      <p class="s-tag">Vidéos</p>
+      <h2 class="s-h2">En mouvement</h2>
+      <div class="video-row">
+        <div class="video-card">
+          <div class="video-thumb vt1">
+            <div class="play-btn">
+              <svg width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M2 1 L12 7.5 L2 14 Z" fill="#2e2926"/></svg>
+            </div>
+          </div>
+          <div class="video-meta">
+            <div class="video-name">Pose cil à cil</div>
+            <div class="video-tag">Process · 2min</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <div class="video-thumb vt2">
+            <div class="play-btn">
+              <svg width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M2 1 L12 7.5 L2 14 Z" fill="#2e2926"/></svg>
+            </div>
+          </div>
+          <div class="video-meta">
+            <div class="video-name">Résultat volume</div>
+            <div class="video-tag">Résultat · 45s</div>
+          </div>
+        </div>
+        <div class="video-card">
+          <div class="video-thumb vt3">
+            <div class="play-btn">
+              <svg width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M2 1 L12 7.5 L2 14 Z" fill="#2e2926"/></svg>
+            </div>
+          </div>
+          <div class="video-meta">
+            <div class="video-name">Rehaussement</div>
+            <div class="video-tag">Résultat · 30s</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <%# ---- INSTAGRAM ---- %>
+    <%# Grille 3x2 de vignettes stylisées (placeholder) + lien vers le profil %>
+    <div class="insta-sec">
+      <div class="insta-title">Suivez l'atelier</div>
+      <p class="insta-sub">Dernières réalisations et disponibilités sur Instagram.</p>
+      <div class="insta-grid">
+        <div class="insta-item ig1"></div>
+        <div class="insta-item ig2"></div>
+        <div class="insta-item ig3"></div>
+        <div class="insta-item ig4"></div>
+        <div class="insta-item ig5"></div>
+        <div class="insta-item ig6"></div>
+      </div>
+      <div class="insta-handle">@atelier_b.iche</div>
+      <a href="#" class="insta-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="1.5" y="1.5" width="11" height="11" rx="3" stroke="#2e2926" stroke-width="1.3"/>
+          <circle cx="7" cy="7" r="2.5" stroke="#2e2926" stroke-width="1.3"/>
+          <circle cx="10" cy="4" r="0.7" fill="#2e2926"/>
+        </svg>
+        Voir sur Instagram
+      </a>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-links">
+        <%= link_to "FAQ",     faq_path %>
+        <%= link_to "Avis",    avis_path %>
+        <%= link_to "Shop",    shop_path %>
+        <%= link_to "Contact", contact_path %>
+      </div>
+      <div class="footer-copy">© 2026 Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>
+
+<%# ====================================================================
+    JavaScript de la galerie
+    - filterGallery(cat, pillEl) : filtre les items masonry par catégorie
+      et scroll vers la bonne section selon le filtre sélectionné.
+    ==================================================================== %>
+<script>
+  // Correspondance catégorie → section cible du scroll
+  const categories = {
+    'tout':         { label: 'Tout',         section: 'section-tout' },
+    'cil-a-cil':    { label: 'Cil à cil',    section: 'section-tout' },
+    'volume':       { label: 'Volume',        section: 'section-tout' },
+    'rehaussement': { label: 'Rehaussement',  section: 'section-tout' },
+    'sourcils':     { label: 'Sourcils',      section: 'section-tout' },
+    'avant-apres':  { label: 'Avant / Après', section: 'section-avant-apres' }
+  };
+
+  function filterGallery(cat, pillEl) {
+    // Mettre à jour la pill active
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    if (pillEl) {
+      pillEl.classList.add('active');
+    } else {
+      // "Tout voir" cliqué depuis l'info-filtre : réactiver la première pill
+      document.querySelector('.filter-pill').classList.add('active');
+    }
+
+    const info  = document.getElementById('filter-info');
+    const label = document.getElementById('filter-label');
+    const items = document.querySelectorAll('.masonry-item');
+
+    if (cat === 'tout') {
+      // Afficher tous les items, cacher l'info filtre
+      items.forEach(item => { item.style.display = 'block'; });
+      info.style.display = 'none';
+      document.getElementById('section-tout').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } else if (cat === 'avant-apres') {
+      // Masquer la grille, scroller vers la section avant/après
+      items.forEach(item => { item.style.display = 'none'; });
+      info.style.display = 'flex';
+      label.textContent = categories[cat].label;
+      document.getElementById('section-avant-apres').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } else {
+      // Filtrer la grille par data-cat
+      items.forEach(item => {
+        item.style.display = (item.dataset.cat === cat) ? 'block' : 'none';
+      });
+      info.style.display = 'flex';
+      label.textContent = categories[cat].label;
+      document.getElementById('section-tout').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+</script>

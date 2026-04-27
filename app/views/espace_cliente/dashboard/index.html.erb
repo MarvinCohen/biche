@@ -46,8 +46,8 @@
           <span class="profile-stat-label">Points</span>
         </div>
         <div class="profile-stat">
-          <%# Affiche "1" si un RDV est à venir, "0" sinon %>
-          <span class="profile-stat-num"><%= @prochain_rdv ? 1 : 0 %></span>
+          <%# Nombre total de RDV à venir %>
+          <span class="profile-stat-num"><%= @rdvs_a_venir.size %></span>
           <span class="profile-stat-label">Prochain RDV</span>
         </div>
       </div>
@@ -153,54 +153,53 @@
 
     <%# ================================================================
         ONGLET 2 — MES RDV
-        Prochain rendez-vous + bouton pour en réserver un nouveau
+        Tous les rendez-vous à venir (confirmés + en attente)
     ================================================================= %>
     <div id="tab-rdv" style="display:none">
 
       <div class="sec">
         <p class="s-tag">À venir</p>
-        <h2 class="s-h2">Prochain rendez-vous</h2>
+        <h2 class="s-h2">Mes rendez-vous</h2>
 
-        <% if @prochain_rdv %>
-          <%# Carte du prochain RDV %>
-          <div class="rdv-card">
-            <%# Bloc date (jour + mois abrégé) %>
-            <div class="rdv-date">
-              <div class="rdv-day"><%= @prochain_rdv.date.day %></div>
-              <div class="rdv-month"><%= I18n.l(@prochain_rdv.date, format: "%b") %></div>
-            </div>
-            <div class="rdv-info">
-              <div class="rdv-name"><%= @prochain_rdv.prestation.nom %></div>
-              <div class="rdv-time">
-                <%# Jour de la semaine + heure début → fin %>
-                <%= I18n.l(@prochain_rdv.date, format: "%A").capitalize %> ·
-                <%= @prochain_rdv.heure.strftime('%Hh%M') %>
-                <% if @prochain_rdv.heure_fin %>
-                  → <%= @prochain_rdv.heure_fin.strftime('%Hh%M') %>
-                <% end %>
+        <% if @rdvs_a_venir.any? %>
+          <%# On itère sur tous les RDV à venir triés par date %>
+          <% @rdvs_a_venir.each do |rdv| %>
+            <div class="rdv-card">
+              <div class="rdv-date">
+                <div class="rdv-day"><%= rdv.date.day %></div>
+                <div class="rdv-month"><%= I18n.l(rdv.date, format: "%b") %></div>
               </div>
-              <div class="rdv-tags">
-                <span class="rdv-tag">Calao Studio</span>
-                <span class="rdv-tag"><%= @prochain_rdv.prestation.duree_formatee %></span>
-                <span class="rdv-tag">Confirmé</span>
+              <div class="rdv-info">
+                <div class="rdv-name"><%= rdv.prestation.nom %></div>
+                <div class="rdv-time">
+                  <%= I18n.l(rdv.date, format: "%A").capitalize %> ·
+                  <%= rdv.heure.strftime('%Hh%M') %>
+                  <% if rdv.heure_fin %>
+                    → <%= rdv.heure_fin.strftime('%Hh%M') %>
+                  <% end %>
+                </div>
+                <div class="rdv-tags">
+                  <span class="rdv-tag">Calao Studio</span>
+                  <span class="rdv-tag"><%= rdv.prestation.duree_formatee %></span>
+                  <%# Badge statut : vert si confirmé, neutre si en attente %>
+                  <span class="rdv-tag" style="<%= rdv.statut == 'confirme' ? 'background:#e8f5e8;color:#4a7a4a;border-color:#c8e6c8;' : '' %>">
+                    <%= rdv.statut == 'confirme' ? 'Confirmé' : 'En attente' %>
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <p style="font-size:12px;color:var(--color-muted);text-align:center;margin:12px 0;letter-spacing:0.5px">
-            Rappel automatique envoyé 24h avant
-          </p>
-
-          <%# Bouton annulation %>
-          <div style="display:flex;gap:10px;margin-top:8px">
-            <%= link_to "Annuler",
-                        booking_path(@prochain_rdv),
-                        data: { turbo_method: :delete, turbo_confirm: "Annuler ce rendez-vous ?" },
-                        class: "btn-rdv-cancel" %>
-          </div>
+            <%# Bouton annulation par RDV %>
+            <div style="margin-bottom:16px;">
+              <%= link_to "Annuler ce rendez-vous",
+                          booking_path(rdv),
+                          data: { turbo_method: :delete, turbo_confirm: "Annuler ce rendez-vous du #{I18n.l(rdv.date, format: '%d %B %Y')} ?" },
+                          class: "btn-rdv-cancel" %>
+            </div>
+          <% end %>
 
         <% else %>
-          <%# Aucun RDV à venir : invitation à réserver %>
+          <%# Aucun RDV à venir %>
           <div class="rdv-empty">
             <p class="rdv-empty-text">Vous n'avez pas de rendez-vous à venir pour le moment.</p>
             <%= link_to "Réserver un soin →", new_booking_path, class: "btn-primary" %>
@@ -285,11 +284,11 @@
                       <% end %>
                     </div>
 
-                    <%# Note textuelle de Syam %>
-                    <% if booking.soin_historique.notes.present? %>
+                    <%# Note textuelle de Syam — colonne "note_syam" dans le schéma (pas "notes") %>
+                    <% if booking.soin_historique.note_syam.present? %>
                       <div class="detail-note">
                         <div class="detail-note-label">Note de Syam</div>
-                        <div class="detail-note-text"><%= booking.soin_historique.notes %></div>
+                        <div class="detail-note-text"><%= booking.soin_historique.note_syam %></div>
                       </div>
                     <% end %>
                   <% end %>

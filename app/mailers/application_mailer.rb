@@ -1,4 +1,8 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  # Adresse expéditrice — domaine de test Resend (onboarding@resend.dev)
+  # À remplacer par l'adresse réelle une fois le domaine biche-bordeaux.fr vérifié dans Resend
+  default from: "Biche. <onboarding@resend.dev>"
+
+  # Layout HTML commun à tous les emails (app/views/layouts/mailer.html.erb)
   layout "mailer"
 end

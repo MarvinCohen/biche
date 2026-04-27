@@ -1,0 +1,112 @@
+<% content_for :title, "Modifier mon profil" %>
+
+<%#
+  ============================================================
+  VUE — Formulaire de modification du profil
+  Données : @user = current_user, chargé par ProfilController#edit
+  On ne permet pas de changer email/password ici (géré par Devise).
+  ============================================================
+%>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Mon profil", espace_cliente_profil_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="page-header">
+      <div class="ph-blob"></div>
+      <p class="ph-tag">Profil</p>
+      <h1 class="ph-title">Mes<br>informations</h1>
+      <p class="ph-intro">Modifiez vos informations personnelles.</p>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="sec">
+      <%# form_with envoie un PATCH vers /espace-cliente/profil %>
+      <%# url: espace_cliente_profil_path car c'est une resource singulière %>
+      <%= form_with model: @user,
+                    url: espace_cliente_profil_path,
+                    method: :patch,
+                    local: true do |f| %>
+
+        <%# Affichage des erreurs de validation si le formulaire est resoumis avec des erreurs %>
+        <% if @user.errors.any? %>
+          <div style="background:#fdecea; border-radius:12px; padding:14px 16px; margin-bottom:20px; border:1px solid #f5c6c6;">
+            <p style="font-size:13px; color:#c47a7a; font-weight:500; margin-bottom:8px;">
+              <%= pluralize(@user.errors.count, "erreur") %> :
+            </p>
+            <ul style="font-size:12px; color:#c47a7a; padding-left:16px; line-height:1.8;">
+              <% @user.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%# ---- CHAMP : Prénom ---- %>
+        <div class="auth-field">
+          <%= f.label :first_name, "Prénom", class: "auth-label" %>
+          <%= f.text_field :first_name,
+                           class: "auth-input",
+                           placeholder: "Votre prénom",
+                           autocomplete: "given-name" %>
+        </div>
+
+        <%# ---- CHAMP : Nom ---- %>
+        <div class="auth-field">
+          <%= f.label :last_name, "Nom", class: "auth-label" %>
+          <%= f.text_field :last_name,
+                           class: "auth-input",
+                           placeholder: "Votre nom de famille",
+                           autocomplete: "family-name" %>
+        </div>
+
+        <%# ---- CHAMP : Téléphone (optionnel) ---- %>
+        <div class="auth-field">
+          <%= f.label :phone, "Téléphone", class: "auth-label" %>
+          <%# tel_field n'existe pas en Rails 8 — on utilise text_field avec type "tel" %>
+          <%= f.text_field :phone,
+                           type: "tel",
+                           class: "auth-input",
+                           placeholder: "06 12 34 56 78",
+                           autocomplete: "tel" %>
+        </div>
+
+        <%# ---- CHAMP : Date de naissance (optionnelle — permet l'offre anniversaire) ---- %>
+        <div class="auth-field">
+          <%= f.label :birth_date, "Date de naissance", class: "auth-label" %>
+          <%# Note : permet à Syam d'envoyer une offre automatique le jour J %>
+          <%= f.date_field :birth_date,
+                           class: "auth-input" %>
+          <p style="font-size:11px; color:var(--color-muted); margin-top:4px;">
+            Facultatif · utilisé pour votre offre anniversaire
+          </p>
+        </div>
+
+        <%# ---- BOUTONS ---- %>
+        <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 10px;">
+          <%# Soumettre le formulaire %>
+          <%= f.submit "Enregistrer les modifications", class: "btn-primary" %>
+          <%# Annuler et retourner au profil %>
+          <%= link_to "Annuler", espace_cliente_profil_path, class: "btn-ghost" %>
+        </div>
+
+      <% end %>
+    </div>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

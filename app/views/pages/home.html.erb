@@ -33,22 +33,33 @@
       <div class="hero-big-b">B.</div>
       <div class="hero-accent"></div>
       <div class="hero-content">
+        <%# Photo réelle de l'oeil — remplace l'illustration SVG précédente %>
         <div class="hero-photo">
-          <svg viewBox="0 0 200 200" width="200" height="200" preserveAspectRatio="xMidYMid slice">
-            <rect width="200" height="200" fill="#b8b2a8"/>
-            <path d="M25 110 Q100 68 175 110 Q100 152 25 110Z" fill="#e8e2d8" stroke="#2e2926" stroke-width="1.2"/>
-            <circle cx="100" cy="110" r="24" fill="#2e2926"/>
-            <circle cx="100" cy="110" r="9" fill="#1e1a18"/>
-            <circle cx="94" cy="104" r="3" fill="#fff"/>
-          </svg>
+          <%= image_tag "hero-eye.jpg", alt: "Regard sublimé par Biche.", class: "hero-eye-img" %>
         </div>
         <p class="hero-sup">Technicienne du regard · Bordeaux</p>
         <h1 class="hero-h1">L'art du regard,<br>sur mesure.</h1>
         <p class="hero-p">Du naturel au plus intense,<br>selon tes envies.</p>
-        <%= link_to "Prendre rendez-vous", new_booking_path, class: "cta-primary" %>
+        <%# Bouton principal : réservation %>
+        <%= link_to "Réserve ton créneau", new_booking_path, class: "cta-primary" %>
+        <%# Bouton secondaire : guide morphologique (évite la redondance avec la section prestations) %>
         <div style="margin-top:12px">
-          <%= link_to "Nos soins", prestations_path, class: "cta-ghost" %>
+          <%= link_to "Guide morphologique", morphologie_path, class: "cta-ghost" %>
         </div>
+      </div>
+    </section>
+
+    <%# ---- PROGRAMME FIDÉLITÉ (en premier pour inciter à créer un compte) ---- %>
+    <section class="sec sec-nude">
+      <div class="fid-block">
+        <p class="fid-mini">Fidélité</p>
+        <h2 class="fid-title">Un regard fidèle,<br>mérite récompense</h2>
+        <p class="fid-sub">Gagnez des points à chaque visite.<br>Accédez à votre espace personnel.</p>
+        <% if user_signed_in? %>
+          <%= link_to "Mon espace cliente", espace_cliente_root_path, class: "fid-btn" %>
+        <% else %>
+          <%= link_to "Créer mon compte", new_user_registration_path, class: "fid-btn" %>
+        <% end %>
       </div>
     </section>
 
@@ -94,17 +105,52 @@
       </div>
     </section>
 
-    <%# ---- PROGRAMME FIDÉLITÉ ---- %>
-    <section class="sec sec-nude">
-      <div class="fid-block">
-        <p class="fid-mini">Fidélité</p>
-        <h2 class="fid-title">Un regard fidèle,<br>mérite récompense</h2>
-        <p class="fid-sub">Gagnez des points à chaque visite.<br>Accédez à votre espace personnel.</p>
-        <% if user_signed_in? %>
-          <%= link_to "Mon espace cliente", espace_cliente_root_path, class: "fid-btn" %>
-        <% else %>
-          <%= link_to "Créer mon compte", new_user_registration_path, class: "fid-btn" %>
-        <% end %>
+    <%# ---- SHOP — BEST-SELLERS ---- %>
+    <section class="sec">
+      <div class="shop-block">
+
+        <%# Cercle décoratif en arrière-plan %>
+        <div class="shop-deco"></div>
+
+        <p class="shop-mini">Boutique</p>
+        <h2 class="shop-title">Nos best-sellers</h2>
+        <p class="shop-sub">Prolongez votre soin<br>entre les visites.</p>
+
+        <%# Carousel auto-scrollant — défile automatiquement toutes les 2.5s %>
+        <div class="shop-carousel" id="car-shop">
+          <% @produits.each do |produit| %>
+            <%# data-original marque les cards d'origine pour les distinguer des clones JS %>
+            <div class="shop-card" data-original="true">
+              <%# Icône selon le type de produit %>
+              <div class="shop-card-ico">
+                <% if produit.type_produit == 'carte_cadeau' %>
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    <rect x="2" y="9" width="18" height="12" rx="2" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+                    <path d="M1 9h20" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round"/>
+                    <path d="M11 9V21" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+                    <path d="M11 9c0-3-4-3-4 0s4 0 4 0z" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+                    <path d="M11 9c0-3 4-3 4 0s-4 0-4 0z" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+                  </svg>
+                <% elsif produit.type_produit == 'pack' %>
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    <rect x="3" y="3" width="16" height="16" rx="3" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+                    <path d="M7 11h8M11 7v8" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                <% else %>
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    <path d="M8 3h6l2 4H6L8 3z" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linejoin="round"/>
+                    <rect x="5" y="7" width="12" height="12" rx="2" stroke="rgba(255,255,255,0.7)" stroke-width="1.3"/>
+                    <path d="M9 12h4" stroke="rgba(255,255,255,0.7)" stroke-width="1.3" stroke-linecap="round"/>
+                  </svg>
+                <% end %>
+              </div>
+              <div class="shop-card-name"><%= produit.nom %></div>
+              <div class="shop-card-price"><%= number_to_currency(produit.prix_cents / 100.0, unit: "€", format: "%n%u", precision: 0) %></div>
+            </div>
+          <% end %>
+        </div>
+
+        <%= link_to "Découvrir la boutique", shop_path, class: "shop-btn" %>
       </div>
     </section>
 
@@ -112,13 +158,29 @@
     <section class="sec">
       <p class="s-tag">Nous trouver</p>
       <h2 class="s-h2">Au cœur de Bordeaux</h2>
-      <div class="map-placeholder">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <path d="M16 2C10 2 5 7 5 13c0 8 11 17 11 17s11-9 11-17c0-6-5-11-11-11z" stroke="#2e2926" stroke-width="1.5" fill="#f7f5f2"/>
-          <circle cx="16" cy="13" r="3.5" fill="#2e2926"/>
-        </svg>
-        <div class="map-label">Voir sur Google Maps</div>
+      <%# Carte Google Maps embarquée — Calao Studio, 37 rue Lachassaigne, Bordeaux %>
+      <%# Pas besoin d'API key pour l'embed basique %>
+      <%# Carte Google Maps embarquée — Calao Studio, 37 rue Lachassaigne, Bordeaux %>
+      <div class="map-embed">
+        <iframe
+          src="https://maps.google.com/maps?q=37+Rue+Lachassaigne,+33000+Bordeaux&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          width="100%"
+          height="220"
+          style="border: 0; display: block;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Calao Studio — 37 Rue Lachassaigne, Bordeaux">
+        </iframe>
       </div>
+      <%# Lien externe vers Google Maps (les contrôles de l'iframe sont coupés par le blob) %>
+      <%# Lien vers Google Maps pour l'itinéraire %>
+      <a href="https://maps.google.com/?q=37+Rue+Lachassaigne,+33000+Bordeaux"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="map-label">
+        ↗ Ouvrir dans Google Maps
+      </a>
       <div class="addr-line">
         <b>Calao Studio</b>
         37 Rue Lachassaigne<br>33000 Bordeaux
@@ -144,21 +206,87 @@
 <%# ---- JAVASCRIPT — carrousel ---- %>
 <% content_for :head do %>
   <script>
-    // Fait défiler le carrousel (dir=-1 gauche, dir=1 droite)
+    // scrollCar — défile d'une card à la fois en mesurant la largeur réelle
     function scrollCar(id, dir) {
       const car = document.getElementById(id);
-      car.scrollBy({ left: dir * 274, behavior: 'smooth' });
+      // Largeur réelle de la première card (évite les valeurs codées en dur)
+      const cardWidth = car.firstElementChild ? car.firstElementChild.offsetWidth + 14 : 274;
+      car.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
     }
-    // Met à jour le point actif selon la position du scroll
-    document.addEventListener('DOMContentLoaded', function() {
-      const car = document.getElementById('car-prestations');
+
+    // updateDots — trouve la card la plus proche du centre du carousel et active le dot correspondant
+    function updateDots(car, dots) {
+      const carCenter = car.getBoundingClientRect().left + car.offsetWidth / 2;
+      let closestIndex = 0;
+      let closestDist  = Infinity;
+      [...car.children].forEach((child, i) => {
+        const rect      = child.getBoundingClientRect();
+        const childCenter = rect.left + rect.width / 2;
+        const dist      = Math.abs(childCenter - carCenter);
+        if (dist < closestDist) { closestDist = dist; closestIndex = i; }
+      });
+      dots.forEach((d, i) => d.classList.toggle('active', i === closestIndex));
+    }
+
+    // turbo:load couvre aussi le retour depuis le cache Turbo (navigation retour/avant)
+    // DOMContentLoaded couvre le premier chargement classique
+    function initHome() {
+      // Dots du carousel prestations
+      const car  = document.getElementById('car-prestations');
       const dots = document.querySelectorAll('#dots-prestations .car-dot');
-      if (car) {
-        car.addEventListener('scroll', () => {
-          const index = Math.round(car.scrollLeft / 274);
-          dots.forEach((d, i) => d.classList.toggle('active', i === Math.min(index, dots.length - 1)));
+      if (car) car.addEventListener('scroll', () => updateDots(car, dots));
+
+      // Auto-scroll infini du carousel shop — une card à la fois, défilement continu
+      const shopCar = document.getElementById('car-shop');
+      if (shopCar) {
+        // ---- Protection contre les doubles initialisations (Turbo cache) ----
+        // Si un interval tourne déjà, on l'annule avant d'en créer un nouveau
+        if (shopCar._scrollInterval) clearInterval(shopCar._scrollInterval);
+
+        // On supprime les clones précédents (ajoutés lors d'un passage précédent)
+        // Les items originaux sont marqués data-original="true" par Rails (voir erb)
+        [...shopCar.children].forEach(item => {
+          if (!item.dataset.original) item.remove();
         });
+        // Remet le scroll à zéro pour repartir proprement
+        shopCar.scrollLeft = 0;
+
+        let paused = false;
+
+        // ---- Duplication des items pour un défilement sans saut ----
+        // On clone les items originaux et on les ajoute à la fin
+        // Ainsi quand on arrive à la "moitié", on repart silencieusement au début
+        const originalItems = [...shopCar.children];
+        originalItems.forEach(item => shopCar.appendChild(item.cloneNode(true)));
+
+        // Pause quand l'utilisateur touche le carousel
+        shopCar.addEventListener('touchstart', () => { paused = true; });
+        shopCar.addEventListener('touchend',   () => { setTimeout(() => paused = false, 3000); });
+
+        shopCar._scrollInterval = setInterval(() => {
+          if (paused) return;
+
+          // Largeur exacte d'une card = largeur visible du carousel (pas de gap)
+          const cardWidth = shopCar.firstElementChild
+            ? shopCar.firstElementChild.offsetWidth
+            : shopCar.clientWidth;
+
+          // Avance d'une card avec animation
+          shopCar.scrollBy({ left: cardWidth, behavior: 'smooth' });
+
+          // Quand on a parcouru tous les items originaux (= moitié du scroll total),
+          // on remet silencieusement au début — l'utilisateur ne voit pas le saut
+          const halfWidth = (shopCar.scrollWidth / 2);
+          setTimeout(() => {
+            if (shopCar.scrollLeft >= halfWidth - 10) {
+              shopCar.scrollTo({ left: shopCar.scrollLeft - halfWidth, behavior: 'instant' });
+            }
+          }, 600); // On attend que l'animation smooth soit terminée
+        }, 2500);
       }
-    });
+    }
+
+    document.addEventListener('DOMContentLoaded', initHome);
+    document.addEventListener('turbo:load', initHome);
   </script>
 <% end %>

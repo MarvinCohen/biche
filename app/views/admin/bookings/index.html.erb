@@ -1,0 +1,66 @@
+<% content_for :title, "Admin — Réservations" %>
+
+<%#
+  ============================================================
+  VUE — Liste des réservations filtrée par date
+  Données : @bookings, @date
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Dashboard", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Réservations</div>
+      <div class="admin-header-sub"><%= I18n.l(@date, format: "%-d %B %Y") %></div>
+    </div>
+
+    <%# Navigation par date %>
+    <div class="admin-date-nav">
+      <%= link_to admin_bookings_path(date: (@date - 1.day).to_s), class: "admin-date-nav-btn" do %>←<% end %>
+      <div class="admin-date-label"><%= I18n.l(@date, format: "%-d %B %Y") %></div>
+      <%= link_to admin_bookings_path(date: (@date + 1.day).to_s), class: "admin-date-nav-btn" do %>→<% end %>
+    </div>
+
+    <div class="admin-sec">
+      <div class="admin-sec-title"><%= @bookings.count %> rendez-vous</div>
+
+      <% if @bookings.any? %>
+        <% @bookings.each do |booking| %>
+          <%= link_to admin_booking_path(booking), class: "admin-rdv-card" do %>
+            <div class="admin-rdv-heure">
+              <%= booking.heure.strftime('%H') if booking.heure %><br>
+              <span style="font-size:10px;opacity:0.7;"><%= booking.heure.strftime('%M') if booking.heure %></span>
+            </div>
+            <div class="admin-rdv-info">
+              <div class="admin-rdv-cliente"><%= booking.user.full_name %></div>
+              <div class="admin-rdv-prestation"><%= booking.prestation.nom %> · <%= booking.prestation.duree_minutes %> min</div>
+              <% badge_class = case booking.statut
+                               when 'en_attente' then 'admin-badge-attente'
+                               when 'confirme'   then 'admin-badge-confirme'
+                               when 'termine'    then 'admin-badge-termine'
+                               else 'admin-badge-annule'
+                               end %>
+              <span class="admin-badge <%= badge_class %>">
+                <%= { 'en_attente' => 'En attente', 'confirme' => 'Confirmé', 'termine' => 'Terminé', 'annule' => 'Annulé' }[booking.statut] %>
+              </span>
+            </div>
+            <div style="color:#c8c2bc;font-size:14px;">›</div>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">Aucun rendez-vous ce jour.</div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>

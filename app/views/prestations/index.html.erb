@@ -1,17 +1,836 @@
 <% content_for :title, "Prestations & tarifs" %>
 
+<%#
+  ===================================================================
+  CSS INJECTÉ DANS LE <HEAD> VIA content_for :head
+  -------------------------------------------------------------------
+  Pourquoi content_for :head ?
+  Les variables CSS globales (application.css) ont des valeurs
+  différentes du mockup biche-prestations.html (ex: couleurs, fonts).
+  On injecte ici le CSS exact du mockup APRÈS app.css dans le <head>,
+  ce qui permet de surcharger les styles globaux uniquement pour
+  cette page, sans polluer les autres pages.
+  ===================================================================
+%>
+<% content_for :head do %>
+<style>
+  /* ---- RESET LÉGER & BASE ---- */
+  /* Assure que les marges/paddings ne cassent pas la mise en page */
+  * { box-sizing: border-box; }
+
+  /* Couleur de fond du body pour simuler le fond mobile sombre */
+  body { background: #2a1f15; }
+
+  /* Conteneur centré, max 420px = largeur téléphone */
+  .wrap { max-width: 420px; margin: 0 auto; padding: 24px 12px; }
+
+  /* Carte "téléphone" avec coins arrondis et ombre */
+  .phone {
+    background: #f5ede2;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    position: relative;
+  }
+
+  /* ---- NAVIGATION ---- */
+  /* Barre de navigation fixée en haut, transparente avec flou */
+  .nav {
+    background: rgba(245, 237, 226, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute; /* Superposé au page-header */
+    top: 0; left: 0; right: 0;
+    z-index: 10; /* Au-dessus du contenu */
+  }
+
+  /* Logo "Biche." en italique serif */
+  .logo-mini {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: #3a2a1e;
+    font-style: italic;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  /* Groupe droite de la nav : icône user + bouton réserver + burger */
+  .nav-right { display: flex; gap: 14px; align-items: center; }
+
+  /* Icône utilisateur */
+  .user-ico { width: 20px; height: 20px; cursor: pointer; }
+
+  /* Menu burger (3 traits) */
+  .burger { display: flex; flex-direction: column; gap: 4px; cursor: pointer; width: 22px; }
+  .burger span { height: 1.5px; background: #3a2a1e; border-radius: 1px; display: block; }
+  .burger span:last-child { width: 60%; } /* Dernier trait plus court */
+
+  /* Bouton "Réserver" dans la nav */
+  .reserve-nav, .btn-nav {
+    background: #3a2a1e;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 9px 18px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  /* ---- HEADER DE PAGE ---- */
+  /* Zone avec blobs décoratifs en arrière-plan */
+  .page-header {
+    position: relative;
+    padding: 110px 24px 50px; /* Espace haut = hauteur de la nav */
+    text-align: center;
+    background: #f5ede2;
+    overflow: hidden;
+  }
+
+  /* Blob décoratif haut-droite */
+  .ph-blob {
+    position: absolute;
+    top: 80px; right: -40px;
+    width: 140px; height: 140px;
+    background: #c9a98a;
+    border-radius: 62% 38% 54% 46% / 48% 52% 48% 52%;
+    opacity: 0.3;
+    z-index: 1;
+  }
+
+  /* Blob décoratif bas-gauche */
+  .ph-blob-2 {
+    position: absolute;
+    bottom: -40px; left: -30px;
+    width: 110px; height: 110px;
+    background: #b09e7f;
+    border-radius: 50% 50% 45% 55% / 48% 52% 48% 52%;
+    opacity: 0.2;
+    z-index: 1;
+  }
+
+  /* Texte "étiquette" au-dessus du titre (PRESTATIONS) */
+  .ph-tag {
+    position: relative;
+    z-index: 2;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #a8927c;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* Grand titre de page en serif */
+  .ph-title {
+    position: relative;
+    z-index: 2;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    color: #3a2a1e;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+
+  /* Phrase d'introduction sous le titre */
+  .ph-intro {
+    position: relative;
+    z-index: 2;
+    font-size: 13px;
+    color: #7a6b5c;
+    line-height: 1.7;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  /* ---- SECTION OFFRE DU MOMENT ---- */
+  /* Fond crème qui contient la carte offre */
+  .offer-sec {
+    padding: 40px 20px 20px;
+    background: #f5ede2;
+  }
+
+  /* Carte offre : fond brun foncé, haut arrondi en ovale */
+  .offer-card {
+    background: #3a2a1e;
+    border-radius: 180px 180px 28px 28px / 100px 100px 28px 28px;
+    padding: 42px 24px 28px;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Cercle décoratif en arrière-plan de la carte offre */
+  .offer-card::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -30px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: rgba(201, 169, 138, 0.15);
+  }
+
+  /* Badge "Offre du moment" doré */
+  .offer-badge {
+    display: inline-block;
+    background: #c9a98a;
+    color: #3a2a1e;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Titre de l'offre en serif */
+  .offer-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Description courte de l'offre */
+  .offer-sub {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-bottom: 18px;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Prix affiché en grand serif doré */
+  .offer-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ancien prix barré */
+  .offer-price-old {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: line-through;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Bouton CTA de l'offre */
+  .offer-btn {
+    background: #c9a98a;
+    color: #3a2a1e;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 24px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-family: inherit;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---- SECTIONS COMMUNES ---- */
+  /* Toutes les sections .sec ont ce padding de base */
+  .sec { padding: 50px 20px; background: #fff; }
+  .sec-cream { background: #faf4ea; } /* Fond crème */
+  .sec-nude  { background: #f5ede2; } /* Fond nude */
+
+  /* Petit texte étiquette au-dessus des titres de section */
+  .s-tag {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #a8927c;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  /* Titre principal des sections */
+  .s-h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    color: #3a2a1e;
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  /* Sous-titre descriptif des sections */
+  .s-sub {
+    font-size: 12px;
+    color: #9e8a76;
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ---- PILLS DE CATÉGORIE ---- */
+  /* Barre horizontale scrollable avec les filtres catégorie */
+  .cat-bar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;       /* Scroll horizontal si débordement */
+    padding: 0 20px 4px;
+    margin: 0 -20px 24px;   /* Déborde sur les marges de la section */
+    scrollbar-width: none;  /* Cache la scrollbar (Firefox) */
+  }
+  .cat-bar::-webkit-scrollbar { display: none; } /* Cache la scrollbar (Chrome) */
+
+  /* Chaque pill de filtre */
+  .cat-pill {
+    flex-shrink: 0;          /* Empêche le retrait à la ligne */
+    padding: 9px 18px;
+    border-radius: 30px;
+    border: 1px solid #d4c5b0;
+    background: #fff;
+    color: #7a6b5c;
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 500;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  /* Pill active (sélectionnée) */
+  .cat-pill.active {
+    background: #3a2a1e;
+    color: #fff;
+    border-color: #3a2a1e;
+  }
+
+  /* ---- CAROUSEL PRESTATIONS ---- */
+  /* Conteneur relatif pour les flèches de navigation */
+  .carousel-wrap { position: relative; margin: 0 -20px; }
+
+  /* Bande de cards avec scroll horizontal snap */
+  .carousel {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory; /* Accrochage par card */
+    padding: 8px 20px 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+
+  /* Card individuelle du carousel — haut arrondi en ovale */
+  .presta-card {
+    flex: 0 0 280px;          /* Largeur fixe, ne rétrécit pas */
+    background: #fff;
+    border-radius: 180px 180px 24px 24px / 140px 140px 24px 24px;
+    padding: 22px 22px 26px;
+    scroll-snap-align: center; /* S'aligne au centre lors du snap */
+    text-align: center;
+    border: 1px solid #ebe0cc;
+    position: relative;
+  }
+
+  /* Card mise en avant (border brun foncé) */
+  .presta-card.highlight {
+    border: 1.5px solid #3a2a1e;
+  }
+
+  /* Badge "Populaire" sur la card highlight */
+  .pick-badge {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: #3a2a1e;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Zone image ronde avec dégradé beige */
+  .presta-img {
+    width: 180px; height: 180px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e8d7bf 0%, #d4bfa0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .presta-img svg { opacity: 0.5; } /* SVG semi-transparent */
+
+  /* Nom de la prestation */
+  .presta-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: #3a2a1e;
+    margin-bottom: 6px;
+    font-weight: 400;
+  }
+
+  /* Description de la prestation */
+  .presta-desc {
+    font-size: 12px;
+    color: #9e8a76;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    min-height: 58px; /* Hauteur min pour aligner les éléments sous */
+  }
+
+  /* Badges durée / type */
+  .presta-meta {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .presta-meta-item {
+    font-size: 10px;
+    color: #7a6b5c;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    background: #f5ede2;
+    border-radius: 12px;
+  }
+
+  /* Prix de la prestation */
+  .presta-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: #3a2a1e;
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  /* Libellé au-dessus du prix ("À partir de") */
+  .presta-price-sup {
+    font-size: 10px;
+    color: #9e8a76;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* Bouton "Je réserve" sur la card */
+  .presta-btn {
+    background: #3a2a1e;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 28px;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-family: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  /* Contrôles du carousel : flèches + dots */
+  .carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    align-items: center;
+  }
+
+  /* Bouton flèche circulaire */
+  .car-arrow {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #ebe0cc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .car-arrow:hover { background: #3a2a1e; }
+  .car-arrow:hover svg path { stroke: #fff; }
+
+  /* Rangée de points indicateurs */
+  .car-dots { display: flex; gap: 6px; margin: 0 10px; }
+
+  /* Point individuel (inactif = gris) */
+  .car-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #d4c5b0;
+    transition: all 0.2s;
+  }
+
+  /* Point actif (allongé = brun foncé) */
+  .car-dot.active {
+    background: #3a2a1e;
+    width: 22px;
+    border-radius: 3px;
+  }
+
+  /* Indication "glissez" au-dessus du carousel */
+  .swipe-hint {
+    text-align: center;
+    font-size: 10px;
+    color: #a8927c;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* ---- LISTE COMPLÈTE DES TARIFS ---- */
+  /* Colonne de lignes de tarifs */
+  .full-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Ligne individuelle : nom + durée à gauche, prix + bouton à droite */
+  .full-item {
+    background: #fff;
+    border: 1px solid #ebe0cc;
+    border-radius: 20px;
+    padding: 16px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Partie gauche : nom + durée */
+  .full-item-left { flex: 1; min-width: 0; }
+
+  /* Nom de la prestation dans la liste */
+  .full-item-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: #3a2a1e;
+    margin-bottom: 3px;
+  }
+
+  /* Durée / description dans la liste */
+  .full-item-desc {
+    font-size: 11px;
+    color: #9e8a76;
+    line-height: 1.5;
+  }
+
+  /* Partie droite : prix + bouton — ne rétrécit pas */
+  .full-item-right {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Prix dans la liste */
+  .full-item-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: #3a2a1e;
+    margin-bottom: 8px;
+  }
+
+  /* Bouton "Réserver" dans la liste */
+  .full-item-btn {
+    background: #3a2a1e;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: inherit;
+    font-weight: 500;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  /* ---- BLOC INFO MORPHOLOGIE ---- */
+  /* Encart centré avec icône, titre et lien */
+  .info-block {
+    background: #faf4ea;
+    border-radius: 24px;
+    padding: 26px 22px;
+    text-align: center;
+    border: 1px solid #ebe0cc;
+  }
+
+  /* Cercle d'icône */
+  .info-icon {
+    width: 50px; height: 50px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: #f5ede2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Titre de l'encart info */
+  .info-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: #3a2a1e;
+    margin-bottom: 8px;
+  }
+
+  /* Texte descriptif de l'encart info */
+  .info-text {
+    font-size: 12px;
+    color: #7a6b5c;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  /* Lien "Voir le guide" avec bordure */
+  .info-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #3a2a1e;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: 1px solid #3a2a1e;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+
+  /* ---- CARTE RETOUCHES GROUPÉES ---- */
+
+  /* Carte englobant toutes les variantes d'un même type de retouche */
+  .full-item-group {
+    background: #fff;
+    border: 1px solid #ebe0cc;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  /* Titre du groupe (ex: "Retouche Cil à cil") */
+  .full-item-group-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: #3a2a1e;
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid #f5ede2;
+  }
+
+  /* Ligne d'une variante (2 semaines ou 3 semaines) */
+  .full-item-variant {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 18px;
+    gap: 12px;
+    border-bottom: 1px solid #f5ede2;
+  }
+
+  .full-item-variant:last-child { border-bottom: none; }
+
+  .full-item-variant-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  /* Badge "2 semaines" ou "3 semaines" */
+  .variant-tag {
+    font-size: 10px;
+    color: #7a6b5c;
+    background: #f5ede2;
+    border-radius: 10px;
+    padding: 3px 10px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  /* Durée en gris discret */
+  .variant-meta {
+    font-size: 11px;
+    color: #9e8a76;
+  }
+
+  .full-item-variant-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  /* ---- ACCORDÉON TARIFS ---- */
+
+  /* Header cliquable d'une catégorie (Extensions, Retouches...) */
+  .tarif-cat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: #f5ede2;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: #3a2a1e;
+    margin-bottom: 4px;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .tarif-cat-header:hover { background: #ede4d6; }
+
+  /* Flèche qui pivote à l'ouverture */
+  .tarif-cat-arrow {
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  /* Flèche inversée quand la catégorie est ouverte */
+  .tarif-cat-header.open .tarif-cat-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* Corps de la catégorie : liste des prestations */
+  .tarif-cat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  /* ---- FOOTER ---- */
+  /* Fond brun très foncé avec décoration circulaire */
+  .footer {
+    background: #2a1f15;
+    padding: 40px 20px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(201, 169, 138, 0.06);
+  }
+
+  /* Logo Biche. en doré dans le footer */
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    color: #c9a98a;
+    font-style: italic;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Sous-titre du footer */
+  .footer-tag {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Liens du footer en petits textes */
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-links a {
+    font-size: 10px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  /* Copyright discret */
+  .footer-copy {
+    font-size: 9px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+  }
+</style>
+<% end %>
+
+<%# ====================================================================
+    CONTENU DE LA PAGE PRESTATIONS
+    Structure : wrap > phone > nav + header + offre + carousel + tarifs
+                + morphologie + footer
+    ==================================================================== %>
 <div class="wrap">
   <div class="phone">
 
     <%# ---- NAVIGATION ---- %>
+    <%# Barre fixée en absolute sur le page-header (z-index: 10) %>
     <nav class="nav">
       <%= link_to "Biche.", root_path, class: "logo-mini" %>
       <div class="nav-right">
+        <%# Icône utilisateur — visible seulement si connectée %>
         <% if user_signed_in? %>
           <%= link_to espace_cliente_root_path do %>
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <circle cx="9" cy="6.5" r="3" stroke="#2e2926" stroke-width="1.3"/>
-              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#2e2926" stroke-width="1.3" stroke-linecap="round"/>
+            <svg class="user-ico" viewBox="0 0 18 18" fill="none">
+              <circle cx="9" cy="6.5" r="3" stroke="#3a2a1e" stroke-width="1.3"/>
+              <path d="M2.5 16c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" stroke="#3a2a1e" stroke-width="1.3" stroke-linecap="round"/>
             </svg>
           <% end %>
         <% end %>
@@ -21,165 +840,348 @@
     </nav>
 
     <%# ---- HEADER DE PAGE ---- %>
+    <%# Zone décorative avec 2 blobs en arrière-plan %>
     <div class="page-header">
-      <div class="ph-blob"></div>
-      <div class="ph-blob-2"></div>
+      <div class="ph-blob"></div>   <%# Blob doré haut-droite %>
+      <div class="ph-blob-2"></div> <%# Blob beige bas-gauche %>
       <p class="ph-tag">Prestations</p>
       <h1 class="ph-title">Soins du<br>regard</h1>
       <p class="ph-intro">Chaque prestation est pensée pour révéler votre regard, en respectant votre morphologie et vos envies.</p>
     </div>
 
-    <%# ---- OFFRE — COULEURS & STRASS ---- %>
-    <div class="sec" style="padding-top: 32px; padding-bottom: 24px;">
-      <div class="option-badge-block">
-        <span class="option-badge">Option</span>
-        <p class="option-text">Couleurs, strass… <strong>+10€</strong> sur toute pose complète</p>
+    <%# ---- OFFRE DU MOMENT ---- %>
+    <%# Carte sombre avec haut arrondi en ovale, fond #3a2a1e %>
+    <div class="offer-sec">
+      <div class="offer-card">
+        <div class="offer-badge">Offre du moment</div>
+        <div class="offer-title">Première visite<br>offerte à −20%</div>
+        <div class="offer-sub">Pose complète cil à cil pour les nouvelles clientes, jusqu'au 30 mai.</div>
+        <div class="offer-price">52€</div>
+        <div class="offer-price-old">au lieu de 65€</div>
+        <%= link_to "J'en profite", new_booking_path, class: "offer-btn" %>
       </div>
     </div>
 
-    <%# ---- FILTRE PAR CATÉGORIE ---- %>
-    <div class="sec" style="padding-top: 0; padding-bottom: 0; background: #fff;">
-      <div class="cat-bar">
-        <%# Onglet "Toutes" — pas de filtre actif %>
-        <a href="<%= prestations_path %>" class="cat-pill <%= params[:categorie].blank? ? 'active' : '' %>">Toutes</a>
-        <a href="<%= prestations_path(categorie: 'extensions') %>" class="cat-pill <%= params[:categorie] == 'extensions' ? 'active' : '' %>">Extensions</a>
-        <a href="<%= prestations_path(categorie: 'retouche') %>" class="cat-pill <%= params[:categorie] == 'retouche' ? 'active' : '' %>">Retouches</a>
-        <a href="<%= prestations_path(categorie: 'rehaussement') %>" class="cat-pill <%= params[:categorie] == 'rehaussement' ? 'active' : '' %>">Rehaussement</a>
-        <a href="<%= prestations_path(categorie: 'depose') %>" class="cat-pill <%= params[:categorie] == 'depose' ? 'active' : '' %>">Dépose</a>
-      </div>
-    </div>
+    <%# ---- CAROUSEL PRESTATIONS ---- %>
+    <%# Section nude avec filtres pills + carousel horizontal scrollable %>
+    <div class="sec sec-nude">
+      <p class="s-tag">Le catalogue</p>
+      <h2 class="s-h2">Nos soins signatures</h2>
+      <p class="s-sub">Filtrez par type pour trouver le soin qui vous correspond.</p>
 
-    <%# ---- EXTENSIONS — POSES COMPLÈTES ---- %>
-    <% extensions = @prestations.select { |p| p.categorie == "extensions" } %>
-    <% if extensions.any? %>
-      <div class="sec">
-        <p class="s-tag">Poses complètes</p>
-        <h2 class="s-h2">Extensions de cils</h2>
-        <div class="full-list">
-          <% extensions.each do |prestation| %>
-            <div class="full-item">
-              <div class="full-item-left">
-                <div class="full-item-name"><%= prestation.nom %></div>
-                <div class="full-item-desc"><%= prestation.duree_formatee %></div>
-              </div>
-              <div class="full-item-right">
-                <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
-                <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
-              </div>
+      <%# ---- PILLS DE FILTRE ---- %>
+      <%# Scrollables horizontalement, clic JS pour activer (pas de rechargement page) %>
+      <div class="cat-bar" id="catBar">
+        <span class="cat-pill active" data-cat="toutes">Toutes</span>
+        <span class="cat-pill" data-cat="extensions">Extensions</span>
+        <span class="cat-pill" data-cat="rehaussement">Rehaussement</span>
+        <span class="cat-pill" data-cat="sourcils">Sourcils</span>
+      </div>
+
+      <%# Indication "glissez" avec flèches svg %>
+      <div class="swipe-hint">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M8 3 L4 7 L8 11" stroke="#a8927c" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Glissez pour découvrir
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M6 3 L10 7 L6 11" stroke="#a8927c" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <%# ---- CAROUSEL ---- %>
+      <%# scroll-snap-type: x mandatory = chaque scroll s'accroche à la card suivante %>
+      <div class="carousel-wrap">
+        <div class="carousel" id="car1">
+
+          <%# Card 1 : Cil à cil — pose naturelle %>
+          <div class="presta-card" data-cat="extensions">
+            <div class="presta-img">
+              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
+                <path d="M5 35 Q25 10 50 35 Q75 10 95 35" stroke="#6b5344" stroke-width="1.5" fill="none"/>
+                <g stroke="#6b5344" stroke-width="1.2" stroke-linecap="round">
+                  <path d="M15 30 L12 15"/><path d="M25 22 L22 8"/><path d="M40 18 L40 5"/>
+                  <path d="M50 18 L50 3"/><path d="M60 18 L62 5"/><path d="M75 22 L78 8"/>
+                  <path d="M85 30 L90 15"/>
+                </g>
+              </svg>
             </div>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
-    <%# ---- RETOUCHES (2 ET 3 SEMAINES) ---- %>
-    <% retouches_2sem = @prestations.select { |p| p.categorie == "retouche" && p.nom.include?("2 semaines") } %>
-    <% retouches_3sem = @prestations.select { |p| p.categorie == "retouche" && p.nom.include?("3 semaines") } %>
-    <% if retouches_2sem.any? || retouches_3sem.any? %>
-      <div class="sec sec-cream">
-        <p class="s-tag">Remplissages & Dépose</p>
-        <h2 class="s-h2">Retouches</h2>
-
-        <%# Tableau comparatif 2 sem vs 3 sem, fidèle au tarif papier %>
-        <div class="retouche-table">
-          <div class="retouche-header">
-            <div class="retouche-header-label"></div>
-            <div class="retouche-header-col">2 sem.</div>
-            <div class="retouche-header-col">3 sem.</div>
+            <div class="presta-name">Cil à cil</div>
+            <div class="presta-desc">Effet naturel, une extension posée sur chaque cil naturel pour un résultat élégant et discret.</div>
+            <div class="presta-meta">
+              <div class="presta-meta-item">2h</div>
+              <div class="presta-meta-item">Pose</div>
+            </div>
+            <div class="presta-price">
+              <span class="presta-price-sup">À partir de</span>
+              60€
+            </div>
+            <%= link_to "Je réserve", new_booking_path, class: "presta-btn" %>
           </div>
 
-          <%# On itère sur les retouches 2 semaines pour construire les lignes %>
-          <% retouches_2sem.each do |r2| %>
-            <%# Nom de base = "Retouche Cil à cil" (sans le " — 2 semaines") %>
-            <% nom_base = r2.nom.gsub(" — 2 semaines", "") %>
-            <%# On cherche la retouche 3 semaines correspondante %>
-            <% r3 = retouches_3sem.find { |r| r.nom.start_with?(nom_base) } %>
+          <%# Card 2 : Volume léger — mise en avant "Populaire" %>
+          <div class="presta-card highlight" data-cat="extensions">
+            <div class="pick-badge">Populaire</div>
+            <div class="presta-img">
+              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
+                <path d="M5 38 Q25 8 50 38 Q75 8 95 38" stroke="#6b5344" stroke-width="1.8" fill="none"/>
+                <g stroke="#6b5344" stroke-width="1.3" stroke-linecap="round">
+                  <path d="M12 32 L8 12"/><path d="M22 24 L17 4"/><path d="M35 20 L33 2"/>
+                  <path d="M50 18 L50 0"/><path d="M65 20 L67 2"/><path d="M78 24 L83 4"/>
+                  <path d="M88 32 L92 12"/>
+                </g>
+              </svg>
+            </div>
+            <div class="presta-name">Volume léger</div>
+            <div class="presta-desc">Effet densifié avec 2 à 3 extensions par cil pour un regard intensifié et élégant.</div>
+            <div class="presta-meta">
+              <div class="presta-meta-item">2h30</div>
+              <div class="presta-meta-item">Pose</div>
+            </div>
+            <div class="presta-price">
+              <span class="presta-price-sup">À partir de</span>
+              70€
+            </div>
+            <%= link_to "Je réserve", new_booking_path, class: "presta-btn" %>
+          </div>
 
-            <div class="retouche-row">
-              <div class="retouche-row-name"><%= nom_base.gsub("Retouche ", "") %></div>
-              <%# Prix 2 semaines — toujours présent %>
-              <div class="retouche-row-price">
-                <%= link_to number_to_currency(r2.prix_euros, unit: "€", format: "%n%u", precision: 0),
-                            new_booking_path(prestation_id: r2.id),
-                            class: "retouche-price-link" %>
+          <%# Card 3 : Rehaussement — sans extension %>
+          <div class="presta-card" data-cat="rehaussement">
+            <div class="presta-img">
+              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
+                <path d="M5 40 Q25 15 50 30 Q75 15 95 40" stroke="#6b5344" stroke-width="1.5" fill="none"/>
+                <g stroke="#6b5344" stroke-width="1" stroke-linecap="round">
+                  <path d="M15 34 L13 22"/><path d="M25 28 L24 14"/><path d="M40 24 L40 10"/>
+                  <path d="M50 22 L50 8"/><path d="M60 24 L61 10"/><path d="M75 28 L77 14"/>
+                  <path d="M85 34 L88 22"/>
+                </g>
+              </svg>
+            </div>
+            <div class="presta-name">Rehaussement</div>
+            <div class="presta-desc">Courbure naturelle de vos cils, sans extension. Un regard ouvert et doux.</div>
+            <div class="presta-meta">
+              <div class="presta-meta-item">1h</div>
+              <div class="presta-meta-item">Soin</div>
+            </div>
+            <div class="presta-price">
+              <span class="presta-price-sup">À partir de</span>
+              40€
+            </div>
+            <%= link_to "Je réserve", new_booking_path, class: "presta-btn" %>
+          </div>
+
+          <%# Card 4 : Sourcils — à venir (bouton désactivé) %>
+          <div class="presta-card" data-cat="sourcils">
+            <div class="presta-img">
+              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
+                <path d="M10 35 Q30 20 50 25 Q70 20 90 35" stroke="#6b5344" stroke-width="2" fill="none"/>
+                <path d="M15 32 L18 38" stroke="#6b5344" stroke-width="1.2"/>
+                <path d="M30 28 L33 36" stroke="#6b5344" stroke-width="1.2"/>
+                <path d="M50 25 L52 35" stroke="#6b5344" stroke-width="1.2"/>
+                <path d="M70 28 L72 36" stroke="#6b5344" stroke-width="1.2"/>
+                <path d="M85 32 L83 38" stroke="#6b5344" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <div class="presta-name">Sourcils</div>
+            <div class="presta-desc">Remodelage, teinture et mise en forme pour un regard structuré.</div>
+            <div class="presta-meta">
+              <div class="presta-meta-item">Bientôt</div>
+            </div>
+            <div class="presta-price">
+              <span class="presta-price-sup">Tarif</span>
+              —
+            </div>
+            <%# Bouton désactivé visuellement avec opacity et cursor not-allowed %>
+            <button class="presta-btn" style="opacity: 0.4; cursor: not-allowed;">À venir</button>
+          </div>
+
+        </div><%# /carousel %>
+
+        <%# Contrôles : flèche gauche + dots + flèche droite %>
+        <div class="carousel-controls">
+          <%# Flèche gauche — appelle scrollCar() en JS %>
+          <div class="car-arrow" onclick="scrollCar('car1', -1)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 3 L5 8 L10 13" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <%# 4 dots — un par card du carousel %>
+          <div class="car-dots" id="dots1">
+            <div class="car-dot active"></div>
+            <div class="car-dot"></div>
+            <div class="car-dot"></div>
+            <div class="car-dot"></div>
+          </div>
+
+          <%# Flèche droite %>
+          <div class="car-arrow" onclick="scrollCar('car1', 1)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 3 L11 8 L6 13" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+      </div><%# /carousel-wrap %>
+    </div><%# /sec sec-nude %>
+
+    <%# ====================================================================
+        LISTE COMPLÈTE DES TARIFS — données dynamiques depuis @prestations
+        @prestations est chargé dans PrestationsController#index
+        On filtre par catégorie avec .select pour grouper les sections
+        ==================================================================== %>
+    <div class="sec">
+      <p class="s-tag">Grille complète</p>
+      <h2 class="s-h2">Tous les tarifs</h2>
+      <p class="s-sub">Du premier rendez-vous à l'entretien régulier.</p>
+
+      <%#
+        Accordéon par catégorie — chaque catégorie est un header cliquable.
+        La première (Extensions) est ouverte par défaut, les autres repliées.
+        toggleCat() en JS gère l'ouverture/fermeture et la rotation de la flèche.
+      %>
+      <div class="full-list">
+
+        <%# Helper local : rendu d'un bloc accordéon par catégorie %>
+        <%# open_default = true pour la première catégorie %>
+
+        <%# ---- EXTENSIONS ---- %>
+        <% extensions = @prestations.select { |p| p.categorie == "extensions" } %>
+        <% unless extensions.empty? %>
+          <div class="tarif-cat-header open" onclick="toggleCat(this)">
+            <span>Extensions</span>
+            <svg class="tarif-cat-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6 L8 10 L12 6" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="tarif-cat-body">
+            <% extensions.each do |prestation| %>
+              <div class="full-item">
+                <div class="full-item-left">
+                  <div class="full-item-name"><%= prestation.nom %></div>
+                  <div class="full-item-desc">Pose complète · <%= prestation.duree_formatee %></div>
+                </div>
+                <div class="full-item-right">
+                  <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
+                  <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
+                </div>
               </div>
-              <%# Prix 3 semaines — X si pas disponible (ex: Manga) %>
-              <div class="retouche-row-price">
-                <% if r3 %>
-                  <%= link_to number_to_currency(r3.prix_euros, unit: "€", format: "%n%u", precision: 0),
-                              new_booking_path(prestation_id: r3.id),
-                              class: "retouche-price-link" %>
-                <% else %>
-                  <span class="retouche-na">X</span>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# ---- REHAUSSEMENT ---- %>
+        <% rehaussement = @prestations.select { |p| p.categorie == "rehaussement" } %>
+        <% unless rehaussement.empty? %>
+          <div class="tarif-cat-header" onclick="toggleCat(this)">
+            <span>Rehaussement</span>
+            <svg class="tarif-cat-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6 L8 10 L12 6" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="tarif-cat-body" style="display:none">
+            <% rehaussement.each do |prestation| %>
+              <div class="full-item">
+                <div class="full-item-left">
+                  <div class="full-item-name"><%= prestation.nom %></div>
+                  <div class="full-item-desc">Sans extension · <%= prestation.duree_formatee %></div>
+                </div>
+                <div class="full-item-right">
+                  <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
+                  <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# ---- RETOUCHES ---- %>
+        <%# On groupe par nom de base (ex: "Retouche Cil à cil") en splitant sur " — " %>
+        <%# Chaque groupe contient 1 ou 2 variantes (2 semaines / 3 semaines) %>
+        <% retouches = @prestations.select { |p| p.categorie == "retouche" } %>
+        <% unless retouches.empty? %>
+          <div class="tarif-cat-header" onclick="toggleCat(this)">
+            <span>Retouches</span>
+            <svg class="tarif-cat-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6 L8 10 L12 6" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="tarif-cat-body" style="display:none">
+            <% retouches.group_by { |p| p.nom.split(' — ').first }.each do |base_nom, variantes| %>
+              <div class="full-item-group">
+                <%# Nom de base sans le suffixe "2 semaines / 3 semaines" %>
+                <div class="full-item-group-name"><%= base_nom %></div>
+
+                <%# Une ligne par variante (2 sem ou 3 sem) %>
+                <% variantes.each do |prestation| %>
+                  <div class="full-item-variant">
+                    <div class="full-item-variant-left">
+                      <%# Suffixe = "2 semaines" ou "3 semaines" (après " — ") %>
+                      <span class="variant-tag"><%= prestation.nom.split(' — ').last %></span>
+                      <span class="variant-meta"><%= prestation.duree_formatee %></span>
+                    </div>
+                    <div class="full-item-variant-right">
+                      <span class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></span>
+                      <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
+                    </div>
+                  </div>
                 <% end %>
               </div>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
+            <% end %>
+          </div>
+        <% end %>
 
-    <%# ---- REHAUSSEMENT ---- %>
-    <% rehaussements = @prestations.select { |p| p.categorie == "rehaussement" } %>
-    <% if rehaussements.any? %>
-      <div class="sec">
-        <p class="s-tag">Sans extension</p>
-        <h2 class="s-h2">Rehaussement</h2>
-        <div class="full-list">
-          <% rehaussements.each do |prestation| %>
-            <div class="full-item">
-              <div class="full-item-left">
-                <div class="full-item-name"><%= prestation.nom %></div>
-                <div class="full-item-desc"><%= prestation.duree_formatee %></div>
+        <%# ---- DÉPOSE ---- %>
+        <% depose = @prestations.select { |p| p.categorie == "depose" } %>
+        <% unless depose.empty? %>
+          <div class="tarif-cat-header" onclick="toggleCat(this)">
+            <span>Dépose</span>
+            <svg class="tarif-cat-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6 L8 10 L12 6" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="tarif-cat-body" style="display:none">
+            <% depose.each do |prestation| %>
+              <div class="full-item">
+                <div class="full-item-left">
+                  <div class="full-item-name"><%= prestation.nom %></div>
+                  <div class="full-item-desc">Retrait des extensions · <%= prestation.duree_formatee %></div>
+                </div>
+                <div class="full-item-right">
+                  <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
+                  <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
+                </div>
               </div>
-              <div class="full-item-right">
-                <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
-                <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
+            <% end %>
+          </div>
+        <% end %>
 
-    <%# ---- DÉPOSE ---- %>
-    <% deposes = @prestations.select { |p| p.categorie == "depose" } %>
-    <% if deposes.any? %>
-      <div class="sec sec-nude">
-        <p class="s-tag">Retrait</p>
-        <h2 class="s-h2">Dépose</h2>
-        <div class="full-list">
-          <% deposes.each do |prestation| %>
-            <div class="full-item">
-              <div class="full-item-left">
-                <div class="full-item-name"><%= prestation.nom %></div>
-                <div class="full-item-desc"><%= prestation.description %></div>
-              </div>
-              <div class="full-item-right">
-                <div class="full-item-price"><%= number_to_currency(prestation.prix_euros, unit: "€", format: "%n%u", precision: 0) %></div>
-                <%= link_to "Réserver", new_booking_path(prestation_id: prestation.id), class: "full-item-btn" %>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
+        <%# Si aucune prestation en base (avant seed ou migration) %>
+        <% if @prestations.empty? %>
+          <p style="text-align:center; color:#9e8a76; font-size:13px; padding:20px 0;">
+            Les prestations seront disponibles prochainement.
+          </p>
+        <% end %>
+
+      </div><%# /full-list %>
+    </div><%# /sec %>
 
     <%# ---- BLOC MORPHOLOGIE ---- %>
+    <%# Encart informatif qui invite à consulter le guide par morphologie %>
     <div class="sec sec-cream">
       <div class="info-block">
         <div class="info-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M3 12 C7 6 17 6 21 12 C17 18 7 18 3 12Z" stroke="#2e2926" stroke-width="1.5"/>
-            <circle cx="12" cy="12" r="3" fill="#2e2926"/>
+            <path d="M3 12 C7 6 17 6 21 12 C17 18 7 18 3 12Z" stroke="#3a2a1e" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="3" fill="#3a2a1e"/>
           </svg>
         </div>
         <div class="info-title">Quelle prestation pour vous ?</div>
-        <p class="info-text">Si vous hésitez, notre guide par morphologie vous oriente vers la pose idéale.</p>
+        <p class="info-text">Si vous hésitez entre les différents soins, notre guide par morphologie vous oriente vers la pose idéale.</p>
         <%= link_to morphologie_path, class: "info-link" do %>
           Voir le guide
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-            <path d="M3 7 L11 7 M7 3 L11 7 L7 11" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M3 7 L11 7 M7 3 L11 7 L7 11" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         <% end %>
       </div>
@@ -190,13 +1192,84 @@
       <div class="footer-logo">Biche.</div>
       <div class="footer-tag">Technicienne du regard · Bordeaux</div>
       <div class="footer-links">
-        <%= link_to "FAQ", faq_path %>
-        <%= link_to "Avis", avis_path %>
-        <%= link_to "Shop", shop_path %>
+        <%= link_to "FAQ",     faq_path %>
+        <%= link_to "Avis",    avis_path %>
+        <%= link_to "Shop",    shop_path %>
         <%= link_to "Contact", contact_path %>
       </div>
       <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
     </footer>
 
-  </div>
-</div>
+  </div><%# /phone %>
+</div><%# /wrap %>
+
+<%#
+  ====================================================================
+  JAVASCRIPT DU CAROUSEL
+  -------------------------------------------------------------------
+  Ce script gère deux comportements :
+  1. scrollCar() : défilement du carousel au clic sur les flèches
+  2. Écoute de l'événement scroll : met à jour les dots indicateurs
+  3. Clic sur les pills : active visuellement la pill cliquée
+  ====================================================================
+%>
+<script>
+  // scrollCar — défile d'une card en mesurant la largeur réelle (évite les valeurs codées en dur)
+  function scrollCar(id, dir) {
+    const car = document.getElementById(id);
+    const cardWidth = car.firstElementChild ? car.firstElementChild.offsetWidth + 14 : 294;
+    car.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
+  }
+
+  // updateDots — trouve la card la plus proche du centre du carousel et active le dot correspondant
+  // Cette approche est indépendante de la largeur codée en dur
+  function updateDots(car, dots) {
+    const carCenter = car.getBoundingClientRect().left + car.offsetWidth / 2;
+    let closestIndex = 0;
+    let closestDist  = Infinity;
+    [...car.children].forEach((child, i) => {
+      const rect        = child.getBoundingClientRect();
+      const childCenter = rect.left + rect.width / 2;
+      const dist        = Math.abs(childCenter - carCenter);
+      if (dist < closestDist) { closestDist = dist; closestIndex = i; }
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === closestIndex));
+  }
+
+  const car1 = document.getElementById('car1');
+  const dots = document.querySelectorAll('#dots1 .car-dot');
+  if (car1) car1.addEventListener('scroll', () => updateDots(car1, dots));
+
+  // Activation des pills + filtrage des cards du carousel
+  document.querySelectorAll('.cat-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      // Met à jour la pill active
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+
+      const cat = pill.dataset.cat; // Catégorie sélectionnée
+
+      // Affiche ou cache chaque card selon son data-cat
+      document.querySelectorAll('#car1 .presta-card').forEach(card => {
+        const match = cat === 'toutes' || card.dataset.cat === cat;
+        card.style.display = match ? '' : 'none';
+      });
+
+      // Remet le carousel au début et met à jour les dots
+      car1.scrollTo({ left: 0, behavior: 'smooth' });
+      updateDots(car1, dots);
+    });
+  });
+
+  // toggleCat — ouvre ou referme un accordéon de catégorie de tarifs
+  // header : l'élément .tarif-cat-header cliqué
+  function toggleCat(header) {
+    const body   = header.nextElementSibling; // .tarif-cat-body juste après
+    const isOpen = header.classList.contains('open');
+
+    // Inverse l'état ouvert/fermé
+    header.classList.toggle('open', !isOpen);
+    // Affiche ou cache le corps
+    body.style.display = isOpen ? 'none' : 'flex';
+  }
+</script>

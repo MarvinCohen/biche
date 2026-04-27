@@ -1,0 +1,179 @@
+<% content_for :title, "Admin — Détail RDV" %>
+
+<%#
+  ============================================================
+  VUE — Détail d'une réservation + actions de gestion
+  Données : @booking, @soin_historique
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Planning", admin_bookings_path(date: @booking.date), class: "admin-logout" %>
+    </nav>
+
+    <%# ---- HEADER : statut + nom cliente ---- %>
+    <div class="admin-header">
+      <% badge_class = case @booking.statut
+                       when 'en_attente' then 'admin-badge-attente'
+                       when 'confirme'   then 'admin-badge-confirme'
+                       when 'termine'    then 'admin-badge-termine'
+                       else 'admin-badge-annule'
+                       end %>
+      <div style="margin-bottom: 6px;">
+        <span class="admin-badge <%= badge_class %>">
+          <%= { 'en_attente' => 'En attente', 'confirme' => 'Confirmé', 'termine' => 'Terminé', 'annule' => 'Annulé' }[@booking.statut] %>
+        </span>
+      </div>
+      <div class="admin-header-title"><%= @booking.user.full_name %></div>
+      <div class="admin-header-sub">
+        <%= I18n.l(@booking.date, format: "%-d %B %Y") %>
+        <% if @booking.heure %>
+          · <%= @booking.heure.strftime('%Hh%M') %>
+          <% if @booking.heure_fin %>→ <%= @booking.heure_fin.strftime('%Hh%M') %><% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# ---- DÉTAIL DU RDV ---- %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Détails</div>
+      <div class="admin-detail-box">
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Prestation</div>
+          <div class="admin-detail-value"><%= @booking.prestation.nom %></div>
+        </div>
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Durée</div>
+          <div class="admin-detail-value"><%= @booking.prestation.duree_minutes %> min</div>
+        </div>
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Prix</div>
+          <div class="admin-detail-value"><%= @booking.prestation.prix_euros %>€</div>
+        </div>
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Garantie</div>
+          <div class="admin-detail-value">
+            <%= @booking.mode_paiement == 'acompte' ? "Acompte 30%" : "Empreinte CB" %>
+          </div>
+        </div>
+        <% if @booking.notes_cliente.present? %>
+          <div class="admin-detail-row">
+            <div class="admin-detail-label">Note cliente</div>
+            <div class="admin-detail-value" style="font-style:italic;color:#6e6560;">
+              <%= @booking.notes_cliente %>
+            </div>
+          </div>
+        <% end %>
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Téléphone</div>
+          <div class="admin-detail-value"><%= @booking.user.phone.present? ? @booking.user.phone : "—" %></div>
+        </div>
+        <div class="admin-detail-row">
+          <div class="admin-detail-label">Email</div>
+          <div class="admin-detail-value" style="font-size:11px;"><%= @booking.user.email %></div>
+        </div>
+      </div>
+    </div>
+
+    <%# ---- ACTIONS — boutons selon le statut actuel ---- %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Actions</div>
+
+      <%# Confirmer : uniquement si "en_attente" %>
+      <% if @booking.statut == 'en_attente' %>
+        <%# button_to génère un formulaire avec PATCH — turbo_confirm demande confirmation %>
+        <%= button_to "✓ Confirmer le rendez-vous",
+                      confirmer_admin_booking_path(@booking),
+                      method: :patch,
+                      data: { turbo_confirm: "Confirmer le RDV de #{@booking.user.full_name} ?" },
+                      class: "btn-admin-confirmer" %>
+      <% end %>
+
+      <%# Marquer terminé : uniquement si "confirme" %>
+      <% if @booking.statut == 'confirme' %>
+        <%= button_to "✓ Marquer comme terminé",
+                      terminer_admin_booking_path(@booking),
+                      method: :patch,
+                      data: { turbo_confirm: "Marquer ce soin comme terminé ? Un point fidélité sera crédité." },
+                      class: "btn-admin-terminer" %>
+      <% end %>
+
+      <%# Fiche technique : créer ou modifier selon si elle existe déjà %>
+      <% if @booking.statut == 'termine' %>
+        <% if @soin_historique.present? %>
+          <%# La fiche existe : proposer de la modifier %>
+          <%= link_to "✏ Modifier la fiche technique",
+                      edit_admin_soin_historique_path(@soin_historique),
+                      class: "btn-admin-fiche" %>
+        <% else %>
+          <%# Pas encore de fiche : proposer de la créer %>
+          <%= link_to "✏ Remplir la fiche technique",
+                      new_admin_soin_historique_path(booking_id: @booking.id),
+                      class: "btn-admin-fiche" %>
+        <% end %>
+      <% end %>
+
+      <%# Annuler : toujours disponible sauf si déjà annulé %>
+      <% unless @booking.statut == 'annule' %>
+        <%= button_to "✕ Annuler ce rendez-vous",
+                      annuler_admin_booking_path(@booking),
+                      method: :patch,
+                      data: { turbo_confirm: "Annuler définitivement ce rendez-vous ?" },
+                      class: "btn-admin-annuler" %>
+      <% end %>
+    </div>
+
+    <%# ---- FICHE TECHNIQUE (si elle existe) ---- %>
+    <% if @soin_historique.present? %>
+      <div class="admin-sec">
+        <div class="admin-sec-title">Fiche technique</div>
+        <div class="admin-detail-box">
+          <% if @soin_historique.courbure.present? %>
+            <div class="admin-detail-row">
+              <div class="admin-detail-label">Courbure</div>
+              <div class="admin-detail-value"><%= @soin_historique.courbure %></div>
+            </div>
+          <% end %>
+          <% if @soin_historique.longueur.present? %>
+            <div class="admin-detail-row">
+              <div class="admin-detail-label">Longueur</div>
+              <div class="admin-detail-value"><%= @soin_historique.longueur %></div>
+            </div>
+          <% end %>
+          <% if @soin_historique.epaisseur.present? %>
+            <div class="admin-detail-row">
+              <div class="admin-detail-label">Épaisseur</div>
+              <div class="admin-detail-value"><%= @soin_historique.epaisseur %></div>
+            </div>
+          <% end %>
+          <% if @soin_historique.technique.present? %>
+            <div class="admin-detail-row">
+              <div class="admin-detail-label">Technique</div>
+              <div class="admin-detail-value"><%= @soin_historique.technique %></div>
+            </div>
+          <% end %>
+          <% if @soin_historique.note_syam.present? %>
+            <div class="admin-detail-row" style="flex-direction:column; align-items:flex-start; gap:6px;">
+              <div class="admin-detail-label">Note personnelle</div>
+              <div class="admin-note-box"><%= @soin_historique.note_syam %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# ---- LIEN VERS LE PROFIL DE LA CLIENTE ---- %>
+    <div class="admin-sec">
+      <%= link_to "Voir le profil de #{@booking.user.first_name}",
+                  admin_user_path(@booking.user),
+                  class: "btn-admin-fiche" %>
+    </div>
+
+  </div>
+</div>

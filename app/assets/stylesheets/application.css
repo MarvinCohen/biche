@@ -98,13 +98,15 @@ body {
   align-items: center;
 }
 
-/* Bouton burger (menu) */
+/* Bouton burger (3 traits) */
 .burger {
   display: flex;
   flex-direction: column;
   gap: 4px;
   cursor: pointer;
   width: 22px;
+  position: relative;
+  z-index: 101; /* au-dessus du menu overlay */
 }
 
 .burger span {
@@ -112,9 +114,154 @@ body {
   background: var(--color-dark);
   border-radius: 1px;
   display: block;
+  transition: transform 0.25s ease, opacity 0.2s ease, width 0.2s ease;
+  transform-origin: center;
 }
 
 .burger span:last-child { width: 60%; }
+
+/* État ouvert : les traits forment un × */
+.burger.open span:first-child {
+  transform: translateY(5.5px) rotate(45deg);
+}
+.burger.open span:nth-child(2) {
+  opacity: 0;
+}
+.burger.open span:last-child {
+  width: 100%;
+  transform: translateY(-5.5px) rotate(-45deg);
+}
+
+/* ============================================================
+   MENU NAVIGATION OVERLAY
+   Panel qui glisse depuis la droite quand le burger est cliqué.
+   Ajouté dans application.html.erb, commun à toutes les pages.
+   ============================================================ */
+
+/* Fond semi-transparent derrière le menu */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 41, 38, 0.5);
+  z-index: 98;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.nav-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Panel du menu : glisse depuis la droite */
+.nav-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(300px, 85vw);
+  height: 100%;
+  background: var(--color-nude);
+  z-index: 99;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-menu.open {
+  transform: translateX(0);
+}
+
+/* En-tête du menu : logo + bouton fermer */
+.nav-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nav-menu-logo {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-dark);
+  font-style: italic;
+  text-decoration: none;
+}
+
+/* Bouton × pour fermer */
+.nav-menu-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #f0ede8;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--color-dark);
+  line-height: 1;
+}
+
+/* Liste des liens de navigation */
+.nav-menu-links {
+  padding: 16px 0;
+  flex: 1;
+}
+
+.nav-menu-link {
+  display: block;
+  padding: 14px 24px;
+  font-size: 13px;
+  color: var(--color-dark);
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #f0ede8;
+  transition: background 0.15s;
+}
+
+.nav-menu-link:hover {
+  background: #f6f4f1;
+}
+
+/* Séparateur visuel entre sections */
+.nav-menu-sep {
+  height: 6px;
+  background: #f0ede8;
+  border: none;
+  margin: 0;
+}
+
+/* Lien mis en avant (Réserver) */
+.nav-menu-link-cta {
+  display: block;
+  margin: 20px 24px;
+  text-align: center;
+  padding: 13px;
+  background: var(--color-dark);
+  color: #fff;
+  border-radius: 40px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+/* Pied du menu : infos contact */
+.nav-menu-footer {
+  padding: 20px 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.nav-menu-footer-text {
+  font-size: 11px;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
 
 /* ============================================================
    BOUTONS — styles réutilisables
