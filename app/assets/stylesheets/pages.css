@@ -1580,64 +1580,78 @@
   overflow: hidden;
 }
 
-/* Bloc principal (grand, forme organique) */
+/* Bloc principal — grand blob multi-lobes, haut gauche */
+/* Forme cloud avec bosses prononcées sur tous les côtés */
 .col-main {
   position: absolute;
-  top: 0;
-  left: 20px;
-  width: 190px;
-  height: 250px;
-  border-radius: 52% 48% 38% 62% / 42% 58% 42% 58%;
-  background: linear-gradient(145deg, #b8b2a8, #7a7470);
+  top: -5px;
+  left: 8px;
+  width: 200px;
+  height: 265px;
+  background: #c4b09e;
+  clip-path: path('M 90,8 C 105,0 125,-2 148,10 C 168,20 185,40 192,65 C 198,88 190,105 196,128 C 202,150 196,175 178,194 C 162,210 140,220 118,234 C 97,246 70,255 46,244 C 23,233 5,210 2,184 C -1,160 10,140 5,116 C 0,93 -6,68 5,45 C 15,23 38,8 62,6 C 72,4 80,12 90,8 Z');
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
-/* Bloc secondaire (rond) */
+/* Blob secondaire — forme arrondie irrégulière, haut droite */
 .col-sec {
   position: absolute;
-  top: 40px;
-  right: 20px;
-  width: 145px;
-  height: 145px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #ccc5bb, #a09890);
+  top: 25px;
+  right: 10px;
+  width: 148px;
+  height: 138px;
+  background: #d8c8b8;
+  clip-path: path('M 58,6 C 80,-2 112,2 132,20 C 150,36 152,62 144,84 C 136,104 114,118 88,122 C 62,126 34,116 16,96 C 0,78 -2,50 10,30 C 20,12 40,12 58,6 Z');
   z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
-/* Bloc tertiaire (rectangle arrondi) */
+/* Blob tertiaire — large et très plat, style "flaque" ou "splash", bas */
 .col-third {
   position: absolute;
-  bottom: 10px;
-  left: 60px;
-  width: 170px;
-  height: 110px;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #ddd6cc, #b8b2a8);
+  bottom: 14px;
+  left: 40px;
+  width: 178px;
+  height: 88px;
+  background: #b8a898;
+  clip-path: path('M 48,10 C 68,0 98,-4 128,4 C 154,11 172,28 170,50 C 168,68 150,80 124,87 C 98,93 68,92 44,80 C 22,69 4,52 5,35 C 6,20 26,18 48,10 Z');
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
-/* Bloc accent (fond sombre avec "B.") */
+/* Blob accent — petit, très irrégulier, style étoile de mer, bas droite */
 .col-accent {
   position: absolute;
-  bottom: 24px;
-  right: 28px;
-  width: 84px;
-  height: 84px;
-  border-radius: 60% 40% 50% 50% / 45% 55% 45% 55%;
+  bottom: 18px;
+  right: 18px;
+  width: 92px;
+  height: 96px;
   background: var(--color-dark);
+  clip-path: path('M 42,4 C 56,-2 74,4 82,20 C 90,34 88,52 96,66 C 102,78 92,95 76,96 C 60,97 44,86 30,88 C 16,90 2,80 2,64 C 2,48 14,34 10,20 C 6,7 28,9 42,4 Z');
   z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+/* Photo réelle dans un bloc du collage — remplace les SVG placeholders */
+/* object-fit: cover garantit que la photo remplit le bloc sans déformation */
+.col-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* Lettre "B." dans le bloc accent */
@@ -1716,12 +1730,34 @@
   display: block;
 }
 
-/* Hauteurs variables pour effet masonry */
-.masonry-item.tall   .masonry-bg { height: 200px; }
-.masonry-item.short  .masonry-bg { height: 130px; }
-.masonry-item.medium .masonry-bg { height: 160px; }
+/* Hauteurs variables pour effet masonry — s'applique au .masonry-bg (ancien) ET au .masonry-photo (nouveau) */
+.masonry-item.tall   .masonry-bg,
+.masonry-item.tall   .masonry-photo,
+.masonry-item.tall   .masonry-bg-placeholder { height: 200px; }
 
-/* Photos réelles pour les items masonry — images temporaires Unsplash */
+.masonry-item.short  .masonry-bg,
+.masonry-item.short  .masonry-photo,
+.masonry-item.short  .masonry-bg-placeholder { height: 130px; }
+
+.masonry-item.medium .masonry-bg,
+.masonry-item.medium .masonry-photo,
+.masonry-item.medium .masonry-bg-placeholder { height: 160px; }
+
+/* Photo uploadée via Active Storage — remplit l'item comme un background-cover */
+.masonry-photo {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+
+/* Fond dégradé de fallback quand aucune image n'est uploadée */
+.masonry-bg-placeholder {
+  background: linear-gradient(135deg, #ddd6cc, #c8bfb4);
+  display: block;
+  width: 100%;
+}
+
+/* Photos réelles pour les items masonry — images temporaires (conservé pour fallback si besoin) */
 /* URL relative sans /assets/ : Propshaft réécrit automatiquement avec le digest en prod */
 .m1 { background: url('galerie-1-cil-a-cil.jpg') center/cover no-repeat; }
 .m2 { background: url('galerie-2-volume.jpg') center/cover no-repeat; }

@@ -4,6 +4,7 @@ class Order < ApplicationRecord
   # ============================================================
   belongs_to :user     # La cliente qui commande
   belongs_to :product  # Le produit commandé
+  has_many   :cartes_cadeaux, class_name: 'CarteCadeau'
 
   # ============================================================
   # VALIDATIONS
@@ -29,8 +30,20 @@ class Order < ApplicationRecord
     montant_cents / 100.0
   end
 
-  # Vérifie si c'est une commande de carte cadeau (nécessite email destinataire)
+  # Vérifie si c'est une commande de carte cadeau
   def carte_cadeau?
     product.type_produit == 'carte_cadeau'
+  end
+
+  # Crée la CarteCadeau associée après confirmation du paiement
+  # Appelé depuis orders#success et le webhook Stripe
+  # Idempotent : ne crée rien si une carte existe déjà pour cette commande
+  def creer_carte_cadeau!
+    return if cartes_cadeaux.exists?
+
+    cartes_cadeaux.create!(
+      montant_initial_cents: montant_cents,
+      solde_cents:           montant_cents  # Solde initial = montant total
+    )
   end
 end

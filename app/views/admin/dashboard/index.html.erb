@@ -31,19 +31,34 @@
       </div>
     </div>
 
-    <%# Stats rapides : aujourd'hui / ce mois / clientes %>
+    <%#
+      Stats enrichies — grille 2×2
+      Ligne 1 : RDV du jour + CA du jour
+      Ligne 2 : RDV du mois + CA du mois
+    %>
     <div class="admin-stats">
+      <%# Nombre de RDV pour la date affichée (hors annulés) %>
       <div class="admin-stat">
         <span class="admin-stat-num"><%= @nb_rdvs_aujourd_hui %></span>
-        <span class="admin-stat-label">Aujourd'hui</span>
+        <span class="admin-stat-label">RDV du jour</span>
       </div>
+
+      <%# CA du jour : somme des prestations confirmées / terminées, en euros %>
       <div class="admin-stat">
+        <span class="admin-stat-num"><%= "#{(@ca_jour / 100.0).round}€" %></span>
+        <span class="admin-stat-label">CA du jour</span>
+      </div>
+
+      <%# Nombre de RDV confirmés ou terminés ce mois %>
+      <div class="admin-stat admin-stat--border-top">
         <span class="admin-stat-num"><%= @nb_rdvs_mois %></span>
-        <span class="admin-stat-label">Ce mois</span>
+        <span class="admin-stat-label">RDV du mois</span>
       </div>
-      <div class="admin-stat">
-        <span class="admin-stat-num"><%= @nb_clientes %></span>
-        <span class="admin-stat-label">Clientes</span>
+
+      <%# CA du mois : somme des prestations confirmées / terminées ce mois, en euros %>
+      <div class="admin-stat admin-stat--border-top">
+        <span class="admin-stat-num"><%= "#{(@ca_mois / 100.0).round}€" %></span>
+        <span class="admin-stat-label">CA du mois</span>
       </div>
     </div>
 
@@ -142,13 +157,63 @@
       </div>
     <% end %>
 
-    <%# ---- RACCOURCIS ---- %>
+    <%# ---- NAVIGATION EN GRILLE D'ICÔNES ---- %>
+    <%# Chaque tuile : emoji large + label court, 2 colonnes %>
     <div class="admin-sec">
       <div class="admin-sec-title">Navigation</div>
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <%= link_to "Toutes les réservations", admin_bookings_path, class: "btn-admin-fiche" %>
-        <%= link_to "Mes clientes", admin_users_path, class: "btn-admin-fiche" %>
-        <%= link_to "Envoyer un message", new_admin_message_path, class: "btn-admin-fiche" %>
+      <div class="admin-nav-grid">
+
+        <%# Tuile principale — fond sombre, mise en avant %>
+        <%= link_to new_admin_booking_path(date: @date.to_s), class: "admin-nav-tile admin-nav-tile--primary" do %>
+          <span class="admin-nav-tile-icon">📅</span>
+          <span class="admin-nav-tile-label">Nouveau RDV</span>
+        <% end %>
+
+        <%= link_to admin_agenda_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">🗓</span>
+          <span class="admin-nav-tile-label">Agenda</span>
+        <% end %>
+
+        <%= link_to admin_bookings_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">📋</span>
+          <span class="admin-nav-tile-label">Réservations</span>
+        <% end %>
+
+        <%= link_to admin_users_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">👥</span>
+          <span class="admin-nav-tile-label">Clientes</span>
+        <% end %>
+
+        <%= link_to admin_prestations_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">💅</span>
+          <span class="admin-nav-tile-label">Prestations</span>
+        <% end %>
+
+        <%= link_to admin_products_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">🛍️</span>
+          <span class="admin-nav-tile-label">Boutique</span>
+        <% end %>
+
+        <%= link_to admin_indisponibilites_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">🚫</span>
+          <span class="admin-nav-tile-label">Bloqués</span>
+        <% end %>
+
+        <%= link_to admin_cartes_cadeaux_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">🎁</span>
+          <span class="admin-nav-tile-label">Cadeaux</span>
+        <% end %>
+
+        <%= link_to admin_galerie_photos_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">🖼️</span>
+          <span class="admin-nav-tile-label">Galerie</span>
+        <% end %>
+
+        <%= link_to new_admin_message_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">💬</span>
+          <span class="admin-nav-tile-label">Message</span>
+        <% end %>
+
       </div>
     </div>
 

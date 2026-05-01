@@ -1,0 +1,60 @@
+<% content_for :title, "Admin — Scanner une carte" %>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Cartes", admin_cartes_cadeaux_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Scanner une carte</div>
+      <div class="admin-header-sub">Entrez le code ou scannez le QR code</div>
+    </div>
+
+    <%# Formulaire de recherche par code %>
+    <div class="admin-sec">
+      <%= form_with url: scanner_admin_cartes_cadeaux_path, method: :get, local: true do |f| %>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <%= f.text_field :code,
+                           value: params[:code],
+                           placeholder: "BICHE-XXXX-XXXX",
+                           autocomplete: "off",
+                           autofocus: true,
+                           style: "flex:1; padding:13px 16px; border:1px solid #e2dbd2; border-radius:14px; font-size:14px; font-family:'Courier New',monospace; letter-spacing:1px; text-transform:uppercase; color:#2e2926; background:#f7f5f2;" %>
+          <%= f.submit "Chercher",
+                       style: "padding:13px 20px; background:#2e2926; color:#fff; border:none; border-radius:14px; font-size:12px; font-family:inherit; cursor:pointer; white-space:nowrap;" %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Résultat de la recherche %>
+    <% if @erreur %>
+      <div class="admin-sec">
+        <div class="admin-empty">
+          <div class="admin-empty-text"><%= @erreur %></div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @carte %>
+      <%# Carte trouvée — redirection automatique vers sa fiche %>
+      <% if @carte %>
+        <script>
+          // Rediriger automatiquement vers la fiche de la carte
+          window.location.href = "<%= admin_carte_cadeau_path(@carte) %>";
+        </script>
+      <% end %>
+    <% end %>
+
+    <%# Aide — comment scanner le QR code %>
+    <div style="padding:0 16px 32px; font-size:11px; color:var(--color-muted); text-align:center; line-height:1.7;">
+      Scannez le QR code depuis l'email de la cliente<br>
+      pour être redirigé directement sur cette page.
+    </div>
+
+  </div>
+</div>

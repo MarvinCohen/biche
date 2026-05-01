@@ -34,7 +34,20 @@ class BookingMailer < ApplicationMailer
     )
   end
 
-  # Email 3 — Rappel 24h avant le rendez-vous
+  # Email 3 — Annulation par Syam (envoyé quand Syam annule un RDV)
+  # Déclenché par : Admin::BookingsController#annuler
+  def rdv_annule(booking)
+    @booking = booking
+    @user    = booking.user
+    @espace_url = espace_cliente_root_url
+
+    mail(
+      to:      @user.email,
+      subject: "Votre rendez-vous a été annulé — Biche."
+    )
+  end
+
+  # Email 4 — Rappel 24h avant le rendez-vous
   # Déclenché par : Rake task (lib/tasks/emails.rake) via cron quotidien
   def rappel_rdv(booking)
     @booking = booking

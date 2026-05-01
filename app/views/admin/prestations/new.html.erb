@@ -1,0 +1,28 @@
+<% content_for :title, "Admin — Nouvelle prestation" %>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Prestations", admin_prestations_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Nouvelle prestation</div>
+      <div class="admin-header-sub">Elle sera visible par les clientes dès activation</div>
+    </div>
+
+    <div class="admin-sec">
+      <%= form_with model: [:admin, @prestation], local: true, multipart: true do |f| %>
+        <%= render "form", f: f %>
+
+        <%= f.submit "Ajouter la prestation", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_prestations_path, class: "btn-admin-fiche", style: "margin-top:8px;" %>
+      <% end %>
+    </div>
+
+  </div>
+</div>

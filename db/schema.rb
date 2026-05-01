@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_25_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_29_094130) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "bookings", force: :cascade do |t|
     t.integer "acompte_cents"
@@ -30,6 +58,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_25_000001) do
     t.index ["user_id"], name: "index_bookings_on_user_id"
   end
 
+  create_table "carte_transactions", force: :cascade do |t|
+    t.integer "booking_id"
+    t.bigint "carte_cadeau_id", null: false
+    t.datetime "created_at", null: false
+    t.string "description"
+    t.integer "montant_cents", null: false
+    t.datetime "updated_at", null: false
+    t.index ["carte_cadeau_id"], name: "index_carte_transactions_on_carte_cadeau_id"
+  end
+
+  create_table "cartes_cadeaux", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.integer "montant_initial_cents", null: false
+    t.bigint "order_id", null: false
+    t.integer "solde_cents", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_cartes_cadeaux_on_active"
+    t.index ["code"], name: "index_cartes_cadeaux_on_code", unique: true
+    t.index ["order_id"], name: "index_cartes_cadeaux_on_order_id"
+  end
+
   create_table "fidelite_cards", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "points"
@@ -38,6 +89,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_25_000001) do
     t.bigint "user_id", null: false
     t.integer "visites"
     t.index ["user_id"], name: "index_fidelite_cards_on_user_id"
+  end
+
+  create_table "galerie_photos", force: :cascade do |t|
+    t.string "categorie", null: false
+    t.datetime "created_at", null: false
+    t.string "legende", null: false
+    t.string "legende_sub"
+    t.integer "position", default: 0, null: false
+    t.string "taille", default: "medium", null: false
+    t.datetime "updated_at", null: false
+    t.index ["categorie"], name: "index_galerie_photos_on_categorie"
+    t.index ["position"], name: "index_galerie_photos_on_position"
+  end
+
+  create_table "indisponibilites", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date_debut", null: false
+    t.date "date_fin", null: false
+    t.time "heure_debut", null: false
+    t.time "heure_fin", null: false
+    t.string "raison"
+    t.datetime "updated_at", null: false
+    t.index ["date_debut"], name: "index_indisponibilites_on_date_debut"
+    t.index ["date_fin"], name: "index_indisponibilites_on_date_fin"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -116,8 +191,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_25_000001) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bookings", "prestations"
   add_foreign_key "bookings", "users"
+  add_foreign_key "carte_transactions", "cartes_cadeaux", column: "carte_cadeau_id"
+  add_foreign_key "cartes_cadeaux", "orders"
   add_foreign_key "fidelite_cards", "users"
   add_foreign_key "messages", "users"
   add_foreign_key "orders", "products"

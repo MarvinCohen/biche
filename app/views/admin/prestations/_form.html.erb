@@ -1,0 +1,131 @@
+<%#
+  ============================================================
+  PARTIAL — Formulaire prestation (partagé new + edit)
+  Variables : @prestation, f (form builder)
+  ============================================================
+%>
+
+<%# Erreurs de validation %>
+<% if @prestation.errors.any? %>
+  <div class="admin-errors">
+    <% @prestation.errors.full_messages.each do |msg| %>
+      <div class="admin-error-item">⚠ <%= msg %></div>
+    <% end %>
+  </div>
+<% end %>
+
+<%# ---- NOM ---- %>
+<div class="admin-field">
+  <%= f.label :nom, "Nom de la prestation", class: "admin-label" %>
+  <%= f.text_field :nom,
+                   class: "admin-input",
+                   placeholder: "Ex: Pose volume russe" %>
+</div>
+
+<%# ---- CATÉGORIE ---- %>
+<div class="admin-field">
+  <%= f.label :categorie, "Catégorie", class: "admin-label" %>
+  <%= f.select :categorie,
+               options_for_select(
+                 [
+                   ["Extensions",   "extensions"],
+                   ["Retouches",    "retouche"],
+                   ["Rehaussement", "rehaussement"],
+                   ["Dépose",       "depose"]
+                 ],
+                 @prestation.categorie
+               ),
+               { include_blank: "Choisir une catégorie" },
+               class: "admin-select" %>
+</div>
+
+<%# ---- PRIX ---- %>
+<div class="admin-field">
+  <label class="admin-label">Prix (€)</label>
+  <div style="position: relative;">
+    <input type="number"
+           name="prestation[prix_euros]"
+           value="<%= @prestation.prix_cents ? @prestation.prix_euros.to_i : '' %>"
+           min="1"
+           step="1"
+           class="admin-input"
+           placeholder="65"
+           style="padding-right: 32px;">
+    <%# Symbole € en overlay à droite %>
+    <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%);
+                 color:var(--color-muted); font-size:13px;">€</span>
+  </div>
+</div>
+
+<%# ---- DURÉE ---- %>
+<div class="admin-field">
+  <label class="admin-label">Durée (minutes)</label>
+  <%# Select par tranches de 15 min, de 15 min à 4h %>
+  <%= f.select :duree_minutes,
+               options_for_select(
+                 (1..16).map { |i| i * 15 }.map do |min|
+                   h = min / 60
+                   m = min % 60
+                   label = h > 0 ? (m > 0 ? "#{h}h#{m.to_s.rjust(2,'0')}" : "#{h}h") : "#{m} min"
+                   [label, min]
+                 end,
+                 @prestation.duree_minutes
+               ),
+               { include_blank: "Choisir une durée" },
+               class: "admin-select" %>
+</div>
+
+<%# ---- DESCRIPTION ---- %>
+<div class="admin-field">
+  <%= f.label :description, "Description", class: "admin-label" %>
+  <%= f.text_area :description,
+                  class: "admin-textarea",
+                  rows: 3,
+                  placeholder: "Description visible par les clientes..." %>
+</div>
+
+<%# ---- PHOTO ---- %>
+<div class="admin-field">
+  <label class="admin-label">Photo</label>
+
+  <%# Aperçu de la photo actuelle si elle existe %>
+  <% if @prestation.photo.attached? %>
+    <div style="margin-bottom:10px; border-radius:12px; overflow:hidden; border:1px solid var(--color-border);">
+      <%= image_tag @prestation.photo, style: "width:100%; height:160px; object-fit:cover; display:block;" %>
+    </div>
+    <div style="font-size:10px; color:var(--color-muted); margin-bottom:8px;">
+      Choisir une nouvelle image pour remplacer celle-ci.
+    </div>
+  <% end %>
+
+  <%# Champ d'upload — accepte uniquement les images %>
+  <%= f.file_field :photo,
+                   accept: "image/*",
+                   class: "admin-input",
+                   style: "padding:8px; cursor:pointer;" %>
+  <div style="font-size:10px; color:var(--color-muted); margin-top:4px;">
+    JPG ou PNG recommandé · Ratio 4:3 idéal
+  </div>
+</div>
+
+<%# ---- DISPONIBILITÉ ---- %>
+<div class="admin-field">
+  <label class="admin-label">Disponibilité</label>
+  <div style="display:flex; gap:8px; margin-top:4px;">
+    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;
+                  background:#f6f4f1; border-radius:10px; padding:10px 14px; flex:1;
+                  border:1.5px solid <%= @prestation.disponible ? '#2e2926' : '#e2dbd2' %>;">
+      <%= f.radio_button :disponible, true, style: "accent-color:#2e2926;" %>
+      <span style="font-size:12px; color:#2e2926;">Active</span>
+    </label>
+    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;
+                  background:#f6f4f1; border-radius:10px; padding:10px 14px; flex:1;
+                  border:1.5px solid <%= @prestation.disponible ? '#e2dbd2' : '#2e2926' %>;">
+      <%= f.radio_button :disponible, false, style: "accent-color:#2e2926;" %>
+      <span style="font-size:12px; color:#2e2926;">Désactivée</span>
+    </label>
+  </div>
+  <div style="font-size:10px; color:var(--color-muted); margin-top:6px; letter-spacing:0.3px;">
+    Une prestation désactivée n'apparaît plus lors de la prise de RDV.
+  </div>
+</div>

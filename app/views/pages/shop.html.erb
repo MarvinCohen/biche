@@ -40,11 +40,146 @@
   .s-sub { font-size: 12px; color: #8e8480; text-align: center; line-height: 1.6; margin-bottom: 26px; }
 
   /* Carte cadeau — visuel de prévisualisation */
-  .gift-visual { background: linear-gradient(135deg, #2e2926 0%, #5e5a56 100%); border-radius: 18px; padding: 20px 22px; margin-bottom: 20px; position: relative; overflow: hidden; }
-  .gift-visual::before { content: ''; position: absolute; top: -20px; right: -20px; width: 80px; height: 80px; border-radius: 50%; background: rgba(184,168,152,0.1); }
-  .gift-visual-logo { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: rgba(255,255,255,0.85); font-style: italic; margin-bottom: 20px; }
-  .gift-visual-amount { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: #fff; }
-  .gift-visual-code { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 3px; margin-top: 8px; }
+  /* Dégradé chaud brun + effet de profondeur avec les cercles décoratifs */
+  .gift-visual {
+    background: linear-gradient(135deg, #1e1b19 0%, #3a3330 50%, #5e5a56 100%);
+    border-radius: 20px;
+    padding: 22px 22px 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    /* Ombre portée pour effet de carte physique */
+    box-shadow: 0 8px 32px rgba(46,41,38,0.35), 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  /* Bordure intérieure fine dorée — effet carte premium */
+  .gift-visual::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 14px;
+    border: 0.5px solid rgba(184,168,152,0.25);
+    pointer-events: none;
+  }
+
+  /* Grand cercle décoratif en haut à droite */
+  .gift-visual-circle-1 {
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,168,152,0.15) 0%, transparent 70%);
+  }
+
+  /* Petit cercle décoratif en bas à gauche */
+  .gift-visual-circle-2 {
+    position: absolute;
+    bottom: -20px; left: -20px;
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,168,152,0.1) 0%, transparent 70%);
+  }
+
+  /* Reflet brillant animé qui glisse sur la carte */
+  @keyframes shimmer {
+    0%   { transform: translateX(-120%) skewX(-15deg); }
+    100% { transform: translateX(300%) skewX(-15deg); }
+  }
+  .gift-visual-shimmer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    animation: shimmer 3.5s ease-in-out infinite;
+  }
+
+  /* Contenu de la carte — au-dessus des décorations */
+  .gift-visual-inner { position: relative; z-index: 1; }
+
+  /* En-tête de la carte : logo à gauche, puce décorative à droite */
+  .gift-visual-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  .gift-visual-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    color: rgba(255,255,255,0.9);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  /* Puce décorative dorée en haut à droite (imite les cartes bancaires) */
+  .gift-visual-chip {
+    width: 28px; height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #c8b89a, #a89078);
+    opacity: 0.7;
+    border: 0.5px solid rgba(255,255,255,0.2);
+  }
+
+  /* Montant — élément central de la carte */
+  .gift-visual-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    color: #fff;
+    font-weight: 300;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    /* line-height plus généreux pour éviter que les descendants (5, 9, g...)
+       débordent sur le label "Carte cadeau" en dessous */
+    line-height: 1.15;
+  }
+
+  /* "Pour Prénom" — affiché au-dessus du montant sur le visuel de la carte */
+  .gift-visual-pour {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: rgba(184,168,152,0.65);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .gift-visual-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(184,168,152,0.7);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  /* Séparateur élégant */
+  .gift-visual-sep {
+    height: 0.5px;
+    background: linear-gradient(90deg, transparent, rgba(184,168,152,0.4), transparent);
+    margin-bottom: 12px;
+  }
+
+  /* Pied de carte : validité et code */
+  .gift-visual-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .gift-visual-valid {
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1.6;
+  }
+
+  .gift-visual-code {
+    font-size: 9px;
+    color: rgba(184,168,152,0.5);
+    letter-spacing: 2.5px;
+    text-align: right;
+  }
 
   /* Carte cadeau — formulaire de commande */
   .gift-card-box { background: #2e2926; border-radius: 24px; padding: 30px 22px; position: relative; overflow: hidden; }
@@ -86,11 +221,9 @@
   .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; grid-auto-rows: 1fr; }
   /* flex colonne sur la card pour pousser le footer en bas quelle que soit la hauteur */
   .product-card { background: #fff; border: 1px solid #e2dbd2; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
-  .product-img { height: 130px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .pi-1 { background: linear-gradient(145deg, #ddd6cc, #b8b2a8); }
-  .pi-2 { background: linear-gradient(145deg, #ccc5bb, #a09890); }
-  .pi-3 { background: linear-gradient(145deg, #b8b2a8, #7a7470); }
-  .pi-4 { background: linear-gradient(145deg, #f6f4f1, #ddd6cc); }
+  /* Zone image produit — hauteur fixe, contient photo Active Storage ou placeholder SVG */
+  .product-img { height: 130px; flex-shrink: 0; overflow: hidden; background: #f0ede8;
+                 display: flex; align-items: center; justify-content: center; }
   /* flex: 1 sur product-body — prend tout l'espace restant après l'image */
   .product-body { padding: 12px 14px; display: flex; flex-direction: column; flex: 1; }
   .product-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: #2e2926; margin-bottom: 3px; }
@@ -164,9 +297,42 @@
 
       <%# Aperçu visuel de la carte cadeau %>
       <div class="gift-visual">
-        <div class="gift-visual-logo">Biche.</div>
-        <div class="gift-visual-amount">65€</div>
-        <div class="gift-visual-code">BICHE-2026-XXXX</div>
+        <%# Éléments décoratifs de fond %>
+        <div class="gift-visual-circle-1"></div>
+        <div class="gift-visual-circle-2"></div>
+        <%# Reflet animé qui glisse sur la carte — effet premium %>
+        <div class="gift-visual-shimmer"></div>
+
+        <%# Contenu de la carte — au-dessus des décorations (z-index: 1) %>
+        <div class="gift-visual-inner">
+
+          <%# En-tête : logo Biche. + puce décorative %>
+          <div class="gift-visual-header">
+            <div class="gift-visual-logo">Biche.</div>
+            <div class="gift-visual-chip"></div>
+          </div>
+
+          <%# Nom du destinataire — mis à jour en temps réel (caché si vide) %>
+          <div class="gift-visual-pour" id="gift-preview-pour" style="display:none;">
+            Pour <span id="gift-preview-nom"></span>
+          </div>
+
+          <%# Montant mis à jour en temps réel par le JS — id ciblé %>
+          <div class="gift-visual-amount" id="gift-preview-amount">65€</div>
+          <div class="gift-visual-label">Carte cadeau</div>
+
+          <%# Séparateur élégant %>
+          <div class="gift-visual-sep"></div>
+
+          <%# Pied de carte %>
+          <div class="gift-visual-footer">
+            <div class="gift-visual-valid">
+              Valable 1 an<br>Toutes prestations
+            </div>
+            <div class="gift-visual-code">BICHE·2026·XXXX</div>
+          </div>
+
+        </div>
       </div>
 
       <%# Formulaire de commande %>
@@ -180,184 +346,116 @@
           <div class="gift-amount" onclick="selectAmount(this)">80€</div>
           <div class="gift-amount" onclick="selectAmount(this)">95€</div>
         </div>
+        <%# Champ destinataire — mis à jour en temps réel sur le visuel de la carte %>
+        <div class="gift-custom" style="margin-bottom:14px;">
+          <div class="gift-custom-label">Pour :</div>
+          <input class="gift-custom-input"
+                 type="text"
+                 id="gift-input-nom"
+                 placeholder="Prénom de la personne"
+                 maxlength="30"/>
+        </div>
+
         <div class="gift-custom">
           <div class="gift-custom-label">Montant libre :</div>
-          <input class="gift-custom-input" type="number" placeholder="Ex : 120"/>
+          <%# type="text" + inputmode="numeric" : clavier numérique sur mobile,
+              mais le scroll ne change plus la valeur (comportement type="number" indésirable) %>
+          <input class="gift-custom-input"
+                 type="text"
+                 id="gift-input-montant"
+                 inputmode="numeric"
+                 pattern="[0-9]*"
+                 placeholder="Ex : 120"/>
         </div>
-        <button class="gift-btn">Offrir cette carte →</button>
+        <%# Le bouton collecte le montant sélectionné + le nom et navigue vers orders#new %>
+        <button class="gift-btn" onclick="soumettreCarte(event)">Offrir cette carte →</button>
       </div>
     </div>
 
-    <%# ---- PACKS MULTI-VISITES ---- %>
-    <div class="sec sec-alt" id="section-packs">
-      <div class="s-tag">Fidélité</div>
-      <div class="s-h2">Packs multi-visites</div>
-      <div class="s-sub">Pour les clientes régulières. Plus vous prenez, plus vous économisez.</div>
+    <%# ---- PACKS MULTI-VISITES — données depuis la base ---- %>
+    <% if @produits_packs.any? %>
+      <div class="sec sec-alt" id="section-packs">
+        <div class="s-tag">Fidélité</div>
+        <div class="s-h2">Packs multi-visites</div>
+        <div class="s-sub">Pour les clientes régulières. Plus vous prenez, plus vous économisez.</div>
 
-      <div class="packs-list">
-
-        <%# Pack Starter — 3 retouches %>
-        <div class="pack-card">
-          <div class="pack-header">
-            <div class="pack-badge gold">Starter</div>
-            <div class="pack-name">Pack 3 retouches</div>
-            <div class="pack-desc">Idéal pour démarrer. 3 retouches à utiliser dans les 3 mois.</div>
-            <div class="pack-includes">
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                3 retouches 3 semaines
+        <div class="packs-list">
+          <% @produits_packs.each_with_index do |pack, i| %>
+            <%# Le 2ème pack est mis en avant (featured) %>
+            <div class="pack-card <%= 'featured' if i == 1 %>">
+              <div class="pack-header">
+                <% if i == 1 %>
+                  <div class="pack-badge">⭐ Populaire</div>
+                <% end %>
+                <div class="pack-name"><%= pack.nom %></div>
+                <% if pack.description.present? %>
+                  <%# La description peut contenir des avantages séparés par des sauts de ligne %>
+                  <%# Première ligne = description courte, lignes suivantes = liste d'avantages %>
+                  <% lignes = pack.description.strip.split("\n").map(&:strip).reject(&:blank?) %>
+                  <div class="pack-desc"><%= lignes.first %></div>
+                  <% if lignes.size > 1 %>
+                    <div class="pack-includes">
+                      <% lignes.drop(1).each do |ligne| %>
+                        <div class="pack-include-item">
+                          <div class="pack-check">
+                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                              <path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/>
+                            </svg>
+                          </div>
+                          <%= ligne %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
               </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                Valable 3 mois
-              </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                Points fidélité x3
+              <div class="pack-footer">
+                <div class="pack-price"><%= pack.prix_euros.to_i %>€</div>
+                <%= link_to "Choisir", new_order_path(product_id: pack.id), class: "pack-btn" %>
               </div>
             </div>
-          </div>
-          <div class="pack-footer">
-            <div>
-              <div class="pack-price">120€</div>
-              <div class="pack-price-old">au lieu de 135€</div>
-              <div class="pack-economy">Économie : 15€</div>
-            </div>
-            <button class="pack-btn">Choisir</button>
-          </div>
+          <% end %>
         </div>
-
-        <%# Pack Populaire — 5 retouches (mis en avant) %>
-        <div class="pack-card featured">
-          <div class="pack-header">
-            <div class="pack-badge">⭐ Populaire</div>
-            <div class="pack-name">Pack 5 retouches</div>
-            <div class="pack-desc">Le plus choisi. 5 retouches sur 5 mois pour un regard toujours parfait.</div>
-            <div class="pack-includes">
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                5 retouches 3 semaines
-              </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                Valable 5 mois
-              </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                Points fidélité x5
-              </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                Brossette cils offerte
-              </div>
-            </div>
-          </div>
-          <div class="pack-footer">
-            <div>
-              <div class="pack-price">195€</div>
-              <div class="pack-price-old">au lieu de 225€</div>
-              <div class="pack-economy">Économie : 30€</div>
-            </div>
-            <button class="pack-btn">Choisir</button>
-          </div>
-        </div>
-
-        <%# Pack VIP — 10 retouches, badge doré via style inline comme dans la maquette %>
-        <div class="pack-card">
-          <div class="pack-header">
-            <div class="pack-badge" style="background:#b8a898;color:#2e2926">VIP</div>
-            <div class="pack-name">Pack 10 retouches</div>
-            <div class="pack-desc">Un an de regard parfait avec le maximum d'avantages.</div>
-            <div class="pack-includes">
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                10 retouches 3 semaines
-              </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                Valable 12 mois
-              </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                1 pose complète offerte
-              </div>
-              <div class="pack-include-item">
-                <div class="pack-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-                Produits entretien offerts
-              </div>
-            </div>
-          </div>
-          <div class="pack-footer">
-            <div>
-              <div class="pack-price">380€</div>
-              <div class="pack-price-old">au lieu de 450€</div>
-              <div class="pack-economy">Économie : 70€</div>
-            </div>
-            <button class="pack-btn">Choisir</button>
-          </div>
-        </div>
-
       </div>
-    </div>
+    <% end %>
 
-    <%# ---- PRODUITS ROUTINE ---- %>
-    <%# Données des produits — une seule card réutilisée via une boucle %>
-    <% products = [
-      {
-        img_class: "pi-1",
-        svg: '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.4"><rect x="14" y="4" width="12" height="28" rx="6" stroke="#2e2926" stroke-width="1.5"/><path d="M14 18 L26 18" stroke="#2e2926" stroke-width="1"/></svg>',
-        name: "Nettoyant cils",
-        desc: "Mousse douce sans huile ni alcool",
-        price: "18€"
-      },
-      {
-        img_class: "pi-2",
-        svg: '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.4"><ellipse cx="20" cy="20" rx="10" ry="14" stroke="#2e2926" stroke-width="1.5"/><path d="M14 16 L26 16 M14 20 L26 20 M14 24 L26 24" stroke="#2e2926" stroke-width="0.8"/></svg>',
-        name: "Brossette cils",
-        desc: "Pack de 10 brossettes jetables",
-        price: "8€"
-      },
-      {
-        img_class: "pi-3",
-        svg: '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.35"><rect x="10" y="8" width="20" height="26" rx="4" stroke="#fff" stroke-width="1.5"/><path d="M10 18 L30 18" stroke="#fff" stroke-width="1"/><circle cx="20" cy="28" r="3" stroke="#fff" stroke-width="1"/></svg>',
-        name: "Sérum cils",
-        desc: "Fortifiant pour cils naturels",
-        price: "32€"
-      },
-      {
-        img_class: "pi-4",
-        svg: '<svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.4"><path d="M12 8 L28 8 L32 32 L8 32 Z" stroke="#2e2926" stroke-width="1.5" fill="none"/><path d="M15 8 C15 5 25 5 25 8" stroke="#2e2926" stroke-width="1.2" fill="none"/></svg>',
-        name: "Kit entretien",
-        desc: "Nettoyant + brossettes + sérum",
-        price: "52€"
-      }
-    ] %>
+    <%# ---- PRODUITS ROUTINE — données depuis la base ---- %>
+    <% if @produits_routine.any? %>
+      <div class="sec" id="section-products">
+        <div class="s-tag">Routine</div>
+        <div class="s-h2">Produits d'entretien</div>
+        <div class="s-sub">Sélectionnés pour prolonger la durée de vos extensions.</div>
 
-    <div class="sec" id="section-products">
-      <div class="s-tag">Routine</div>
-      <div class="s-h2">Produits d'entretien</div>
-      <div class="s-sub">Sélectionnés pour prolonger la durée de vos extensions.</div>
-
-      <%# Boucle sur les produits — une seule card réutilisée avec des données différentes %>
-      <div class="products-grid">
-        <% products.each do |product| %>
-          <div class="product-card">
-            <div class="product-img <%= product[:img_class] %>">
-              <%# SVG stocké comme string — html_safe pour éviter l'échappement %>
-              <%= product[:svg].html_safe %>
-            </div>
-            <div class="product-body">
-              <div class="product-name"><%= product[:name] %></div>
-              <div class="product-desc"><%= product[:desc] %></div>
-              <div class="product-footer">
-                <div class="product-price"><%= product[:price] %></div>
-                <button class="product-btn">Ajouter</button>
+        <div class="products-grid">
+          <% @produits_routine.each do |product| %>
+            <div class="product-card">
+              <div class="product-img">
+                <% if product.photo.attached? %>
+                  <%# Photo Active Storage — couvre toute la zone image %>
+                  <%= image_tag product.photo,
+                                style: "width:100%; height:100%; object-fit:cover; display:block;",
+                                alt: product.nom %>
+                <% else %>
+                  <%# Placeholder SVG générique si pas de photo %>
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" opacity="0.3">
+                    <circle cx="20" cy="14" r="8" stroke="#2e2926" stroke-width="1.5"/>
+                    <path d="M8 36 C8 28 32 28 32 36" stroke="#2e2926" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                <% end %>
+              </div>
+              <div class="product-body">
+                <div class="product-name"><%= product.nom %></div>
+                <div class="product-desc"><%= product.description %></div>
+                <div class="product-footer">
+                  <div class="product-price"><%= product.prix_euros.to_i %>€</div>
+                  <%= link_to "Ajouter", new_order_path(product_id: product.id), class: "product-btn" %>
+                </div>
               </div>
             </div>
-          </div>
-        <% end %>
+          <% end %>
+        </div>
       </div>
-    </div>
+    <% end %>
 
     <%# ---- FOOTER ---- %>
     <div class="footer">
@@ -384,9 +482,76 @@
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  // Met à jour l'aperçu de la carte cadeau avec le montant sélectionné
   function selectAmount(el) {
+    // Désélectionne tous les montants, active le cliqué
     document.querySelectorAll('.gift-amount').forEach(a => a.classList.remove('selected'));
     el.classList.add('selected');
+
+    // Vide le champ montant libre quand on clique sur un montant prédéfini
+    document.getElementById('gift-input-montant').value = '';
+
+    // Met à jour l'aperçu visuel de la carte cadeau
+    document.getElementById('gift-preview-amount').textContent = el.textContent;
+  }
+
+  // Mise à jour du nom du destinataire en temps réel sur le visuel de la carte
+  document.getElementById('gift-input-nom').addEventListener('input', function() {
+    const nom = this.value.trim();
+    const bloc = document.getElementById('gift-preview-pour');
+    const span = document.getElementById('gift-preview-nom');
+
+    if (nom) {
+      // Afficher le bloc "Pour Prénom" et mettre à jour le texte
+      span.textContent = nom;
+      bloc.style.display = 'block';
+    } else {
+      // Cacher le bloc si le champ est vide
+      bloc.style.display = 'none';
+    }
+  });
+
+  // Mise à jour de l'aperçu en temps réel quand on tape un montant libre
+  document.getElementById('gift-input-montant').addEventListener('input', function() {
+    const val = this.value.trim();
+
+    // Désélectionne les pills prédéfinies si l'utilisateur tape un montant libre
+    document.querySelectorAll('.gift-amount').forEach(a => a.classList.remove('selected'));
+
+    // Met à jour l'aperçu — si le champ est vide on remet le placeholder
+    document.getElementById('gift-preview-amount').textContent = val ? val + '€' : '—';
+  });
+
+  // Soumettre la carte cadeau — récupère le montant et le nom, puis navigue vers orders#new
+  function soumettreCarte(e) {
+    e.preventDefault();
+
+    // Chercher le montant : d'abord dans le champ libre, sinon la pill sélectionnée
+    const champLibre = document.getElementById('gift-input-montant').value.trim();
+    const pillActive = document.querySelector('.gift-amount.selected');
+
+    let montant = 0;
+    if (champLibre) {
+      montant = parseInt(champLibre, 10);
+    } else if (pillActive) {
+      // Le texte de la pill est "65€" → on retire le "€"
+      montant = parseInt(pillActive.textContent, 10);
+    }
+
+    // Validation — montant minimum 10€
+    if (!montant || montant < 10) {
+      alert("Veuillez sélectionner ou saisir un montant pour la carte cadeau.");
+      return;
+    }
+
+    // Récupérer le nom du destinataire (optionnel)
+    const nom = document.getElementById('gift-input-nom').value.trim();
+
+    // Construire l'URL vers orders#new avec les paramètres
+    const params = new URLSearchParams({ montant: montant });
+    if (nom) params.append('destinataire_nom', nom);
+
+    window.location.href = "<%= new_order_path %>?" + params.toString();
   }
 
   // Mise à jour du menu actif au scroll dans le conteneur .phone

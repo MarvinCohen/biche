@@ -1,0 +1,148 @@
+<% content_for :title, "Admin — Bloquer un créneau" %>
+
+<%#
+  ============================================================
+  VUE — Formulaire de blocage d'un créneau
+  Supporte les plages d'un jour ou multi-jours.
+  Données : @indisponibilite
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Créneaux bloqués", admin_indisponibilites_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Bloquer un créneau</div>
+      <div class="admin-header-sub">Un jour ou plusieurs jours consécutifs</div>
+    </div>
+
+    <div class="admin-sec">
+
+      <%= form_with model: [:admin, @indisponibilite], local: true do |f| %>
+
+        <%# Erreurs de validation %>
+        <% if @indisponibilite.errors.any? %>
+          <div class="admin-errors">
+            <% @indisponibilite.errors.full_messages.each do |msg| %>
+              <div class="admin-error-item">⚠ <%= msg %></div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# ---- PÉRIODE (début + fin en grille 2 colonnes) ---- %>
+        <div class="admin-grid-2">
+          <div class="admin-field">
+            <%= f.label :date_debut, "Du", class: "admin-label" %>
+            <%= f.date_field :date_debut,
+                             class: "admin-input",
+                             id: "indisponibilite_date_debut",
+                             onchange: "syncDateFin(this)" %>
+          </div>
+
+          <div class="admin-field">
+            <%= f.label :date_fin, "Au", class: "admin-label" %>
+            <%= f.date_field :date_fin,
+                             class: "admin-input",
+                             id: "indisponibilite_date_fin" %>
+          </div>
+        </div>
+
+        <%#
+          Note : si "Du" = "Au", c'est un blocage d'un seul jour.
+          Le JS ci-dessous synchronise "Au" = "Du" quand on change "Du",
+          pour éviter qu'on ait une date_fin < date_debut par mégarde.
+        %>
+
+        <%# ---- HEURES de début et fin (en grille 2 colonnes) ---- %>
+        <div class="admin-grid-2">
+          <div class="admin-field">
+            <%= f.label :heure_debut, "Début", class: "admin-label" %>
+            <%# Select toutes les 15 min de 8h à 19h45 %>
+            <%= f.select :heure_debut,
+                         options_for_select(
+                           (8..19).flat_map do |h|
+                             [0, 15, 30, 45].map do |m|
+                               label = "#{h.to_s.rjust(2,'0')}h#{m.to_s.rjust(2,'0')}"
+                               value = "#{h.to_s.rjust(2,'0')}:#{m.to_s.rjust(2,'0')}"
+                               [label, value]
+                             end
+                           end
+                         ),
+                         { include_blank: "Début" },
+                         class: "admin-select" %>
+          </div>
+
+          <div class="admin-field">
+            <%= f.label :heure_fin, "Fin", class: "admin-label" %>
+            <%# Select toutes les 15 min de 8h15 à 20h00 %>
+            <%= f.select :heure_fin,
+                         options_for_select(
+                           (8..20).flat_map do |h|
+                             [0, 15, 30, 45].filter_map do |m|
+                               next if h == 20 && m > 0   # On s'arrête à 20h00
+                               next if h == 8  && m == 0  # On commence à 8h15 minimum
+                               label = "#{h.to_s.rjust(2,'0')}h#{m.to_s.rjust(2,'0')}"
+                               value = "#{h.to_s.rjust(2,'0')}:#{m.to_s.rjust(2,'0')}"
+                               [label, value]
+                             end
+                           end
+                         ),
+                         { include_blank: "Fin" },
+                         class: "admin-select" %>
+          </div>
+        </div>
+
+        <%# ---- RAISON (optionnelle) ---- %>
+        <div class="admin-field">
+          <%= f.label :raison, "Raison (optionnelle)", class: "admin-label" %>
+          <div class="admin-raison-pills">
+            <% ["Pause déjeuner", "Congé", "Formation", "Fermeture", "Personnel"].each do |suggestion| %>
+              <button type="button"
+                      onclick="document.getElementById('indisponibilite_raison').value='<%= suggestion %>'"
+                      class="admin-raison-pill">
+                <%= suggestion %>
+              </button>
+            <% end %>
+          </div>
+          <%= f.text_field :raison,
+                           class: "admin-input",
+                           placeholder: "Ex: Pause déjeuner, Congé...",
+                           style: "margin-top: 8px;" %>
+        </div>
+
+        <%= f.submit "Bloquer ce créneau", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_indisponibilites_path, class: "btn-admin-fiche", style: "margin-top: 8px;" %>
+
+      <% end %>
+    </div>
+
+  </div>
+</div>
+
+<%# Quand on change la date de début, on met à jour date_fin si elle est avant %>
+<script>
+  function syncDateFin(inputDebut) {
+    var dateFin = document.getElementById('indisponibilite_date_fin');
+    // Si date_fin est vide OU si elle est avant date_debut, on la met à jour
+    if (!dateFin.value || dateFin.value < inputDebut.value) {
+      dateFin.value = inputDebut.value;
+    }
+    // Empêcher de choisir une date_fin avant date_debut
+    dateFin.min = inputDebut.value;
+  }
+
+  // Initialiser le min de date_fin au chargement de la page
+  document.addEventListener('DOMContentLoaded', function() {
+    var dateDebut = document.getElementById('indisponibilite_date_debut');
+    if (dateDebut && dateDebut.value) {
+      document.getElementById('indisponibilite_date_fin').min = dateDebut.value;
+    }
+  });
+</script>

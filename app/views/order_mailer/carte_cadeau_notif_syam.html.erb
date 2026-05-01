@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0; padding:0; background:#f7f5f2; font-family:'Helvetica Neue', Arial, sans-serif;">
+
+  <div style="max-width:480px; margin:0 auto; padding:32px 16px;">
+
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-family:Georgia,serif; font-size:28px; color:#2e2926; font-style:italic;">Biche.</div>
+      <div style="font-size:10px; letter-spacing:3px; color:#8e8480; text-transform:uppercase; margin-top:4px;">Nouvelle commande</div>
+    </div>
+
+    <div style="background:#fff; border-radius:16px; padding:24px; margin-bottom:16px;">
+      <p style="font-size:15px; color:#2e2926; margin:0 0 16px; font-weight:500;">🎁 Carte cadeau à envoyer</p>
+
+      <table style="width:100%; font-size:13px; border-collapse:collapse;">
+        <tr style="border-bottom:1px solid #f0ece6;">
+          <td style="padding:8px 0; color:#8e8480;">Montant</td>
+          <td style="padding:8px 0; color:#2e2926; font-weight:600; text-align:right;"><%= @montant %>€</td>
+        </tr>
+        <% if @order.destinataire_nom.present? %>
+        <tr style="border-bottom:1px solid #f0ece6;">
+          <td style="padding:8px 0; color:#8e8480;">Pour</td>
+          <td style="padding:8px 0; color:#2e2926; text-align:right;"><%= @order.destinataire_nom %></td>
+        </tr>
+        <% end %>
+        <tr style="border-bottom:1px solid #f0ece6;">
+          <td style="padding:8px 0; color:#8e8480;">Email destinataire</td>
+          <td style="padding:8px 0; color:#2e2926; text-align:right;"><%= @order.destinataire_email %></td>
+        </tr>
+        <tr style="border-bottom:1px solid #f0ece6;">
+          <td style="padding:8px 0; color:#8e8480;">Commandé par</td>
+          <td style="padding:8px 0; color:#2e2926; text-align:right;"><%= @acheteur.full_name %> (<%= @acheteur.email %>)</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0; color:#8e8480;">Commande #</td>
+          <td style="padding:8px 0; color:#2e2926; text-align:right;">#<%= @order.id %></td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="background:#fdf8f0; border:1px solid #e8ddd0; border-radius:12px; padding:16px; font-size:12px; color:#6e6560; line-height:1.7;">
+      À faire : envoyer la carte cadeau par email à <strong><%= @order.destinataire_email %></strong> avec le code de la carte.
+    </div>
+
+  </div>
+</body>
+</html>

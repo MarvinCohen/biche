@@ -149,6 +149,15 @@
   justify-content: center;
 }
 
+/* Photo réelle d'une prestation (depuis Active Storage ou galerie) —
+   remplit le cercle .presta-img en couvrant toute la surface */
+.presta-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* recadrage centré sans déformation */
+  display: block;
+}
+
 .presta-name {
   font-family: var(--font-serif);
   font-size: 22px;
@@ -271,7 +280,7 @@
 
 .shop-card:hover { background: rgba(255, 255, 255, 0.12); }
 
-/* Icône du produit */
+/* Icône du produit (fallback sans photo) */
 .shop-card-ico {
   width: 42px; height: 42px;
   border-radius: 50%;
@@ -281,6 +290,7 @@
   justify-content: center;
   margin: 0 auto 10px;
 }
+
 
 /* Nom du produit */
 .shop-card-name {

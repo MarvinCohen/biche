@@ -1,0 +1,206 @@
+<% content_for :title, "Admin — Nouveau RDV" %>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Planning", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Nouveau RDV</div>
+      <div class="admin-header-sub">Directement confirmé · Email envoyé si compte existant</div>
+    </div>
+
+    <div class="admin-sec">
+
+      <%= form_with model: [:admin, @booking], local: true do |f| %>
+
+        <%# Erreurs de validation %>
+        <% if @booking.errors.any? %>
+          <div class="admin-errors">
+            <% @booking.errors.full_messages.each do |msg| %>
+              <div class="admin-error-item">⚠ <%= msg %></div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# ---- TOGGLE CLIENTE EXISTANTE / NOUVELLE ---- %>
+        <div class="admin-field">
+          <div class="admin-label">Cliente</div>
+          <div style="display:flex; gap:8px; margin-bottom:14px;">
+            <%# Les deux boutons basculent entre les deux blocs via JS %>
+            <button type="button" id="btn-existante" class="admin-toggle-btn active"
+                    onclick="toggleCliente('existante')">
+              Cliente existante
+            </button>
+            <button type="button" id="btn-nouvelle" class="admin-toggle-btn"
+                    onclick="toggleCliente('nouvelle')">
+              Nouvelle cliente
+            </button>
+          </div>
+
+          <%# Bloc — cliente existante (select) %>
+          <div id="bloc-existante">
+            <%= f.select :user_id,
+                         options_for_select(
+                           @clientes.map { |u| ["#{u.full_name} — #{u.phone.presence || u.email}", u.id] },
+                           @booking.user_id
+                         ),
+                         { prompt: "Choisir une cliente..." },
+                         class: "admin-select" %>
+          </div>
+
+          <%# Bloc — nouvelle cliente (champs prénom/nom/téléphone) — caché par défaut %>
+          <div id="bloc-nouvelle" style="display:none;">
+            <%# Checkbox cachée qui indique au controller de créer une nouvelle cliente %>
+            <input type="hidden" name="nouvelle_cliente" id="nouvelle_cliente_flag" value="0">
+
+            <div class="admin-grid-2" style="margin-bottom:10px;">
+              <div class="admin-field" style="margin-bottom:0;">
+                <label class="admin-label">Prénom</label>
+                <input type="text" name="nouvelle_first_name" class="admin-input" placeholder="Marie">
+              </div>
+              <div class="admin-field" style="margin-bottom:0;">
+                <label class="admin-label">Nom</label>
+                <input type="text" name="nouvelle_last_name" class="admin-input" placeholder="Dupont">
+              </div>
+            </div>
+
+            <div class="admin-field" style="margin-bottom:0;">
+              <label class="admin-label">Téléphone (optionnel)</label>
+              <input type="tel" name="nouvelle_phone" class="admin-input" placeholder="06 00 00 00 00">
+            </div>
+          </div>
+        </div>
+
+        <%# ---- PRESTATION ---- %>
+        <div class="admin-field">
+          <%= f.label :prestation_id, "Prestation", class: "admin-label" %>
+          <%# id="booking_prestation_id" — écouté par le JS pour recharger les créneaux %>
+          <%= f.grouped_collection_select :prestation_id,
+                                          @prestations.group_by(&:categorie),
+                                          :last,
+                                          :first,
+                                          :id,
+                                          :nom,
+                                          { prompt: "Choisir une prestation..." },
+                                          class: "admin-select",
+                                          id: "booking_prestation_id" %>
+        </div>
+
+        <%# ---- DATE ET HEURE ---- %>
+        <div class="admin-grid-2">
+          <div class="admin-field">
+            <%= f.label :date, "Date", class: "admin-label" %>
+            <%# id="booking_date_field" — écouté par le JS pour recharger les créneaux %>
+            <%= f.date_field :date,
+                             class: "admin-input",
+                             id: "booking_date_field",
+                             min: Date.today.to_s,
+                             value: @booking.date %>
+          </div>
+
+          <div class="admin-field">
+            <%= f.label :heure, "Heure", class: "admin-label" %>
+            <%# Le select est peuplé dynamiquement par le JS après sélection date + prestation %>
+            <select name="booking[heure]" id="booking_heure_select" class="admin-select">
+              <option value="">— Choisir d'abord une date et une prestation —</option>
+            </select>
+          </div>
+        </div>
+
+        <%# ---- NOTE OPTIONNELLE ---- %>
+        <div class="admin-field">
+          <%= f.label :notes_cliente, "Note (optionnelle)", class: "admin-label" %>
+          <%= f.text_area :notes_cliente,
+                          class: "admin-textarea",
+                          rows: 3,
+                          placeholder: "Demandes particulières, allergies, précisions..." %>
+        </div>
+
+        <%# Info statut %>
+        <div style="background:rgba(122,154,106,0.1); border:1px solid rgba(122,154,106,0.3); border-radius:12px; padding:12px 14px; margin-bottom:16px; font-size:12px; color:#4e6a42;">
+          ✓ Ce RDV sera directement <strong>confirmé</strong>.
+        </div>
+
+        <%= f.submit "Créer le rendez-vous", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_root_path, class: "btn-admin-fiche", style: "margin-top: 8px;" %>
+
+      <% end %>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ---- Rechargement des créneaux disponibles via AJAX ----
+  // Appelé à chaque changement de date ou de prestation
+  function rechargerCreneaux() {
+    const date         = document.getElementById('booking_date_field').value;
+    const prestationId = document.getElementById('booking_prestation_id').value;
+    const select       = document.getElementById('booking_heure_select');
+
+    // On attend que les deux champs soient remplis
+    if (!date || !prestationId) {
+      select.innerHTML = '<option value="">— Choisir d\'abord une date et une prestation —</option>';
+      return;
+    }
+
+    // Indicateur de chargement
+    select.innerHTML = '<option value="">Chargement...</option>';
+
+    // Appel AJAX vers /admin/bookings/creneaux
+    fetch(`/admin/bookings/creneaux?date=${date}&prestation_id=${prestationId}`, {
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(creneaux => {
+      if (creneaux.length === 0) {
+        // Aucun créneau libre ce jour-là pour cette prestation
+        select.innerHTML = '<option value="">Aucun créneau disponible ce jour</option>';
+        return;
+      }
+      // Peupler le select avec les créneaux disponibles
+      select.innerHTML = '<option value="">Choisir un créneau...</option>' +
+        creneaux.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+    })
+    .catch(() => {
+      select.innerHTML = '<option value="">Erreur de chargement</option>';
+    });
+  }
+
+  // Écouter les changements sur la date et la prestation
+  document.getElementById('booking_date_field')
+          .addEventListener('change', rechargerCreneaux);
+  document.getElementById('booking_prestation_id')
+          .addEventListener('change', rechargerCreneaux);
+
+  // ---- Bascule entre "cliente existante" et "nouvelle cliente" ----
+  function toggleCliente(mode) {
+    const blocExistante  = document.getElementById('bloc-existante');
+    const blocNouvelle   = document.getElementById('bloc-nouvelle');
+    const btnExistante   = document.getElementById('btn-existante');
+    const btnNouvelle    = document.getElementById('btn-nouvelle');
+    const flag           = document.getElementById('nouvelle_cliente_flag');
+
+    if (mode === 'nouvelle') {
+      // Affiche les champs prénom/nom, cache le select, active le flag
+      blocExistante.style.display  = 'none';
+      blocNouvelle.style.display   = 'block';
+      btnNouvelle.classList.add('active');
+      btnExistante.classList.remove('active');
+      flag.value = '1';  // Indique au controller de créer une nouvelle cliente
+    } else {
+      // Affiche le select, cache les champs, désactive le flag
+      blocExistante.style.display  = 'block';
+      blocNouvelle.style.display   = 'none';
+      btnExistante.classList.add('active');
+      btnNouvelle.classList.remove('active');
+      flag.value = '0';
+    }
+  }
+</script>

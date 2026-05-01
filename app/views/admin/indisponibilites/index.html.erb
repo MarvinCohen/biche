@@ -1,0 +1,88 @@
+<% content_for :title, "Admin — Créneaux bloqués" %>
+
+<%#
+  ============================================================
+  VUE — Liste des créneaux bloqués par Syam
+  Données : @indisponibilites
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Dashboard", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Créneaux bloqués</div>
+      <div class="admin-header-sub">Pauses, congés, fermetures ponctuelles</div>
+    </div>
+
+    <%# ---- BOUTON AJOUTER ---- %>
+    <div class="admin-sec">
+      <%= link_to "＋ Bloquer un créneau", new_admin_indisponibilite_path, class: "btn-admin-confirmer" %>
+    </div>
+
+    <%# ---- LISTE DES INDISPONIBILITÉS ---- %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">À venir (<%= @indisponibilites.count %>)</div>
+
+      <% if @indisponibilites.any? %>
+        <% @indisponibilites.each do |indispo| %>
+          <div class="admin-indispo-card">
+
+            <%# Bloc date à gauche — affiche le jour de début %>
+            <div class="admin-rdv-heure" style="background:#8e8480; width:54px; font-size:13px;">
+              <%= indispo.date_debut.day %><br>
+              <span style="font-size:9px; opacity:0.8;"><%= I18n.l(indispo.date_debut, format: "%b") %></span>
+            </div>
+
+            <%# Infos du blocage %>
+            <div class="admin-rdv-info">
+              <div class="admin-rdv-cliente">
+                <%= indispo.raison.present? ? indispo.raison : "Indisponible" %>
+              </div>
+              <div class="admin-rdv-prestation">
+                <%# Affiche la plage horaire %>
+                <%= indispo.plage_horaire %>
+              </div>
+              <%# Plage de dates — affichée seulement si multi-jours %>
+              <% if indispo.nb_jours > 1 %>
+                <div style="font-size:10px; color:var(--color-muted); margin-top:3px;">
+                  <%= indispo.plage_dates %>
+                  <span style="color:var(--color-accent); margin-left:4px;">
+                    (<%= indispo.nb_jours %> jours)
+                  </span>
+                </div>
+              <% else %>
+                <div style="font-size:10px; color:var(--color-muted); margin-top:3px;">
+                  <%= I18n.l(indispo.date_debut, format: "%-d %B %Y") %>
+                </div>
+              <% end %>
+            </div>
+
+            <%# Bouton supprimer %>
+            <%= button_to "✕",
+                          admin_indisponibilite_path(indispo),
+                          method: :delete,
+                          data: { turbo_confirm: "Débloquer ce créneau ?" },
+                          class: "admin-indispo-delete" %>
+          </div>
+        <% end %>
+
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">
+            Aucun créneau bloqué.<br>
+            <span style="font-size:11px; opacity:0.7;">Bloquez des plages pour les pauses, congés, etc.</span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>

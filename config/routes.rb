@@ -66,8 +66,11 @@ Rails.application.routes.draw do
     # Tableau de bord : planning du jour + stats
     root to: "dashboard#index"
 
-    # Réservations : liste (avec filtre date), détail, changement de statut
-    resources :bookings, only: [:index, :show] do
+    # Réservations : liste (avec filtre date), détail, changement de statut, création manuelle
+    resources :bookings, only: [:index, :show, :new, :create] do
+      collection do
+        get :creneaux  # Créneaux disponibles toutes les 15 min (AJAX pour le formulaire admin)
+      end
       member do
         patch :confirmer   # en_attente → confirme
         patch :terminer    # confirme  → termine
@@ -81,14 +84,49 @@ Rails.application.routes.draw do
     # Clientes : liste et profil complet
     resources :users, only: [:index, :show]
 
+    # Prestations : CRUD complet — Syam peut créer, modifier et supprimer des prestations
+    resources :prestations, only: [:index, :new, :create, :edit, :update, :destroy]
+
     # Messages : envoi de newsletters / notifications aux clientes
     resources :messages, only: [:new, :create]
+
+    # Produits boutique : CRUD complet
+    resources :products, only: [:index, :new, :create, :edit, :update, :destroy]
+
+    # Indisponibilités : Syam peut bloquer des créneaux (pause, congé, etc.)
+    resources :indisponibilites, only: [:index, :new, :create, :destroy]
+
+    # Cartes cadeaux : Syam peut consulter les cartes, voir le solde et déduire un montant
+    resources :cartes_cadeaux, only: [:index, :show] do
+      member do
+        post :deduire  # Déduire un montant du solde de la carte
+      end
+      collection do
+        get :scanner   # Page de scan / recherche par code
+      end
+    end
+
+    # Galerie photos : Syam peut ajouter, supprimer et réordonner les photos de la galerie
+    resources :galerie_photos, only: [:index, :new, :create, :destroy] do
+      collection do
+        # Endpoint AJAX pour sauvegarder le nouvel ordre après drag-and-drop
+        patch :reordonner
+      end
+    end
+
+    # Agenda semaine : vue sur 7 jours
+    get 'agenda', to: 'dashboard#agenda', as: :agenda
   end
 
   # ============================================================
   # SHOP — boutique en ligne (à connecter aux paiements Stripe plus tard)
   # ============================================================
-  resources :orders, only: [:new, :create, :show]
+  resources :orders, only: [:new, :create, :show] do
+    collection do
+      # Page de confirmation après paiement Stripe réussi
+      get :success
+    end
+  end
 
   # ============================================================
   # STRIPE — webhooks de paiement (appelé par Stripe directement)

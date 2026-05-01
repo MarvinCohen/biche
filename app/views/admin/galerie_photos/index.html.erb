@@ -1,0 +1,111 @@
+<% content_for :title, "Admin — Galerie" %>
+
+<%#
+  ============================================================
+  VUE — Gestion de la galerie de réalisations
+  Liste toutes les photos avec aperçu, légende et catégorie.
+  Syam peut ajouter ou supprimer des photos, et les réordonner
+  par drag-and-drop (ordre sauvegardé via AJAX).
+  Données : @galerie_photos
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <%# ---- NAVIGATION ADMIN ---- %>
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Accueil", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="admin-header">
+      <div class="admin-header-title">Galerie</div>
+      <div class="admin-header-sub"><%= @galerie_photos.count %> photo<%= 's' if @galerie_photos.count > 1 %></div>
+    </div>
+
+    <%# ---- BOUTON AJOUTER ---- %>
+    <div style="padding: 0 16px 16px;">
+      <%= link_to "＋ Ajouter une photo", new_admin_galerie_photo_path, class: "btn-admin-confirmer" %>
+    </div>
+
+    <%# ---- LISTE DES PHOTOS ---- %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Photos (<%= @galerie_photos.count %>)</div>
+
+      <% if @galerie_photos.any? %>
+
+        <%#
+          Liste réordonnée par drag-and-drop.
+          L'attribut data-galerie-reorder-url stocke l'URL AJAX utilisée
+          par le Stimulus controller pour sauvegarder le nouvel ordre.
+        %>
+        <div id="galerie-sortable"
+             data-controller="galerie-sort"
+             data-galerie-sort-url-value="<%= reordonner_admin_galerie_photos_path %>">
+
+          <% @galerie_photos.each do |photo| %>
+            <%# Chaque ligne est draggable — data-id sert à reconstruire le tableau d'IDs %>
+            <div class="admin-galerie-item" data-id="<%= photo.id %>">
+
+              <%# Icône de déplacement (handle pour le drag) %>
+              <div class="admin-galerie-drag">⠿</div>
+
+              <%# Aperçu de la photo (vignette carrée) %>
+              <div class="admin-galerie-thumb">
+                <% if photo.image.attached? %>
+                  <%# On utilise l'image originale — le CSS gère le recadrage (object-fit: cover) %>
+                  <%# .variant() nécessite ImageMagick/libvips, non disponible ici %>
+                  <%= image_tag photo.image, alt: photo.legende %>
+                <% else %>
+                  <%# Placeholder SVG quand aucune photo n'est encore attachée %>
+                  <div class="admin-galerie-thumb-placeholder">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="3" width="18" height="18" rx="3" stroke="#c8c2bc" stroke-width="1.5"/>
+                      <circle cx="8.5" cy="8.5" r="1.5" stroke="#c8c2bc" stroke-width="1.2"/>
+                      <path d="M3 16l5-4 4 3 3-2 6 5" stroke="#c8c2bc" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+
+              <%# Infos : légende + catégorie + taille %>
+              <div class="admin-galerie-info">
+                <div class="admin-rdv-cliente"><%= photo.legende %></div>
+                <div class="admin-rdv-prestation">
+                  <%# Libellé lisible pour la catégorie %>
+                  <% label_cat = GaleriePhoto::CATEGORIES.find { |_, v| v == photo.categorie }&.first || photo.categorie %>
+                  <% label_taille = GaleriePhoto::TAILLES.find { |_, v| v == photo.taille }&.first || photo.taille %>
+                  <%= label_cat %> · <%= label_taille %>
+                </div>
+              </div>
+
+              <%# Bouton supprimer — confirmation requise %>
+              <%= button_to "✕",
+                            admin_galerie_photo_path(photo),
+                            method: :delete,
+                            data: { turbo_confirm: "Supprimer cette photo définitivement ?" },
+                            class: "admin-galerie-delete" %>
+            </div>
+          <% end %>
+
+        </div>
+
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">Aucune photo dans la galerie.</div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ---- LÉGENDE ---- %>
+    <div style="padding: 0 16px 32px; font-size: 11px; color: var(--color-muted); text-align: center; line-height: 1.6;">
+      Faites glisser les photos pour modifier leur ordre d'affichage.<br>
+      L'ordre est sauvegardé automatiquement.
+    </div>
+
+  </div>
+</div>

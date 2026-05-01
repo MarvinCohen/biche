@@ -75,12 +75,41 @@
       </div>
       <div style="margin: 0 -20px">
         <div class="carousel" id="car-prestations">
+          <%#
+            Mapping prestation.categorie → galerie.categorie
+            Permet de trouver automatiquement une photo de galerie correspondante
+          %>
+          <%#
+            Correspondance catégorie prestation → catégorie galerie.
+            Toutes les catégories de prestations sont couvertes.
+          %>
+          <% cat_map = { 'extensions'   => 'cil-a-cil',
+                         'rehaussement' => 'rehaussement',
+                         'sourcils'     => 'sourcils',
+                         'retouche'     => 'cil-a-cil',
+                         'depose'       => 'cil-a-cil' } %>
+
+          <%# Première photo dispo dans toute la galerie — utilisée en dernier recours %>
+          <% premiere_photo_galerie = @galerie_par_categorie.values.first %>
+
           <% @prestations.each do |prestation| %>
             <div class="presta-card">
               <div class="presta-img">
-                <svg width="100" height="60" viewBox="0 0 100 60" fill="none">
-                  <path d="M5 35 Q25 10 50 35 Q75 10 95 35" stroke="#5e5550" stroke-width="1.5" fill="none"/>
-                </svg>
+                <% if prestation.photo.attached? %>
+                  <%# Priorité 1 : photo uploadée directement sur la prestation %>
+                  <%= image_tag prestation.photo, alt: prestation.nom, class: "presta-photo" %>
+                <% elsif (galerie_photo = @galerie_par_categorie[cat_map[prestation.categorie]]) %>
+                  <%# Priorité 2 : première photo de galerie de la catégorie correspondante %>
+                  <%= image_tag galerie_photo.image, alt: prestation.nom, class: "presta-photo" %>
+                <% elsif premiere_photo_galerie %>
+                  <%# Priorité 3 : n'importe quelle photo de galerie si pas de match de catégorie %>
+                  <%= image_tag premiere_photo_galerie.image, alt: prestation.nom, class: "presta-photo" %>
+                <% else %>
+                  <%# Priorité 4 : SVG placeholder si la galerie est vide %>
+                  <svg width="100" height="60" viewBox="0 0 100 60" fill="none">
+                    <path d="M5 35 Q25 10 50 35 Q75 10 95 35" stroke="#5e5550" stroke-width="1.5" fill="none"/>
+                  </svg>
+                <% end %>
               </div>
               <div class="presta-name"><%= prestation.nom %></div>
               <div class="presta-desc"><%= prestation.description %></div>

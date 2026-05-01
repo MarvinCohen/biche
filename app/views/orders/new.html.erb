@@ -1,0 +1,169 @@
+<% content_for :title, "Carte cadeau — Confirmation" %>
+
+<% content_for :head do %>
+<style>
+  /* Carte cadeau visuelle — reprise exacte du shop */
+  .gift-visual {
+    background: linear-gradient(135deg, #1e1b19 0%, #3a3330 50%, #5e5a56 100%);
+    border-radius: 20px;
+    padding: 22px 22px 20px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(46,41,38,0.35), 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .gift-visual::after {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 14px;
+    border: 0.5px solid rgba(184,168,152,0.25);
+    pointer-events: none;
+  }
+  .gift-visual-circle-1 {
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,168,152,0.15) 0%, transparent 70%);
+  }
+  .gift-visual-circle-2 {
+    position: absolute;
+    bottom: -20px; left: -20px;
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,168,152,0.1) 0%, transparent 70%);
+  }
+  @keyframes shimmer {
+    0%   { transform: translateX(-120%) skewX(-15deg); }
+    100% { transform: translateX(300%) skewX(-15deg); }
+  }
+  .gift-visual-shimmer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    animation: shimmer 3.5s ease-in-out infinite;
+  }
+  .gift-visual-inner { position: relative; z-index: 1; }
+  .gift-visual-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+  .gift-visual-logo { font-family: 'Cormorant Garamond', serif; font-size: 26px; color: rgba(255,255,255,0.9); font-style: italic; font-weight: 400; letter-spacing: 0.5px; }
+  .gift-visual-chip { width: 28px; height: 20px; border-radius: 4px; background: linear-gradient(135deg, #c8b89a, #a89078); opacity: 0.7; border: 0.5px solid rgba(255,255,255,0.2); }
+  .gift-visual-pour { font-size: 10px; letter-spacing: 1.5px; color: rgba(184,168,152,0.65); text-transform: uppercase; margin-bottom: 4px; }
+  .gift-visual-amount { font-family: 'Cormorant Garamond', serif; font-size: 42px; color: #fff; font-weight: 300; letter-spacing: -0.5px; margin-bottom: 6px; line-height: 1.15; }
+  .gift-visual-label { font-size: 9px; letter-spacing: 3px; color: rgba(184,168,152,0.7); text-transform: uppercase; margin-bottom: 16px; }
+  .gift-visual-sep { height: 0.5px; background: linear-gradient(90deg, transparent, rgba(184,168,152,0.4), transparent); margin-bottom: 12px; }
+  .gift-visual-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+  .gift-visual-valid { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; line-height: 1.6; }
+  .gift-visual-code { font-size: 9px; color: rgba(184,168,152,0.5); letter-spacing: 2.5px; text-align: right; }
+</style>
+<% end %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav" style="background:rgba(247,245,242,0.94); backdrop-filter:blur(10px); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:0.5px solid #e4ddd6;">
+      <%= link_to "Biche.", root_path, style:"font-family:'Cormorant Garamond',serif; font-size:22px; color:#2e2926; font-style:italic; text-decoration:none;" %>
+      <%= link_to "← Boutique", shop_path, style:"font-size:12px; color:#8e8480; text-decoration:none;" %>
+    </nav>
+
+    <%# ---- EN-TÊTE ---- %>
+    <div style="padding:48px 24px 24px; background:#e8e2d8; text-align:center;">
+      <div style="font-size:10px; letter-spacing:4px; color:#7a6e66; text-transform:uppercase; margin-bottom:10px;">Carte cadeau</div>
+      <h1 style="font-family:'Cormorant Garamond',serif; font-size:32px; color:#2e2926; font-weight:400; margin:0;">Finaliser la commande</h1>
+    </div>
+
+    <div style="padding:24px 20px;">
+
+      <%# Erreurs de validation %>
+      <% if @order.errors.any? %>
+        <div style="background:#fdf0f0; border:1px solid #e8c8c8; border-radius:12px; padding:14px; margin-bottom:20px; font-size:13px; color:#c47a7a;">
+          <% @order.errors.full_messages.each do |msg| %>
+            <div>· <%= msg %></div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%# Aperçu visuel de la carte — même modèle que la page shop %>
+      <div class="gift-visual">
+        <div class="gift-visual-circle-1"></div>
+        <div class="gift-visual-circle-2"></div>
+        <div class="gift-visual-shimmer"></div>
+
+        <div class="gift-visual-inner">
+          <div class="gift-visual-header">
+            <div class="gift-visual-logo">Biche.</div>
+            <div class="gift-visual-chip"></div>
+          </div>
+
+          <% if @destinataire_nom.present? %>
+            <div class="gift-visual-pour">Pour <%= @destinataire_nom %></div>
+          <% end %>
+
+          <div class="gift-visual-amount"><%= @montant_euros %>€</div>
+          <div class="gift-visual-label">Carte cadeau</div>
+
+          <div class="gift-visual-sep"></div>
+
+          <div class="gift-visual-footer">
+            <div class="gift-visual-valid">
+              Valable 1 an<br>Toutes prestations
+            </div>
+            <div class="gift-visual-code">BICHE·<%= Date.today.year %>·XXXX</div>
+          </div>
+        </div>
+      </div>
+
+      <%# Formulaire de finalisation %>
+      <%# data-turbo="false" — obligatoire pour que la redirection vers Stripe (domaine externe)
+          fonctionne. Sans ça, Turbo intercepte le redirect en AJAX et ne navigue pas. %>
+      <%= form_with model: @order, url: orders_path, local: true, data: { turbo: false } do |f| %>
+
+        <%# Champs cachés — montant et produit transmis via les params %>
+        <%= f.hidden_field :montant_cents, value: @montant_euros * 100 %>
+
+        <%# Nom du destinataire (pré-rempli depuis le shop, modifiable) %>
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; color:#8e8480; margin-bottom:6px;">Pour (prénom)</label>
+          <%= f.text_field :destinataire_nom,
+                           placeholder: "Prénom de la personne",
+                           maxlength: 40,
+                           style: "width:100%; padding:12px 14px; border:1px solid #e2dbd2; border-radius:12px; font-size:14px; font-family:inherit; background:#fff; box-sizing:border-box; color:#2e2926;" %>
+        </div>
+
+        <%# Email du destinataire — obligatoire pour envoyer la carte %>
+        <div style="margin-bottom:20px;">
+          <label style="display:block; font-size:12px; color:#8e8480; margin-bottom:6px;">Email du destinataire <span style="color:#c47a7a;">*</span></label>
+          <%= f.email_field :destinataire_email,
+                            placeholder: "prenom@email.com",
+                            required: true,
+                            style: "width:100%; padding:12px 14px; border:1px solid #e2dbd2; border-radius:12px; font-size:14px; font-family:inherit; background:#fff; box-sizing:border-box; color:#2e2926;" %>
+          <div style="font-size:11px; color:#a09890; margin-top:5px;">La carte sera envoyée à cette adresse par email.</div>
+        </div>
+
+        <%# Récap de la commande %>
+        <div style="background:#f7f5f2; border-radius:14px; padding:16px; margin-bottom:20px;">
+          <div style="font-size:11px; color:#8e8480; letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">Récapitulatif</div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:#4e4a46; margin-bottom:6px;">
+            <span>Carte cadeau Biche.</span>
+            <span style="font-weight:600;"><%= @montant_euros %>€</span>
+          </div>
+          <div style="font-size:11px; color:#a09890;">Commandé par : <%= current_user.full_name %></div>
+        </div>
+
+        <%# Icônes sécurité Stripe %>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px; font-size:11px; color:#a09890;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1 L12 3.5 V7 C12 9.8 9.8 12.3 7 13 C4.2 12.3 2 9.8 2 7 V3.5 Z" stroke="#a09890" stroke-width="1.1" fill="none"/></svg>
+          Paiement sécurisé par Stripe · SSL
+        </div>
+
+        <%# Bouton de confirmation %>
+        <%= f.submit "Confirmer la commande →",
+                     style: "width:100%; background:#2e2926; color:#fff; border:none; border-radius:30px; padding:15px; font-size:12px; font-weight:500; letter-spacing:1.5px; cursor:pointer; text-transform:uppercase; font-family:inherit;" %>
+
+      <% end %>
+
+    </div>
+  </div>
+</div>

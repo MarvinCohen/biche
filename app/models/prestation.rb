@@ -6,6 +6,10 @@ class Prestation < ApplicationRecord
   # On bloque la suppression si des réservations existent pour cette prestation
   has_many :bookings, dependent: :restrict_with_error
 
+  # Photo illustrative de la prestation — gérée via Active Storage
+  # Stockée localement en dev, sur Cloudinary en production
+  has_one_attached :photo
+
   # ============================================================
   # VALIDATIONS
   # ============================================================

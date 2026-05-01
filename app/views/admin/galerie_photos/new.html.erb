@@ -1,0 +1,157 @@
+<% content_for :title, "Admin — Nouvelle photo galerie" %>
+
+<%#
+  ============================================================
+  VUE — Formulaire d'ajout d'une photo dans la galerie
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <%# ---- NAVIGATION ADMIN ---- %>
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Galerie", admin_galerie_photos_path, class: "admin-logout" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="admin-header">
+      <div class="admin-header-title">Nouvelle photo</div>
+      <div class="admin-header-sub">Visible dans la galerie dès l'ajout</div>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="admin-sec">
+      <%# multipart: true obligatoire pour l'upload de fichier Active Storage %>
+      <%= form_with model: [:admin, @galerie_photo], local: true, multipart: true do |f| %>
+
+        <%# Affichage des erreurs de validation si présents %>
+        <% if @galerie_photo.errors.any? %>
+          <div class="admin-errors" style="background:#fdf0f0; border:1px solid #e8c8c8; border-radius:8px; padding:12px; margin-bottom:16px; font-size:13px; color:#c47a7a;">
+            <% @galerie_photo.errors.full_messages.each do |msg| %>
+              <div>· <%= msg %></div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# ---- PHOTO PRINCIPALE (ou photo "Avant") ---- %>
+        <%# Le label change dynamiquement selon la catégorie choisie (JS) %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label id="label-image" style="display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;">Photo</label>
+          <%= f.file_field :image,
+                           accept: "image/*",
+                           class: "admin-file-input",
+                           id: "galerie-image-input",
+                           onchange: "previewGalerieImage(this, 'galerie-preview-img', 'galerie-preview')" %>
+          <%# Aperçu de la photo avant envoi %>
+          <div id="galerie-preview" style="display:none; margin-top:10px;">
+            <img id="galerie-preview-img" src="" alt="Aperçu"
+                 style="width:100%; max-height:200px; object-fit:cover; border-radius:10px;">
+          </div>
+        </div>
+
+        <%# ---- PHOTO "APRÈS" — visible uniquement si catégorie = avant-apres ---- %>
+        <div id="champ-image-apres" style="display:none; margin-bottom:16px;">
+          <%= f.label :image_apres, "Photo après",
+                      style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.file_field :image_apres,
+                           accept: "image/*",
+                           class: "admin-file-input",
+                           id: "galerie-image-apres-input",
+                           onchange: "previewGalerieImage(this, 'galerie-preview-apres-img', 'galerie-preview-apres')" %>
+          <%# Aperçu de la photo après %>
+          <div id="galerie-preview-apres" style="display:none; margin-top:10px;">
+            <img id="galerie-preview-apres-img" src="" alt="Aperçu après"
+                 style="width:100%; max-height:200px; object-fit:cover; border-radius:10px;">
+          </div>
+        </div>
+
+        <%# ---- LÉGENDE PRINCIPALE ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :legende, "Légende", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.text_field :legende,
+                           placeholder: "Ex : Cil à cil naturel",
+                           class: "admin-input" %>
+        </div>
+
+        <%# ---- SOUS-LÉGENDE (optionnelle) ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :legende_sub, "Sous-légende (optionnel)", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.text_field :legende_sub,
+                           placeholder: "Ex : Pose complète · Effet naturel",
+                           class: "admin-input" %>
+        </div>
+
+        <%# ---- CATÉGORIE ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :categorie, "Catégorie", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.select :categorie,
+                       options_for_select(GaleriePhoto::CATEGORIES, @galerie_photo.categorie),
+                       { include_blank: "Choisir une catégorie" },
+                       class: "admin-input" %>
+        </div>
+
+        <%# ---- TAILLE DANS LA GRILLE ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :taille, "Taille dans la galerie", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.select :taille,
+                       options_for_select(GaleriePhoto::TAILLES, @galerie_photo.taille || 'medium'),
+                       {},
+                       class: "admin-input" %>
+          <div style="font-size:10px; color:var(--color-muted); margin-top:4px;">
+            Grande = haute, Moyenne = standard, Petite = compacte
+          </div>
+        </div>
+
+        <%# ---- POSITION ---- %>
+        <div class="form-group" style="margin-bottom:20px;">
+          <%= f.label :position, "Position", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.number_field :position,
+                             min: 1,
+                             class: "admin-input",
+                             style: "width:80px;" %>
+          <div style="font-size:10px; color:var(--color-muted); margin-top:4px;">
+            Ordre d'affichage dans la galerie (modifiable après ajout)
+          </div>
+        </div>
+
+        <%# ---- BOUTONS ---- %>
+        <%= f.submit "Ajouter à la galerie", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_galerie_photos_path, class: "btn-admin-fiche", style: "margin-top:8px;" %>
+
+      <% end %>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Prévisualisation d'une photo avant upload
+  // imgId et previewId sont passés en paramètre pour réutiliser la fonction
+  // sur les deux champs (image avant + image après)
+  function previewGalerieImage(input, imgId, previewId) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById(imgId).src = e.target.result;
+        document.getElementById(previewId).style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Quand la catégorie change, afficher/masquer le champ "photo après"
+  // et adapter le label de la photo principale
+  document.getElementById('galerie_photo_categorie').addEventListener('change', function() {
+    const estAvantApres = this.value === 'avant-apres';
+
+    // Afficher le 2e champ upload uniquement pour avant-apres
+    document.getElementById('champ-image-apres').style.display = estAvantApres ? 'block' : 'none';
+
+    // Renommer le label de la photo principale pour que Syam comprenne
+    document.getElementById('label-image').textContent = estAvantApres ? 'Photo avant' : 'Photo';
+  });
+</script>

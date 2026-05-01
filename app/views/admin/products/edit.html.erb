@@ -1,0 +1,43 @@
+<% content_for :title, "Admin — #{@product.nom}" %>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Boutique", admin_products_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title"><%= @product.nom %></div>
+      <div class="admin-header-sub">
+        <% labels = { 'routine' => 'Routine', 'pack' => 'Pack', 'carte_cadeau' => 'Carte cadeau' } %>
+        <%= labels[@product.type_produit] %>
+      </div>
+    </div>
+
+    <div class="admin-sec">
+      <%= form_with model: [:admin, @product], local: true, multipart: true do |f| %>
+        <%= render "form", f: f %>
+        <%= f.submit "Enregistrer", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_products_path, class: "btn-admin-fiche", style: "margin-top:8px;" %>
+      <% end %>
+    </div>
+
+    <%# Zone danger %>
+    <div class="admin-sec">
+      <div class="admin-sec-title" style="color:#c47a7a;">Zone danger</div>
+      <%= button_to "Supprimer ce produit",
+                    admin_product_path(@product),
+                    method: :delete,
+                    data: { turbo_confirm: "Supprimer \"#{@product.nom}\" définitivement ?" },
+                    class: "btn-admin-annuler" %>
+      <div style="font-size:10px; color:var(--color-muted); margin-top:6px; text-align:center;">
+        Impossible si des commandes existent. Masquez-le à la place.
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<%#
+  ============================================================
+  PARTIAL — Visuel d'une carte cadeau Biche.
+  Utilisé dans : admin/cartes_cadeaux/show.html.erb
+  Variable locale attendue : carte (instance de CarteCadeau)
+  ============================================================
+%>
+
+<div class="carte-cadeau <%= 'carte-cadeau--epuisee' unless carte.active? %>">
+
+  <%# Bordure intérieure décorative %>
+  <div class="carte-cadeau-inner-border"></div>
+
+  <%# Reflet brillant animé — glisse de gauche à droite toutes les 7s %>
+  <div class="carte-cadeau-shimmer"></div>
+
+  <%# Cercles décoratifs d'arrière-plan %>
+  <div class="carte-cadeau-deco-1"></div>
+  <div class="carte-cadeau-deco-2"></div>
+
+  <div class="carte-cadeau-content">
+
+    <%# ---- LIGNE HAUTE : logo + badge statut ---- %>
+    <div class="carte-cadeau-top">
+      <div class="carte-cadeau-logo">Biche.</div>
+      <span class="carte-cadeau-badge <%= carte.active? ? 'carte-cadeau-badge--active' : 'carte-cadeau-badge--epuisee' %>">
+        <%= carte.active? ? "Active" : "Épuisée" %>
+      </span>
+    </div>
+
+    <%# ---- DESTINATAIRE ---- %>
+    <% if carte.order.destinataire_nom.present? %>
+      <div class="carte-cadeau-destinataire">Pour <%= carte.order.destinataire_nom %></div>
+    <% end %>
+
+    <%# ---- SOLDE EN GRAND ---- %>
+    <div class="carte-cadeau-solde"><%= carte.solde_euros.to_i %>€</div>
+    <div class="carte-cadeau-solde-sub">
+      solde restant · valeur initiale <%= carte.montant_initial_euros.to_i %>€
+    </div>
+
+    <%# ---- BARRE DE PROGRESSION ---- %>
+    <div class="carte-cadeau-progress-track">
+      <div class="carte-cadeau-progress-bar" style="width: <%= carte.pourcentage_restant %>%;"></div>
+    </div>
+
+    <%# ---- PIED : validité + code ---- %>
+    <div class="carte-cadeau-footer">
+      <div class="carte-cadeau-info">Valable 1 an · Toutes prestations</div>
+      <div class="carte-cadeau-code"><%= carte.code %></div>
+    </div>
+
+  </div>
+</div>

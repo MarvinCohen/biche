@@ -5,4 +5,8 @@ class ApplicationMailer < ActionMailer::Base
 
   # Layout HTML commun à tous les emails (app/views/layouts/mailer.html.erb)
   layout "mailer"
+
+  # Rend disponible les helpers de l'application dans les vues des mailers
+  # Nécessaire pour qr_code_svg (défini dans ApplicationHelper)
+  helper :application
 end

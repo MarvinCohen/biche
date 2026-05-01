@@ -1,0 +1,86 @@
+<% content_for :title, "Admin — Carte #{@carte.code}" %>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Cartes", admin_cartes_cadeaux_path, class: "admin-logout" %>
+    </nav>
+
+    <%# Visuel de la carte — partial réutilisable %>
+    <%= render 'carte', carte: @carte %>
+
+    <%# Formulaire de déduction — visible seulement si la carte est active %>
+    <% if @carte.active? %>
+      <div class="admin-sec" style="margin-top:16px;">
+        <div class="admin-sec-title">Utiliser cette carte</div>
+
+        <%= form_with url: deduire_admin_carte_cadeau_path(@carte), method: :post, local: true do |f| %>
+
+          <%# Montant à déduire %>
+          <div style="margin-bottom:12px;">
+            <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:6px;">Montant à déduire (€)</label>
+            <input type="number"
+                   name="montant_euros"
+                   min="1"
+                   max="<%= @carte.solde_euros %>"
+                   step="0.01"
+                   placeholder="Ex : 65"
+                   required
+                   style="width:100%; padding:12px 14px; border:1px solid #e2dbd2; border-radius:12px; font-size:16px; font-family:'Cormorant Garamond',serif; color:#2e2926; background:#f7f5f2; box-sizing:border-box;">
+          </div>
+
+          <%# Description du soin %>
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:6px;">Prestation (optionnel)</label>
+            <%# Suggestions rapides pour remplir la description en un tap %>
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+              <% ['Pose cil à cil', 'Volume russe', 'Retouche', 'Rehaussement', 'Sourcils'].each do |soin| %>
+                <button type="button"
+                        onclick="document.getElementById('desc-input').value = '<%= soin %>'"
+                        style="padding:5px 12px; border-radius:20px; border:1px solid #e2dbd2; background:#f6f4f1; color:var(--color-muted); font-size:11px; cursor:pointer; font-family:inherit;">
+                  <%= soin %>
+                </button>
+              <% end %>
+            </div>
+            <input type="text"
+                   id="desc-input"
+                   name="description"
+                   placeholder="Nom de la prestation"
+                   style="width:100%; padding:11px 14px; border:1px solid #e2dbd2; border-radius:12px; font-size:13px; font-family:inherit; color:#2e2926; background:#f7f5f2; box-sizing:border-box;">
+          </div>
+
+          <%= f.submit "Déduire →",
+                       class: "btn-admin-terminer",
+                       data: { turbo_confirm: "Confirmer la déduction ?" } %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Historique des utilisations %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Historique (<%= @transactions.count %>)</div>
+
+      <% if @transactions.any? %>
+        <% @transactions.each do |t| %>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f0ece6;">
+            <div>
+              <div style="font-size:13px; color:#2e2926; font-weight:500;">− <%= t.montant_cents / 100 %>€</div>
+              <div style="font-size:11px; color:var(--color-muted);">
+                <%= t.description.presence || "Soin Biche." %> · <%= I18n.l(t.created_at.to_date, format: "%-d %B %Y") %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">Aucune utilisation pour l'instant.</div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>

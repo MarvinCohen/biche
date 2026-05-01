@@ -23,6 +23,9 @@ gem "devise"
 # Paiement en ligne via Stripe
 gem "stripe"
 
+# Génération de QR codes (cartes cadeaux)
+gem "rqrcode"
+
 # Pagination des listes
 gem "kaminari"
 

@@ -83,27 +83,50 @@ class BookingsController < ApplicationController
 
   # GET /bookings/creneaux — retourne les créneaux disponibles pour une date (AJAX)
   def creneaux
-    # La date est passée en paramètre GET depuis le calendrier JS
-    date         = Date.parse(params[:date])
-    prestation   = Prestation.find(params[:prestation_id])
+    date       = Date.parse(params[:date])
+    prestation = Prestation.find(params[:prestation_id])
+    duree      = prestation.duree_minutes.minutes
 
     # Créneaux de travail : 9h → 16h30 par tranches de 1h30
-    # (9..17).step(1.5) génère : 9.0, 10.5, 12.0, 13.5, 15.0, 16.5
     tous_les_creneaux = (9..17).step(1.5).map do |h|
       Time.parse("#{h.to_i}:#{(h % 1 * 60).to_i.to_s.rjust(2, '0')}")
     end
 
-    # Heures déjà réservées ce jour-là, converties en "HH:MM" pour comparer
-    # Pluck retourne des objets Time en Rails — on normalise en string pour la comparaison
-    prises = Booking
-               .where(date: date)
-               .where.not(statut: 'annule')
-               .pluck(:heure)
-               .map { |h| h.strftime('%H:%M') }
+    # Charger les RDVs existants du jour avec leur prestation (pour connaître la durée)
+    rdvs_existants = Booking
+                       .where(date: date)
+                       .where.not(statut: 'annule')
+                       .includes(:prestation)
 
-    # On retire les créneaux déjà pris (comparaison string → string, pas Time → string)
+    # Indisponibilités couvrant ce jour (date_debut <= date <= date_fin)
+    indisponibilites = Indisponibilite.where('date_debut <= ? AND date_fin >= ?', date, date)
+
+    # Convertir en secondes depuis minuit pour comparer les heures sans ambiguïté de date
+    # (Rails stocke :time avec la date 2000-01-01, Time.parse prend la date courante)
+    to_s = ->(t) { t.hour * 3600 + t.min * 60 }
+    duree_s = prestation.duree_minutes * 60
+
+    # Rejeter les créneaux qui créeraient un chevauchement avec un RDV existant
+    # OU qui tombent dans une indisponibilité bloquée par Syam
     @creneaux_disponibles = tous_les_creneaux.reject do |c|
-      prises.include?(c.strftime('%H:%M'))
+      nouveau_debut_s = to_s.call(c)
+      nouveau_fin_s   = nouveau_debut_s + duree_s
+
+      # Conflit avec un RDV existant
+      conflit_rdv = rdvs_existants.any? do |rdv|
+        existant_debut_s = to_s.call(rdv.heure)
+        existant_fin_s   = existant_debut_s + rdv.prestation.duree_minutes * 60
+        nouveau_debut_s < existant_fin_s && nouveau_fin_s > existant_debut_s
+      end
+
+      # Conflit avec une indisponibilité (pause déjeuner, congé, etc.)
+      conflit_indispo = indisponibilites.any? do |indispo|
+        indispo_debut_s = to_s.call(indispo.heure_debut)
+        indispo_fin_s   = to_s.call(indispo.heure_fin)
+        nouveau_debut_s < indispo_fin_s && nouveau_fin_s > indispo_debut_s
+      end
+
+      conflit_rdv || conflit_indispo
     end
 
     render json: @creneaux_disponibles.map { |c| c.strftime('%Hh%M') }

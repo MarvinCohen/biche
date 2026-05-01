@@ -1,2 +1,239 @@
-<h1>Prestations#show</h1>
-<p>Find me in app/views/prestations/show.html.erb</p>
+<% content_for :title, @prestation.nom %>
+
+<% content_for :head do %>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #2a1f15; }
+  .wrap { max-width: 420px; margin: 0 auto; padding: 24px 12px; }
+  .phone {
+    background: #f5ede2;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  /* ---- NAV ---- */
+  .nav {
+    background: rgba(245, 237, 226, 0.92);
+    backdrop-filter: blur(10px);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+  }
+  .logo-mini {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: #3a2a1e;
+    font-style: italic;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .back-btn {
+    font-size: 11px;
+    color: #7a6b5c;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-family: inherit;
+  }
+
+  /* ---- HERO PHOTO ---- */
+  .presta-hero {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    padding-top: 60px; /* espace pour la nav absolue */
+  }
+  .presta-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Placeholder quand pas de photo */
+  .presta-hero-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e8d7bf 0%, #c9a98a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Dégradé en bas de l'image pour la lisibilité du texte */
+  .presta-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(transparent, rgba(58, 42, 30, 0.6));
+    pointer-events: none;
+  }
+
+  /* ---- CONTENU ---- */
+  .presta-body { padding: 28px 24px; background: #fff; }
+
+  .presta-cat {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #a8927c;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .presta-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 34px;
+    color: #3a2a1e;
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .presta-description {
+    font-size: 14px;
+    color: #7a6b5c;
+    line-height: 1.8;
+    margin-bottom: 28px;
+  }
+
+  /* Bloc récapitulatif durée + prix */
+  .presta-recap {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .presta-recap-item {
+    flex: 1;
+    background: #f5ede2;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+  }
+  .presta-recap-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #a8927c;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .presta-recap-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: #3a2a1e;
+    line-height: 1;
+  }
+
+  /* Bouton réserver */
+  .btn-reserver {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #3a2a1e;
+    color: #fff;
+    border-radius: 30px;
+    padding: 15px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-decoration: none;
+    font-family: inherit;
+    margin-bottom: 12px;
+  }
+  .btn-retour {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: transparent;
+    color: #7a6b5c;
+    border-radius: 30px;
+    padding: 13px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid #d4c5b0;
+    text-decoration: none;
+    font-family: inherit;
+  }
+
+  /* Footer sobre */
+  .presta-footer {
+    background: #3a2a1e;
+    padding: 24px;
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+  }
+</style>
+<% end %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav" style="position:relative; padding-top:16px;">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <%= link_to "← Soins", prestations_path, class: "back-btn" %>
+    </nav>
+
+    <%# ---- HERO : photo ou dégradé ---- %>
+    <div class="presta-hero">
+      <% if @prestation.photo.attached? %>
+        <%= image_tag @prestation.photo,
+                      class: "presta-hero-img",
+                      alt: @prestation.nom %>
+      <% else %>
+        <%# Placeholder avec SVG cil centré %>
+        <div class="presta-hero-placeholder">
+          <svg width="140" height="84" viewBox="0 0 100 60" fill="none" opacity="0.4">
+            <path d="M5 35 Q25 10 50 35 Q75 10 95 35" stroke="#3a2a1e" stroke-width="1.5" fill="none"/>
+            <g stroke="#3a2a1e" stroke-width="1.2" stroke-linecap="round">
+              <path d="M15 30 L12 15"/><path d="M25 22 L22 8"/><path d="M40 18 L40 5"/>
+              <path d="M50 18 L50 3"/><path d="M60 18 L62 5"/><path d="M75 22 L78 8"/>
+              <path d="M85 30 L90 15"/>
+            </g>
+          </svg>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ---- CORPS ---- %>
+    <div class="presta-body">
+
+      <%# Catégorie en petit au-dessus du nom %>
+      <% labels = { 'extensions' => 'Extensions', 'retouche' => 'Retouches',
+                    'rehaussement' => 'Rehaussement', 'depose' => 'Dépose' } %>
+      <div class="presta-cat"><%= labels[@prestation.categorie] || @prestation.categorie.capitalize %></div>
+
+      <h1 class="presta-title"><%= @prestation.nom %></h1>
+
+      <% if @prestation.description.present? %>
+        <p class="presta-description"><%= @prestation.description %></p>
+      <% end %>
+
+      <%# Durée + Prix côte à côte %>
+      <div class="presta-recap">
+        <div class="presta-recap-item">
+          <div class="presta-recap-label">Durée</div>
+          <div class="presta-recap-value"><%= @prestation.duree_formatee %></div>
+        </div>
+        <div class="presta-recap-item">
+          <div class="presta-recap-label">Prix</div>
+          <div class="presta-recap-value"><%= @prestation.prix_euros.to_i %>€</div>
+        </div>
+      </div>
+
+      <%# CTA %>
+      <%= link_to "Réserver ce soin", new_booking_path(prestation_id: @prestation.id), class: "btn-reserver" %>
+      <%= link_to "Voir tous les soins", prestations_path, class: "btn-retour" %>
+    </div>
+
+    <div class="presta-footer">
+      Calao Studio · 37 Rue Lachassaigne · Bordeaux
+    </div>
+
+  </div>
+</div>

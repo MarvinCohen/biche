@@ -6,7 +6,8 @@ class PrestationsController < ApplicationController
   # GET /prestations — liste complète des soins avec tarifs
   def index
     # Toutes les prestations disponibles, triées alphabétiquement
-    @prestations = Prestation.disponibles.par_nom
+    # with_attached_photo évite les N+1 queries quand on affiche les photos dans la vue
+    @prestations = Prestation.disponibles.par_nom.with_attached_photo
 
     # Filtre par catégorie si un paramètre est passé (via les onglets de la maquette)
     @prestations = @prestations.where(categorie: params[:categorie]) if params[:categorie].present?

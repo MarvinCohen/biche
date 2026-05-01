@@ -6,6 +6,23 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# ============================================================
+# Cloudinary — stockage cloud pour la production
+# Gratuit jusqu'à 25 Go — parfait pour les photos de prestations
+#
+# SETUP :
+# 1. Créer un compte gratuit sur cloudinary.com
+# 2. Ajouter la gem : gem "cloudinary" dans le Gemfile
+# 3. Renseigner les variables d'env sur Railway/Render :
+#    CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+# 4. Dans production.rb, passer à : config.active_storage.service = :cloudinary
+# ============================================================
+cloudinary:
+  service: Cloudinary
+  cloud_name: <%= ENV["CLOUDINARY_CLOUD_NAME"] %>
+  api_key:    <%= ENV["CLOUDINARY_API_KEY"] %>
+  api_secret: <%= ENV["CLOUDINARY_API_SECRET"] %>
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

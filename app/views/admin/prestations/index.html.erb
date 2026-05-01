@@ -1,0 +1,66 @@
+<% content_for :title, "Admin — Prestations" %>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Dashboard", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Prestations</div>
+      <div class="admin-header-sub">Créez, modifiez et gérez le catalogue</div>
+    </div>
+
+    <%# ---- BOUTON AJOUTER ---- %>
+    <div class="admin-sec">
+      <%= link_to "＋ Nouvelle prestation", new_admin_prestation_path, class: "btn-admin-confirmer" %>
+    </div>
+
+    <%# Affichage groupé par catégorie %>
+    <% @prestations_par_categorie.each do |categorie, prestations| %>
+      <div class="admin-sec">
+        <div class="admin-sec-title">
+          <%= { 'extensions' => 'Extensions', 'retouche' => 'Retouches',
+                'rehaussement' => 'Rehaussement', 'depose' => 'Dépose' }[categorie] || categorie.capitalize %>
+        </div>
+
+        <% prestations.each do |prestation| %>
+          <%# Lien vers le formulaire d'édition %>
+          <%= link_to edit_admin_prestation_path(prestation), class: "admin-rdv-card" do %>
+
+            <%# Miniature circulaire — photo si uploadée, sinon fond beige avec initiale %>
+            <div class="admin-presta-thumb">
+              <% if prestation.photo.attached? %>
+                <%= image_tag prestation.photo, style: "width:100%; height:100%; object-fit:cover;" %>
+              <% else %>
+                <span style="font-family:var(--font-serif); font-size:16px; color:#c8c2bc;">
+                  <%= prestation.nom.first.upcase %>
+                </span>
+              <% end %>
+            </div>
+
+            <div class="admin-rdv-info">
+              <div class="admin-rdv-cliente" style="<%= 'opacity: 0.4;' unless prestation.disponible %>">
+                <%= prestation.nom %>
+                <%# Badge "Désactivée" si la prestation est masquée aux clientes %>
+                <% unless prestation.disponible %>
+                  <span class="admin-badge admin-badge-annule" style="margin-left: 6px;">Désactivée</span>
+                <% end %>
+              </div>
+              <div class="admin-rdv-prestation">
+                <%= prestation.duree_formatee %> · <%= prestation.prix_euros.to_i %>€
+              </div>
+            </div>
+
+            <div style="color: #c8c2bc; font-size: 14px;">›</div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+  </div>
+</div>

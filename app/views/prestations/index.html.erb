@@ -869,13 +869,14 @@
       <h2 class="s-h2">Nos soins signatures</h2>
       <p class="s-sub">Filtrez par type pour trouver le soin qui vous correspond.</p>
 
-      <%# ---- PILLS DE FILTRE ---- %>
-      <%# Scrollables horizontalement, clic JS pour activer (pas de rechargement page) %>
+      <%# ---- PILLS DE FILTRE — dynamiques depuis les catégories en base ---- %>
       <div class="cat-bar" id="catBar">
         <span class="cat-pill active" data-cat="toutes">Toutes</span>
-        <span class="cat-pill" data-cat="extensions">Extensions</span>
-        <span class="cat-pill" data-cat="rehaussement">Rehaussement</span>
-        <span class="cat-pill" data-cat="sourcils">Sourcils</span>
+        <% labels = { 'extensions' => 'Extensions', 'retouche' => 'Retouches',
+                      'rehaussement' => 'Rehaussement', 'depose' => 'Dépose' } %>
+        <% @prestations.map(&:categorie).uniq.each do |cat| %>
+          <span class="cat-pill" data-cat="<%= cat %>"><%= labels[cat] || cat.capitalize %></span>
+        <% end %>
       </div>
 
       <%# Indication "glissez" avec flèches svg %>
@@ -894,127 +895,61 @@
       <div class="carousel-wrap">
         <div class="carousel" id="car1">
 
-          <%# Card 1 : Cil à cil — pose naturelle %>
-          <div class="presta-card" data-cat="extensions">
-            <div class="presta-img">
-              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
-                <path d="M5 35 Q25 10 50 35 Q75 10 95 35" stroke="#6b5344" stroke-width="1.5" fill="none"/>
-                <g stroke="#6b5344" stroke-width="1.2" stroke-linecap="round">
-                  <path d="M15 30 L12 15"/><path d="M25 22 L22 8"/><path d="M40 18 L40 5"/>
-                  <path d="M50 18 L50 3"/><path d="M60 18 L62 5"/><path d="M75 22 L78 8"/>
-                  <path d="M85 30 L90 15"/>
-                </g>
-              </svg>
-            </div>
-            <div class="presta-name">Cil à cil</div>
-            <div class="presta-desc">Effet naturel, une extension posée sur chaque cil naturel pour un résultat élégant et discret.</div>
-            <div class="presta-meta">
-              <div class="presta-meta-item">2h</div>
-              <div class="presta-meta-item">Pose</div>
-            </div>
-            <div class="presta-price">
-              <span class="presta-price-sup">À partir de</span>
-              60€
-            </div>
-            <%= link_to "Je réserve", new_booking_path, class: "presta-btn" %>
-          </div>
+          <%# Cards dynamiques — une par prestation disponible en base %>
+          <% @prestations.each_with_index do |prestation, i| %>
+            <%# La première prestation est mise en avant avec le badge "Populaire" %>
+            <div class="presta-card <%= 'highlight' if i == 0 %>" data-cat="<%= prestation.categorie %>">
+              <% if i == 0 %><div class="pick-badge">Populaire</div><% end %>
 
-          <%# Card 2 : Volume léger — mise en avant "Populaire" %>
-          <div class="presta-card highlight" data-cat="extensions">
-            <div class="pick-badge">Populaire</div>
-            <div class="presta-img">
-              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
-                <path d="M5 38 Q25 8 50 38 Q75 8 95 38" stroke="#6b5344" stroke-width="1.8" fill="none"/>
-                <g stroke="#6b5344" stroke-width="1.3" stroke-linecap="round">
-                  <path d="M12 32 L8 12"/><path d="M22 24 L17 4"/><path d="M35 20 L33 2"/>
-                  <path d="M50 18 L50 0"/><path d="M65 20 L67 2"/><path d="M78 24 L83 4"/>
-                  <path d="M88 32 L92 12"/>
-                </g>
-              </svg>
-            </div>
-            <div class="presta-name">Volume léger</div>
-            <div class="presta-desc">Effet densifié avec 2 à 3 extensions par cil pour un regard intensifié et élégant.</div>
-            <div class="presta-meta">
-              <div class="presta-meta-item">2h30</div>
-              <div class="presta-meta-item">Pose</div>
-            </div>
-            <div class="presta-price">
-              <span class="presta-price-sup">À partir de</span>
-              70€
-            </div>
-            <%= link_to "Je réserve", new_booking_path, class: "presta-btn" %>
-          </div>
+              <%# Zone image : photo Active Storage si uploadée, sinon SVG générique %>
+              <div class="presta-img">
+                <% if prestation.photo.attached? %>
+                  <%= image_tag prestation.photo,
+                                style: "width:100%; height:100%; object-fit:cover;",
+                                alt: prestation.nom %>
+                <% else %>
+                  <%# Icône de cil SVG générique %>
+                  <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
+                    <path d="M5 35 Q25 10 50 35 Q75 10 95 35" stroke="#6b5344" stroke-width="1.5" fill="none"/>
+                    <g stroke="#6b5344" stroke-width="1.2" stroke-linecap="round">
+                      <path d="M15 30 L12 15"/><path d="M25 22 L22 8"/><path d="M40 18 L40 5"/>
+                      <path d="M50 18 L50 3"/><path d="M60 18 L62 5"/><path d="M75 22 L78 8"/>
+                      <path d="M85 30 L90 15"/>
+                    </g>
+                  </svg>
+                <% end %>
+              </div>
 
-          <%# Card 3 : Rehaussement — sans extension %>
-          <div class="presta-card" data-cat="rehaussement">
-            <div class="presta-img">
-              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
-                <path d="M5 40 Q25 15 50 30 Q75 15 95 40" stroke="#6b5344" stroke-width="1.5" fill="none"/>
-                <g stroke="#6b5344" stroke-width="1" stroke-linecap="round">
-                  <path d="M15 34 L13 22"/><path d="M25 28 L24 14"/><path d="M40 24 L40 10"/>
-                  <path d="M50 22 L50 8"/><path d="M60 24 L61 10"/><path d="M75 28 L77 14"/>
-                  <path d="M85 34 L88 22"/>
-                </g>
-              </svg>
+              <div class="presta-name"><%= prestation.nom %></div>
+              <div class="presta-desc"><%= prestation.description.present? ? prestation.description : "Soin signature Biche." %></div>
+              <div class="presta-meta">
+                <div class="presta-meta-item"><%= prestation.duree_formatee %></div>
+              </div>
+              <div class="presta-price">
+                <span class="presta-price-sup">À partir de</span>
+                <%= prestation.prix_euros.to_i %>€
+              </div>
+              <%= link_to "Je réserve", new_booking_path(prestation_id: prestation.id), class: "presta-btn" %>
             </div>
-            <div class="presta-name">Rehaussement</div>
-            <div class="presta-desc">Courbure naturelle de vos cils, sans extension. Un regard ouvert et doux.</div>
-            <div class="presta-meta">
-              <div class="presta-meta-item">1h</div>
-              <div class="presta-meta-item">Soin</div>
-            </div>
-            <div class="presta-price">
-              <span class="presta-price-sup">À partir de</span>
-              40€
-            </div>
-            <%= link_to "Je réserve", new_booking_path, class: "presta-btn" %>
-          </div>
-
-          <%# Card 4 : Sourcils — à venir (bouton désactivé) %>
-          <div class="presta-card" data-cat="sourcils">
-            <div class="presta-img">
-              <svg width="110" height="66" viewBox="0 0 100 60" fill="none">
-                <path d="M10 35 Q30 20 50 25 Q70 20 90 35" stroke="#6b5344" stroke-width="2" fill="none"/>
-                <path d="M15 32 L18 38" stroke="#6b5344" stroke-width="1.2"/>
-                <path d="M30 28 L33 36" stroke="#6b5344" stroke-width="1.2"/>
-                <path d="M50 25 L52 35" stroke="#6b5344" stroke-width="1.2"/>
-                <path d="M70 28 L72 36" stroke="#6b5344" stroke-width="1.2"/>
-                <path d="M85 32 L83 38" stroke="#6b5344" stroke-width="1.2"/>
-              </svg>
-            </div>
-            <div class="presta-name">Sourcils</div>
-            <div class="presta-desc">Remodelage, teinture et mise en forme pour un regard structuré.</div>
-            <div class="presta-meta">
-              <div class="presta-meta-item">Bientôt</div>
-            </div>
-            <div class="presta-price">
-              <span class="presta-price-sup">Tarif</span>
-              —
-            </div>
-            <%# Bouton désactivé visuellement avec opacity et cursor not-allowed %>
-            <button class="presta-btn" style="opacity: 0.4; cursor: not-allowed;">À venir</button>
-          </div>
+          <% end %>
 
         </div><%# /carousel %>
 
-        <%# Contrôles : flèche gauche + dots + flèche droite %>
+        <%# Contrôles : flèche gauche + dots dynamiques + flèche droite %>
         <div class="carousel-controls">
-          <%# Flèche gauche — appelle scrollCar() en JS %>
           <div class="car-arrow" onclick="scrollCar('car1', -1)">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 3 L5 8 L10 13" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
 
-          <%# 4 dots — un par card du carousel %>
+          <%# Un dot par prestation %>
           <div class="car-dots" id="dots1">
-            <div class="car-dot active"></div>
-            <div class="car-dot"></div>
-            <div class="car-dot"></div>
-            <div class="car-dot"></div>
+            <% @prestations.each_with_index do |_, i| %>
+              <div class="car-dot <%= 'active' if i == 0 %>"></div>
+            <% end %>
           </div>
 
-          <%# Flèche droite %>
           <div class="car-arrow" onclick="scrollCar('car1', 1)">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M6 3 L11 8 L6 13" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>

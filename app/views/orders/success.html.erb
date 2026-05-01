@@ -1,0 +1,79 @@
+<% content_for :title, "Paiement confirmé — Biche." %>
+
+<% content_for :head do %>
+<style>
+  .gift-visual { background:linear-gradient(135deg,#1e1b19 0%,#3a3330 50%,#5e5a56 100%); border-radius:20px; padding:22px 22px 20px; margin-bottom:28px; position:relative; overflow:hidden; box-shadow:0 8px 32px rgba(46,41,38,0.35),0 2px 8px rgba(0,0,0,0.2); text-align:left; }
+  .gift-visual::after { content:''; position:absolute; inset:6px; border-radius:14px; border:0.5px solid rgba(184,168,152,0.25); pointer-events:none; }
+  .gift-visual-circle-1 { position:absolute; top:-30px; right:-30px; width:110px; height:110px; border-radius:50%; background:radial-gradient(circle,rgba(184,168,152,0.15) 0%,transparent 70%); }
+  .gift-visual-circle-2 { position:absolute; bottom:-20px; left:-20px; width:70px; height:70px; border-radius:50%; background:radial-gradient(circle,rgba(184,168,152,0.1) 0%,transparent 70%); }
+  @keyframes shimmer { 0%{transform:translateX(-120%) skewX(-15deg)} 100%{transform:translateX(300%) skewX(-15deg)} }
+  .gift-visual-shimmer { position:absolute; top:0; left:0; width:40%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent); animation:shimmer 3.5s ease-in-out infinite; }
+  .gift-visual-inner { position:relative; z-index:1; }
+  .gift-visual-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; }
+  .gift-visual-logo { font-family:'Cormorant Garamond',serif; font-size:26px; color:rgba(255,255,255,0.9); font-style:italic; }
+  .gift-visual-chip { width:28px; height:20px; border-radius:4px; background:linear-gradient(135deg,#c8b89a,#a89078); opacity:0.7; }
+  .gift-visual-pour { font-size:10px; letter-spacing:1.5px; color:rgba(184,168,152,0.65); text-transform:uppercase; margin-bottom:4px; }
+  .gift-visual-amount { font-family:'Cormorant Garamond',serif; font-size:42px; color:#fff; font-weight:300; line-height:1.15; margin-bottom:6px; }
+  .gift-visual-label { font-size:9px; letter-spacing:3px; color:rgba(184,168,152,0.7); text-transform:uppercase; margin-bottom:16px; }
+  .gift-visual-sep { height:0.5px; background:linear-gradient(90deg,transparent,rgba(184,168,152,0.4),transparent); margin-bottom:12px; }
+  .gift-visual-footer { display:flex; justify-content:space-between; align-items:flex-end; }
+  .gift-visual-valid { font-size:9px; color:rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; line-height:1.6; }
+  .gift-visual-code { font-size:9px; color:rgba(184,168,152,0.5); letter-spacing:2.5px; }
+</style>
+<% end %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <nav class="nav" style="background:rgba(247,245,242,0.94); backdrop-filter:blur(10px); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:0.5px solid #e4ddd6;">
+      <%= link_to "Biche.", root_path, style:"font-family:'Cormorant Garamond',serif; font-size:22px; color:#2e2926; font-style:italic; text-decoration:none;" %>
+    </nav>
+
+    <div style="padding:48px 24px 40px; text-align:center;">
+
+      <%# Icône succès %>
+      <div style="width:64px; height:64px; border-radius:50%; background:#f0f5ee; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="#7a9a6a" stroke-width="1.5"/>
+          <path d="M8 14 L12 18 L20 10" stroke="#7a9a6a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div style="font-family:'Cormorant Garamond',serif; font-size:30px; color:#2e2926; margin-bottom:8px;">Paiement confirmé</div>
+      <div style="font-size:13px; color:#8e8480; line-height:1.7; max-width:280px; margin:0 auto 32px;">
+        La carte a été envoyée à <strong><%= @order.destinataire_email %></strong>.
+      </div>
+
+      <%# Visuel de la carte %>
+      <div class="gift-visual">
+        <div class="gift-visual-circle-1"></div>
+        <div class="gift-visual-circle-2"></div>
+        <div class="gift-visual-shimmer"></div>
+        <div class="gift-visual-inner">
+          <div class="gift-visual-header">
+            <div class="gift-visual-logo">Biche.</div>
+            <div class="gift-visual-chip"></div>
+          </div>
+          <% if @order.destinataire_nom.present? %>
+            <div class="gift-visual-pour">Pour <%= @order.destinataire_nom %></div>
+          <% end %>
+          <div class="gift-visual-amount"><%= @order.montant_cents / 100 %>€</div>
+          <div class="gift-visual-label">Carte cadeau</div>
+          <div class="gift-visual-sep"></div>
+          <div class="gift-visual-footer">
+            <div class="gift-visual-valid">Valable 1 an<br>Toutes prestations</div>
+            <div class="gift-visual-code">BICHE·<%= Date.today.year %>·#<%= @order.id.to_s.rjust(4, '0') %></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <%= link_to "Retour à la boutique", shop_path,
+                    style:"display:block; background:#2e2926; color:#fff; border-radius:30px; padding:14px; font-size:11px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; text-decoration:none; text-align:center;" %>
+        <%= link_to "Mon espace cliente", espace_cliente_root_path,
+                    style:"display:block; background:transparent; color:#8e8480; border:1px solid #e2dbd2; border-radius:30px; padding:13px; font-size:11px; letter-spacing:1px; text-transform:uppercase; text-decoration:none; text-align:center;" %>
+      </div>
+
+    </div>
+  </div>
+</div>

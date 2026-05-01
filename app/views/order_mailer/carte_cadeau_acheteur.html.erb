@@ -1,0 +1,93 @@
+<%# ============================================================
+    Email acheteur — confirmation de commande carte cadeau
+    Le layout mailer.html.erb gère déjà le DOCTYPE, html, body,
+    l'en-tête "Biche." et le footer. On ne met ici que le contenu.
+    ============================================================ %>
+
+    <%# Carte cadeau visuelle — layout table pour compatibilité Gmail %>
+    <%# Structure : table externe (gradient) → padding 6px → table interne (bordure fine) → contenu %>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(135deg,#1e1b19 0%,#3a3330 50%,#5e5a56 100%); border-radius:20px; margin-bottom:24px; box-shadow:0 8px 32px rgba(46,41,38,0.3);">
+      <tr>
+        <%# Padding de 6px tout autour pour créer l'effet cadre intérieur incrustée %>
+        <td style="padding:6px; border-radius:20px;">
+
+          <%# Cadre intérieur fin — simule le ::after { inset:6px } du web %>
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid rgba(184,168,152,0.22); border-radius:14px;">
+            <tr>
+              <td style="padding:18px 18px 16px; border-radius:14px;">
+
+                <%# En-tête : logo à gauche, puce à droite %>
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px;">
+                  <tr>
+                    <td style="font-family:Georgia,serif; font-size:26px; color:rgba(255,255,255,0.9); font-style:italic; font-weight:400; letter-spacing:0.5px;">Biche.</td>
+                    <td align="right" valign="middle">
+                      <%# Puce dorée décorative %>
+                      <div style="width:28px; height:20px; border-radius:4px; background:linear-gradient(135deg,#c8b89a,#a89078); display:inline-block;"></div>
+                    </td>
+                  </tr>
+                </table>
+
+                <%# Nom du destinataire %>
+                <% if @order.destinataire_nom.present? %>
+                  <div style="font-size:10px; letter-spacing:1.5px; color:rgba(184,168,152,0.65); text-transform:uppercase; margin-bottom:4px;">Pour <%= @order.destinataire_nom %></div>
+                <% end %>
+
+                <%# Montant %>
+                <div style="font-family:Georgia,serif; font-size:42px; color:#fff; font-weight:300; letter-spacing:-0.5px; line-height:1.15; margin-bottom:4px;"><%= @montant %>€</div>
+                <div style="font-size:9px; letter-spacing:3px; color:rgba(184,168,152,0.7); text-transform:uppercase; margin-bottom:14px;">Carte cadeau</div>
+
+                <%# Séparateur dégradé — simulé par une couleur unie en email %>
+                <div style="height:1px; background:rgba(184,168,152,0.3); margin-bottom:12px;"></div>
+
+                <%# Pied de carte : validité à gauche, code à droite %>
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="font-size:9px; color:rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; line-height:1.6;">
+                      Valable 1 an<br>Toutes prestations
+                    </td>
+                    <td align="right" valign="bottom" style="font-size:9px; color:rgba(184,168,152,0.5); letter-spacing:2px;">
+                      BICHE·<%= Date.today.year %>·#<%= @order.id.to_s.rjust(4, '0') %>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+
+    <%# Message %>
+    <div style="background:#fff; border-radius:16px; padding:24px; margin-bottom:24px;">
+      <p style="font-size:15px; color:#2e2926; margin:0 0 12px;">Bonjour <%= @user.first_name %>,</p>
+      <p style="font-size:13px; color:#6e6560; line-height:1.7; margin:0 0 12px;">
+        Votre carte cadeau de <strong><%= @montant %>€</strong>
+        <% if @order.destinataire_nom.present? %>pour <strong><%= @order.destinataire_nom %></strong><% end %>
+        a bien été enregistrée.
+      </p>
+      <p style="font-size:13px; color:#6e6560; line-height:1.7; margin:0 0 16px;">
+        La carte a été envoyée automatiquement à <strong><%= @order.destinataire_email %></strong>.
+      </p>
+
+      <%# Récapitulatif — table pour compatibilité Gmail %>
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#f7f5f2; border-radius:10px; font-size:12px; color:#4e4a46;">
+        <tr>
+          <td style="padding:14px 16px 8px; color:#8e8480;">Carte cadeau</td>
+          <td align="right" style="padding:14px 16px 8px;"><strong><%= @montant %>€</strong></td>
+        </tr>
+        <% if @order.destinataire_nom.present? %>
+        <tr>
+          <td style="padding:0 16px 8px; color:#8e8480;">Pour</td>
+          <td align="right" style="padding:0 16px 8px;"><%= @order.destinataire_nom %></td>
+        </tr>
+        <% end %>
+        <tr>
+          <td style="padding:0 16px 14px; color:#8e8480;">Envoi par email à</td>
+          <td align="right" style="padding:0 16px 14px;"><%= @order.destinataire_email %></td>
+        </tr>
+      </table>
+    </div>
+
+<%# Le footer (adresse, copyright) est géré par le layout mailer.html.erb %>

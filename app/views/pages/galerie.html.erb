@@ -51,31 +51,53 @@
     </div>
 
     <%# ---- COLLAGE HERO ---- %>
-    <%# Composition de blocs organiques superposés — placeholder pour vraies photos %>
+    <%#
+      Si on a au moins 1 photo en BDD → collage avec vraies photos
+      Sinon → fallback sur les formes SVG décoratives
+    %>
     <div class="collage-hero">
+
+      <%# Bloc principal (grand ovale) — photo 1 ou fond gris dégradé %>
       <div class="col-main">
-        <svg class="col-ico" width="70" height="42" viewBox="0 0 70 42" fill="none">
-          <path d="M4 21 C17 7 53 7 66 21 C53 35 17 35 4 21Z" stroke="rgba(247,245,242,0.7)" stroke-width="1.8" fill="none"/>
-          <circle cx="35" cy="21" r="9" stroke="rgba(247,245,242,0.6)" stroke-width="1.5" fill="none"/>
-          <g stroke="rgba(247,245,242,0.7)" stroke-width="1.2" stroke-linecap="round">
-            <path d="M8 15 L5 5"/><path d="M17 10 L15 1"/><path d="M27 8 L26 0"/>
-            <path d="M35 7 L35 0"/><path d="M43 8 L44 0"/><path d="M53 10 L55 1"/><path d="M62 15 L65 5"/>
-          </g>
-        </svg>
+        <% if @collage_photos[0] %>
+          <%# Photo réelle : couvre tout le bloc avec object-fit: cover %>
+          <%= image_tag @collage_photos[0].image,
+                        alt: @collage_photos[0].legende,
+                        class: "col-photo" %>
+        <% else %>
+          <%# Pas de photo — le fond coloré du blob suffit comme décoration %>
+        <% end %>
       </div>
+
+      <%# Blob secondaire haut droite — photo 2 %>
       <div class="col-sec">
-        <svg class="col-ico" width="56" height="34" viewBox="0 0 56 34" fill="none">
-          <path d="M3 17 C13 5 43 5 53 17 C43 29 13 29 3 17Z" stroke="rgba(247,245,242,0.6)" stroke-width="1.5" fill="none"/>
-          <circle cx="28" cy="17" r="7" stroke="rgba(247,245,242,0.5)" stroke-width="1.2" fill="none"/>
-        </svg>
+        <% if @collage_photos[1] %>
+          <%= image_tag @collage_photos[1].image,
+                        alt: @collage_photos[1].legende,
+                        class: "col-photo" %>
+        <% end %>
       </div>
+
+      <%# Blob allongé bas centre-gauche — photo 3 %>
       <div class="col-third">
-        <svg class="col-ico" width="60" height="36" viewBox="0 0 60 36" fill="none">
-          <path d="M3 18 C14 6 46 6 57 18 C46 30 14 30 3 18Z" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none"/>
-          <circle cx="30" cy="18" r="8" stroke="rgba(46,41,38,0.3)" stroke-width="1.2" fill="none"/>
-        </svg>
+        <% if @collage_photos[2] %>
+          <%= image_tag @collage_photos[2].image,
+                        alt: @collage_photos[2].legende,
+                        class: "col-photo" %>
+        <% end %>
       </div>
-      <div class="col-accent"><span>B.</span></div>
+
+      <%# Petit blob bas droite — photo 4 ou logo "B." %>
+      <div class="col-accent">
+        <% if @collage_photos[3] %>
+          <%= image_tag @collage_photos[3].image,
+                        alt: @collage_photos[3].legende,
+                        class: "col-photo" %>
+        <% else %>
+          <span>B.</span>
+        <% end %>
+      </div>
+
     </div>
 
     <%# ---- GRILLE MASONRY ---- %>
@@ -93,75 +115,52 @@
 
       <div class="masonry" id="masonry-grid">
 
-        <div class="masonry-item tall m1" data-cat="cil-a-cil">
-          <div class="masonry-bg m1"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Cil à cil</div>
-            <div class="masonry-legend-sub">Effet naturel</div>
-          </div>
-        </div>
+        <% if @galerie_photos.any? %>
+          <%# Boucle dynamique — on exclut les avant/après (affichés dans leur propre section) %>
+          <% @galerie_photos.reject { |p| p.categorie == 'avant-apres' }.each do |photo| %>
+            <%# data-cat : utilisé par le filtre JS pour afficher/masquer les items %>
+            <div class="masonry-item <%= photo.taille %>" data-cat="<%= photo.categorie %>">
 
-        <div class="masonry-item short m2" data-cat="volume">
-          <div class="masonry-bg m2"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Volume léger</div>
-            <div class="masonry-legend-sub">Effet densifié</div>
-          </div>
-        </div>
+              <%# Photo uploadée via Active Storage, ou fond dégradé de fallback %>
+              <% if photo.image.attached? %>
+                <%= image_tag photo.image, class: "masonry-photo", alt: photo.legende %>
+              <% else %>
+                <%# Fond dégradé placeholder si aucune image n'a été uploadée %>
+                <div class="masonry-bg-placeholder"></div>
+              <% end %>
 
-        <div class="masonry-item medium m3" data-cat="rehaussement">
-          <div class="masonry-bg m3"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Rehaussement</div>
-            <div class="masonry-legend-sub">Courbure naturelle</div>
-          </div>
-        </div>
+              <%# Légende superposée sur la photo %>
+              <div class="masonry-legend">
+                <div class="masonry-legend-text"><%= photo.legende %></div>
+                <% if photo.legende_sub.present? %>
+                  <div class="masonry-legend-sub"><%= photo.legende_sub %></div>
+                <% end %>
+              </div>
 
-        <div class="masonry-item tall m4" data-cat="volume">
-          <div class="masonry-bg m4"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Volume russe</div>
-            <div class="masonry-legend-sub">Effet intense</div>
-          </div>
-        </div>
+            </div>
+          <% end %>
 
-        <div class="masonry-item short m5" data-cat="cil-a-cil">
-          <div class="masonry-bg m5"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Cil à cil</div>
-            <div class="masonry-legend-sub">Pose complète</div>
+        <% else %>
+          <%# Fallback si la galerie est vide — afficher un message discret %>
+          <div style="grid-column: 1 / -1; padding: 40px 0; text-align: center; color: var(--color-muted); font-size: 14px;">
+            La galerie sera bientôt disponible.
           </div>
-        </div>
-
-        <div class="masonry-item medium m6" data-cat="sourcils">
-          <div class="masonry-bg m6"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Sourcils</div>
-            <div class="masonry-legend-sub">Remodelage</div>
-          </div>
-        </div>
-
-        <div class="masonry-item short m7" data-cat="rehaussement">
-          <div class="masonry-bg m7"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Rehaussement</div>
-            <div class="masonry-legend-sub">Résultat</div>
-          </div>
-        </div>
-
-        <div class="masonry-item tall m8" data-cat="cil-a-cil">
-          <div class="masonry-bg m8"></div>
-          <div class="masonry-legend">
-            <div class="masonry-legend-text">Cil à cil</div>
-            <div class="masonry-legend-sub">Naturel & précis</div>
-          </div>
-        </div>
+        <% end %>
 
       </div>
+
+      <%# Bouton "Voir plus" — visible uniquement si plus de 8 photos (géré par JS) %>
+      <div id="voir-plus-wrap" style="text-align:center; padding: 8px 0 24px; display:none;">
+        <button onclick="voirPlusPhotos()" id="btn-voir-plus"
+                style="padding: 11px 28px; border-radius: 30px; border: 1px solid var(--color-dark); background: transparent; color: var(--color-dark); font-size: 11px; font-family: inherit; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;">
+          Voir plus
+        </button>
+      </div>
+
     </section>
 
     <%# ---- AVANT / APRÈS ---- %>
-    <%# Carrousel horizontal de comparaisons avant/après — id ciblé par le filtre JS %>
+    <%# Carrousel horizontal — id ciblé par le filtre JS %>
     <section class="sec sec-alt" id="section-avant-apres">
       <p class="s-tag">Transformations</p>
       <h2 class="s-h2">Avant / Après</h2>
@@ -169,82 +168,66 @@
 
       <div class="avap-wrap">
 
-        <%# Avant/Après 1 — Cil à cil naturel %>
-        <div class="avap-card">
-          <div class="avap-split">
-            <div class="avap-side before">
-              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
-                <path d="M3 15 C12 7 38 7 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                <path d="M3 15 C12 23 38 23 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                <circle cx="25" cy="15" r="5" stroke="rgba(46,41,38,0.3)" stroke-width="1" fill="none"/>
-              </svg>
-              <div class="avap-label before">Avant</div>
-            </div>
-            <div class="avap-side after">
-              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
-                <path d="M3 15 C12 3 38 3 47 15" stroke="rgba(247,245,242,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <path d="M3 15 C12 26 38 26 47 15" stroke="rgba(247,245,242,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <g stroke="rgba(247,245,242,0.8)" stroke-width="1.2" stroke-linecap="round">
-                  <path d="M10 12 L7 3"/><path d="M18 9 L16 1"/><path d="M25 8 L25 0"/><path d="M32 9 L34 1"/><path d="M40 12 L43 3"/>
-                </g>
-              </svg>
-              <div class="avap-label after">Après</div>
-            </div>
-          </div>
-          <div class="avap-footer">
-            <div class="avap-name">Cil à cil naturel</div>
-            <div class="avap-meta">Pose complète · 2h</div>
-          </div>
-        </div>
+        <%# Récupérer uniquement les photos de catégorie avant-apres ayant les deux images %>
+        <% avap_photos = @galerie_photos.select { |p| p.categorie == 'avant-apres' && p.image.attached? && p.image_apres.attached? } %>
 
-        <%# Avant/Après 2 — Volume russe %>
-        <div class="avap-card">
-          <div class="avap-split">
-            <div class="avap-side before" style="background:linear-gradient(145deg,#ccc5bb,#b8b2a8)">
-              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
-                <path d="M3 15 C12 9 38 9 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                <path d="M3 15 C12 21 38 21 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              </svg>
-              <div class="avap-label before">Avant</div>
+        <% if avap_photos.any? %>
+          <%# Boucle dynamique sur les vrais avant/après uploadés par Syam %>
+          <% avap_photos.each do |photo| %>
+            <div class="avap-card">
+              <div class="avap-split">
+                <%# Côté gauche : photo avant %>
+                <div class="avap-side before" style="padding:0; overflow:hidden;">
+                  <%= image_tag photo.image,
+                                alt: "Avant — #{photo.legende}",
+                                style: "width:100%; height:100%; object-fit:cover; display:block;" %>
+                  <div class="avap-label before">Avant</div>
+                </div>
+                <%# Côté droit : photo après %>
+                <div class="avap-side after" style="padding:0; overflow:hidden;">
+                  <%= image_tag photo.image_apres,
+                                alt: "Après — #{photo.legende}",
+                                style: "width:100%; height:100%; object-fit:cover; display:block;" %>
+                  <div class="avap-label after">Après</div>
+                </div>
+              </div>
+              <div class="avap-footer">
+                <div class="avap-name"><%= photo.legende %></div>
+                <% if photo.legende_sub.present? %>
+                  <div class="avap-meta"><%= photo.legende_sub %></div>
+                <% end %>
+              </div>
             </div>
-            <div class="avap-side after" style="background:linear-gradient(145deg,#5e5a56,#2e2926)">
-              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
-                <path d="M3 15 C12 1 38 1 47 15" stroke="rgba(247,245,242,0.7)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                <g stroke="rgba(247,245,242,0.8)" stroke-width="1.5" stroke-linecap="round">
-                  <path d="M7 11 L4 1"/><path d="M14 7 L11 -1"/><path d="M25 6 L25 -2"/><path d="M36 7 L39 -1"/><path d="M43 11 L46 1"/>
-                </g>
-              </svg>
-              <div class="avap-label after">Après</div>
-            </div>
-          </div>
-          <div class="avap-footer">
-            <div class="avap-name">Volume russe</div>
-            <div class="avap-meta">Pose complète · 3h</div>
-          </div>
-        </div>
+          <% end %>
 
-        <%# Avant/Après 3 — Rehaussement %>
-        <div class="avap-card">
-          <div class="avap-split">
-            <div class="avap-side before" style="background:linear-gradient(145deg,#ddd6cc,#ccc5bb)">
-              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
-                <path d="M3 14 C12 8 38 8 47 12" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              </svg>
-              <div class="avap-label before">Avant</div>
+        <% else %>
+          <%# Fallback SVG — affiché tant qu'aucun avant/après n'a été ajouté via l'admin %>
+          <div class="avap-card">
+            <div class="avap-split">
+              <div class="avap-side before">
+                <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                  <path d="M3 15 C12 7 38 7 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <path d="M3 15 C12 23 38 23 47 15" stroke="rgba(46,41,38,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <circle cx="25" cy="15" r="5" stroke="rgba(46,41,38,0.3)" stroke-width="1" fill="none"/>
+                </svg>
+                <div class="avap-label before">Avant</div>
+              </div>
+              <div class="avap-side after">
+                <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
+                  <path d="M3 15 C12 3 38 3 47 15" stroke="rgba(247,245,242,0.75)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <g stroke="rgba(247,245,242,0.8)" stroke-width="1.2" stroke-linecap="round">
+                    <path d="M10 12 L7 3"/><path d="M18 9 L16 1"/><path d="M25 8 L25 0"/><path d="M32 9 L34 1"/><path d="M40 12 L43 3"/>
+                  </g>
+                </svg>
+                <div class="avap-label after">Après</div>
+              </div>
             </div>
-            <div class="avap-side after" style="background:linear-gradient(145deg,#7a7470,#b8b2a8)">
-              <svg width="44" height="26" viewBox="0 0 50 30" fill="none">
-                <path d="M3 14 C12 4 38 4 47 10" stroke="rgba(247,245,242,0.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                <path d="M3 14 C12 24 38 24 47 20" stroke="rgba(247,245,242,0.7)" stroke-width="2" fill="none" stroke-linecap="round"/>
-              </svg>
-              <div class="avap-label after">Après</div>
+            <div class="avap-footer">
+              <div class="avap-name">Cil à cil naturel</div>
+              <div class="avap-meta">Bientôt disponible</div>
             </div>
           </div>
-          <div class="avap-footer">
-            <div class="avap-name">Rehaussement</div>
-            <div class="avap-meta">Soin · 1h</div>
-          </div>
-        </div>
+        <% end %>
 
       </div>
     </section>
@@ -305,7 +288,7 @@
         <div class="insta-item ig6"></div>
       </div>
       <div class="insta-handle">@atelier_b.iche</div>
-      <a href="#" class="insta-btn">
+      <a href="https://www.instagram.com/atelier_b.iche/" target="_blank" rel="noopener noreferrer" class="insta-btn">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <rect x="1.5" y="1.5" width="11" height="11" rx="3" stroke="#2e2926" stroke-width="1.3"/>
           <circle cx="7" cy="7" r="2.5" stroke="#2e2926" stroke-width="1.3"/>
@@ -337,6 +320,46 @@
       et scroll vers la bonne section selon le filtre sélectionné.
     ==================================================================== %>
 <script>
+  // Nombre de photos affichées au départ avant le bouton "Voir plus"
+  const LIMITE_PHOTOS = 8;
+
+  // Indique si l'utilisateur a déjà cliqué sur "Voir plus"
+  // → si oui, on ne réapplique pas la limite quand le filtre revient à "tout"
+  let toutVisible = false;
+
+  // Au chargement de la page : masquer les photos au-delà de LIMITE_PHOTOS
+  document.addEventListener('DOMContentLoaded', function() {
+    appliquerLimite();
+  });
+
+  // Masque les items au-delà de la limite et affiche/cache le bouton "Voir plus"
+  function appliquerLimite() {
+    if (toutVisible) return; // déjà tout affiché, ne rien faire
+
+    const items = Array.from(document.querySelectorAll('.masonry-item'));
+    const wrap  = document.getElementById('voir-plus-wrap');
+
+    items.forEach(function(item, i) {
+      // On masque les items à partir de la 9e photo
+      item.style.display = i < LIMITE_PHOTOS ? 'block' : 'none';
+    });
+
+    // Afficher le bouton uniquement s'il y a plus de LIMITE_PHOTOS photos
+    if (wrap) wrap.style.display = items.length > LIMITE_PHOTOS ? 'block' : 'none';
+  }
+
+  // Clic sur "Voir plus" : afficher toutes les photos et cacher le bouton
+  function voirPlusPhotos() {
+    toutVisible = true;
+
+    document.querySelectorAll('.masonry-item').forEach(function(item) {
+      item.style.display = 'block';
+    });
+
+    const wrap = document.getElementById('voir-plus-wrap');
+    if (wrap) wrap.style.display = 'none';
+  }
+
   // Correspondance catégorie → section cible du scroll
   const categories = {
     'tout':         { label: 'Tout',         section: 'section-tout' },
@@ -353,32 +376,35 @@
     if (pillEl) {
       pillEl.classList.add('active');
     } else {
-      // "Tout voir" cliqué depuis l'info-filtre : réactiver la première pill
       document.querySelector('.filter-pill').classList.add('active');
     }
 
     const info  = document.getElementById('filter-info');
     const label = document.getElementById('filter-label');
     const items = document.querySelectorAll('.masonry-item');
+    const wrap  = document.getElementById('voir-plus-wrap');
 
     if (cat === 'tout') {
-      // Afficher tous les items, cacher l'info filtre
+      // Réafficher tous les items puis réappliquer la limite si "Voir plus" pas encore cliqué
       items.forEach(item => { item.style.display = 'block'; });
       info.style.display = 'none';
+      appliquerLimite(); // remet la limite si toutVisible === false
       document.getElementById('section-tout').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     } else if (cat === 'avant-apres') {
       // Masquer la grille, scroller vers la section avant/après
       items.forEach(item => { item.style.display = 'none'; });
+      if (wrap) wrap.style.display = 'none'; // cacher aussi le bouton "voir plus"
       info.style.display = 'flex';
       label.textContent = categories[cat].label;
       document.getElementById('section-avant-apres').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     } else {
-      // Filtrer la grille par data-cat
+      // Filtrer par catégorie — on montre TOUT ce qui correspond, sans limite
       items.forEach(item => {
         item.style.display = (item.dataset.cat === cat) ? 'block' : 'none';
       });
+      if (wrap) wrap.style.display = 'none'; // pas de "voir plus" quand on filtre
       info.style.display = 'flex';
       label.textContent = categories[cat].label;
       document.getElementById('section-tout').scrollIntoView({ behavior: 'smooth', block: 'start' });

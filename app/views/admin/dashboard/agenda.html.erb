@@ -1,0 +1,133 @@
+<% content_for :title, "Admin — Agenda semaine" %>
+
+<%#
+  ============================================================
+  VUE — Agenda sur 7 jours
+  Données : @jours (Array<Date>), @bookings_par_jour (Hash),
+            @indisponibilites_semaine (Hash), @debut_semaine
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Dashboard", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Agenda</div>
+      <div class="admin-header-sub">
+        <%= I18n.l(@jours.first, format: "%-d %B") %> – <%= I18n.l(@jours.last, format: "%-d %B %Y") %>
+      </div>
+    </div>
+
+    <%# ---- NAVIGATION SEMAINE ---- %>
+    <div class="admin-date-nav">
+      <%# Semaine précédente : reculer de 7 jours %>
+      <%= link_to admin_agenda_path(date: (@debut_semaine - 7.days).to_s), class: "admin-date-nav-btn" do %>
+        ←
+      <% end %>
+
+      <div class="admin-date-label" style="font-size:13px; color:var(--color-muted);">
+        Semaine du <%= I18n.l(@debut_semaine, format: "%-d %B") %>
+      </div>
+
+      <%# Semaine suivante : avancer de 7 jours %>
+      <%= link_to admin_agenda_path(date: (@debut_semaine + 7.days).to_s), class: "admin-date-nav-btn" do %>
+        →
+      <% end %>
+    </div>
+
+    <%# ---- BOUTON RETOUR AUJOURD'HUI (si pas sur la semaine courante) ---- %>
+    <% unless @jours.include?(Date.today) %>
+      <div style="padding: 10px 20px; background:#fff; border-bottom:1px solid var(--color-border);">
+        <%= link_to "↩ Aujourd'hui", admin_agenda_path, class: "btn-admin-fiche", style: "margin: 0; padding: 8px 16px; font-size: 10px;" %>
+      </div>
+    <% end %>
+
+    <%# ---- JOURS DE LA SEMAINE ---- %>
+    <% @jours.each do |jour| %>
+      <%# Récupérer les bookings et indisponibilités pour ce jour %>
+      <% rdvs_du_jour   = @bookings_par_jour[jour] || [] %>
+      <% indispos_du_jour = @indisponibilites_semaine[jour] || [] %>
+
+      <%# Nombre d'éléments affichés ce jour %>
+      <% total_du_jour = rdvs_du_jour.count + indispos_du_jour.count %>
+
+      <div class="admin-sec <%= 'admin-sec-today' if jour == Date.today %>">
+
+        <%# En-tête du jour : date + badge nombre de RDVs %>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--color-muted); font-weight:500;">
+              <% if jour == Date.today %>
+                <span style="color:#b8a898;">• Aujourd'hui</span>
+              <% elsif jour == Date.today + 1 %>
+                Demain
+              <% else %>
+                <%= I18n.l(jour, format:"%A").capitalize %>
+              <% end %>
+            </div>
+            <div style="font-family:var(--font-serif); font-size:20px; color:var(--color-dark);">
+              <%= I18n.l(jour, format:"%-d %B") %>
+            </div>
+          </div>
+
+          <%# Badge nombre de RDVs %>
+          <% if rdvs_du_jour.any? %>
+            <span style="background:var(--color-dark); color:#fff; font-size:9px; padding:3px 9px;
+                         border-radius:10px; letter-spacing:0.5px;">
+              <%= rdvs_du_jour.count %> rdv
+            </span>
+          <% end %>
+        </div>
+
+        <%# ---- RDVs du jour ---- %>
+        <% rdvs_du_jour.each do |booking| %>
+          <%= link_to admin_booking_path(booking), class: "admin-rdv-card" do %>
+            <div class="admin-rdv-heure">
+              <%= booking.heure.strftime('%H') if booking.heure %><br>
+              <span style="font-size:10px; opacity:0.7;"><%= booking.heure.strftime('%M') if booking.heure %></span>
+            </div>
+            <div class="admin-rdv-info">
+              <div class="admin-rdv-cliente"><%= booking.user.full_name %></div>
+              <div class="admin-rdv-prestation"><%= booking.prestation.nom %> · <%= booking.prestation.duree_minutes %> min</div>
+              <% badge_class = booking.statut == 'confirme' ? 'admin-badge-confirme' : 'admin-badge-attente' %>
+              <span class="admin-badge <%= badge_class %>">
+                <%= booking.statut == 'confirme' ? 'Confirmé' : 'En attente' %>
+              </span>
+            </div>
+            <div style="color:#c8c2bc; font-size:14px;">›</div>
+          <% end %>
+        <% end %>
+
+        <%# ---- Indisponibilités du jour ---- %>
+        <% indispos_du_jour.each do |indispo| %>
+          <div class="admin-indispo-agenda">
+            <div style="font-size:13px; color:var(--color-muted);">🔒 <%= indispo.raison.presence || "Indisponible" %></div>
+            <div style="font-size:11px; color:#aaa; margin-top:2px;"><%= indispo.plage_horaire %></div>
+          </div>
+        <% end %>
+
+        <%# Jour libre %>
+        <% if total_du_jour == 0 %>
+          <div style="font-size:12px; color:#ccc; text-align:center; padding:8px 0; font-style:italic;">
+            Journée libre
+          </div>
+        <% end %>
+
+        <%# Lien rapide pour créer un RDV ce jour-là %>
+        <%= link_to "＋", new_admin_booking_path(date: jour.to_s),
+                    style: "display:block; text-align:center; font-size:20px; color:var(--color-border);
+                            text-decoration:none; padding-top:8px; transition:color 0.15s;",
+                    title: "Nouveau RDV le #{I18n.l(jour, format: '%-d %B')}" %>
+
+      </div>
+    <% end %>
+
+  </div>
+</div>

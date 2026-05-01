@@ -1,0 +1,27 @@
+<% content_for :title, "Admin — Nouveau produit" %>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Boutique", admin_products_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Nouveau produit</div>
+      <div class="admin-header-sub">Visible dans la boutique dès activation</div>
+    </div>
+
+    <div class="admin-sec">
+      <%= form_with model: [:admin, @product], local: true, multipart: true do |f| %>
+        <%= render "form", f: f %>
+        <%= f.submit "Ajouter le produit", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_products_path, class: "btn-admin-fiche", style: "margin-top:8px;" %>
+      <% end %>
+    </div>
+
+  </div>
+</div>

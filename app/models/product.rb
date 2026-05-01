@@ -4,6 +4,9 @@ class Product < ApplicationRecord
   # ============================================================
   has_many :orders, dependent: :restrict_with_error  # On ne supprime pas un produit commandé
 
+  # Photo du produit — gérée via Active Storage
+  has_one_attached :photo
+
   # ============================================================
   # VALIDATIONS
   # ============================================================

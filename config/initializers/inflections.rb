@@ -14,3 +14,9 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym "RESTful"
 # end
+
+# Pluralisation custom pour les modèles français
+# Sans ça, Rails pluralise CarteCadeau → carte_cadeaus (incorrect)
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular 'carte_cadeau', 'cartes_cadeaux'
+end
