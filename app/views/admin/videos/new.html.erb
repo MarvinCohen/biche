@@ -1,0 +1,126 @@
+<% content_for :title, "Admin — Nouvelle vidéo" %>
+
+<%#
+  ============================================================
+  VUE — Formulaire d'ajout d'une vidéo Instagram
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Vidéos", admin_videos_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Nouvelle vidéo</div>
+      <div class="admin-header-sub">Visible dans la galerie dès l'ajout</div>
+    </div>
+
+    <div class="admin-sec">
+      <%= form_with model: [:admin, @video], local: true, multipart: true do |f| %>
+
+        <%# Erreurs de validation %>
+        <% if @video.errors.any? %>
+          <div class="admin-errors" style="background:#fdf0f0; border:1px solid #e8c8c8; border-radius:8px; padding:12px; margin-bottom:16px; font-size:13px; color:#c47a7a;">
+            <% @video.errors.full_messages.each do |msg| %>
+              <div>· <%= msg %></div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# ---- MINIATURE ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;">
+            Miniature (screenshot du reel)
+          </label>
+          <%= f.file_field :miniature,
+                           accept: "image/*",
+                           class: "admin-file-input",
+                           onchange: "previewMiniature(this)" %>
+          <div id="miniature-preview" style="display:none; margin-top:10px;">
+            <img id="miniature-preview-img" src="" alt="Aperçu"
+                 style="width:100%; max-height:200px; object-fit:cover; border-radius:10px;">
+          </div>
+        </div>
+
+        <%# ---- FICHIER VIDÉO ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label style="display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;">
+            Fichier vidéo (MP4 téléchargé depuis Instagram)
+          </label>
+          <%= f.file_field :video_file,
+                           accept: "video/*",
+                           class: "admin-file-input" %>
+          <div style="font-size:10px; color:var(--color-muted); margin-top:4px;">
+            Télécharge le reel depuis Instagram → transfère le fichier ici.
+            La vidéo se lancera automatiquement au survol dans la galerie.
+          </div>
+        </div>
+
+        <%# ---- TITRE ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :titre, "Titre", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.text_field :titre,
+                           placeholder: "Ex : Volume russe 3D",
+                           class: "admin-input" %>
+        </div>
+
+        <%# ---- URL INSTAGRAM ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :url, "Lien Instagram", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.url_field :url,
+                          placeholder: "https://www.instagram.com/reel/...",
+                          class: "admin-input" %>
+          <div style="font-size:10px; color:var(--color-muted); margin-top:4px;">
+            Colle le lien du reel depuis Instagram
+          </div>
+        </div>
+
+        <%# ---- TAG / CATÉGORIE ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :tag, "Catégorie", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.select :tag,
+                       options_for_select(Video::TAGS, @video.tag),
+                       { include_blank: "Choisir une catégorie" },
+                       class: "admin-input" %>
+        </div>
+
+        <%# ---- POSITION ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <%= f.label :position, "Position", style: "display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;" %>
+          <%= f.number_field :position, min: 1, class: "admin-input", style: "width:80px;" %>
+        </div>
+
+        <%# ---- ACTIF ---- %>
+        <div class="form-group" style="margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+          <%= f.check_box :actif, style: "width:16px; height:16px;" %>
+          <%= f.label :actif, "Visible dans la galerie", style: "font-size:13px; color:var(--color-dark);" %>
+        </div>
+
+        <%= f.submit "Ajouter la vidéo", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_videos_path, class: "btn-admin-fiche", style: "margin-top:8px;" %>
+
+      <% end %>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Prévisualisation de la miniature avant upload
+  function previewMiniature(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('miniature-preview-img').src = e.target.result;
+        document.getElementById('miniature-preview').style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>

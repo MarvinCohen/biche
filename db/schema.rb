@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_29_094130) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_01_124430) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,7 +54,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_29_094130) do
     t.string "stripe_payment_intent_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["date", "statut"], name: "index_bookings_on_date_and_statut"
+    t.index ["date"], name: "index_bookings_on_date"
     t.index ["prestation_id"], name: "index_bookings_on_prestation_id"
+    t.index ["statut"], name: "index_bookings_on_statut"
     t.index ["user_id"], name: "index_bookings_on_user_id"
   end
 
@@ -137,6 +140,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_29_094130) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["product_id"], name: "index_orders_on_product_id"
+    t.index ["statut"], name: "index_orders_on_statut"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -191,11 +195,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_29_094130) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "videos", force: :cascade do |t|
+    t.boolean "actif", default: true
+    t.datetime "created_at", null: false
+    t.integer "position", default: 0
+    t.string "tag"
+    t.string "titre", null: false
+    t.datetime "updated_at", null: false
+    t.string "url", null: false
+    t.index ["actif"], name: "index_videos_on_actif"
+    t.index ["position"], name: "index_videos_on_position"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bookings", "prestations"
   add_foreign_key "bookings", "users"
-  add_foreign_key "carte_transactions", "cartes_cadeaux", column: "carte_cadeau_id"
+  add_foreign_key "carte_transactions", "cartes_cadeaux"
   add_foreign_key "cartes_cadeaux", "orders"
   add_foreign_key "fidelite_cards", "users"
   add_foreign_key "messages", "users"

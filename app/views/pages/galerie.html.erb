@@ -233,46 +233,98 @@
     </section>
 
     <%# ---- VIDÉOS ---- %>
-    <%# Scroll horizontal de mini-cartes vidéo — placeholder, liens à brancher %>
-    <section class="sec" id="section-videos">
-      <p class="s-tag">Vidéos</p>
-      <h2 class="s-h2">En mouvement</h2>
-      <div class="video-row">
-        <div class="video-card">
-          <div class="video-thumb vt1">
-            <div class="play-btn">
-              <svg width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M2 1 L12 7.5 L2 14 Z" fill="#2e2926"/></svg>
-            </div>
-          </div>
-          <div class="video-meta">
-            <div class="video-name">Pose cil à cil</div>
-            <div class="video-tag">Process · 2min</div>
-          </div>
+    <%# Section visible uniquement si Syam a ajouté au moins une vidéo %>
+    <% if @videos.any? %>
+      <section class="sec" id="section-videos">
+        <p class="s-tag">Vidéos</p>
+        <h2 class="s-h2">En mouvement</h2>
+
+        <%# Scroll horizontal — même pattern que les best-sellers du shop %>
+        <div class="video-row">
+          <% @videos.each do |video| %>
+            <%#
+              Chaque card est un lien vers Instagram (nouvel onglet).
+              La miniature uploadée par Syam sert de thumbnail.
+            %>
+            <a href="<%= video.url %>"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="video-card">
+
+              <%# Thumbnail / player — si fichier vidéo uploadé : player au survol
+                  Sinon : miniature statique avec bouton play %>
+              <div class="video-thumb" style="background:var(--color-sand);">
+
+                <% if video.video_file.attached? %>
+                  <%#
+                    Fichier vidéo disponible → élément <video>
+                    - poster : miniature affichée avant le play
+                    - muted + playsinline : requis pour l'autoplay sur mobile
+                    - loop : boucle infinie pendant le survol
+                    - preload="none" : ne charge pas la vidéo au chargement de la page
+                    Le JS déclenche play() au mouseenter et pause() + currentTime=0 au mouseleave
+                  %>
+                  <video class="video-player"
+                         src="<%= url_for(video.video_file) %>"
+                         <% if video.miniature.attached? %>poster="<%= url_for(video.miniature) %>"<% end %>
+                         muted
+                         loop
+                         playsinline
+                         preload="none"
+                         style="width:100%; height:100%; object-fit:cover; display:block;">
+                  </video>
+
+                  <%# Overlay bouton play — caché quand la vidéo joue (JS toggle la classe) %>
+                  <div class="video-play-overlay">
+                    <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.92); display:flex; align-items:center; justify-content:center;">
+                      <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+                        <path d="M2 1.5 L13 8 L2 14.5 Z" fill="#2e2926"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                <% else %>
+                  <%# Pas de fichier vidéo — miniature statique + bouton play décoratif %>
+                  <% if video.miniature.attached? %>
+                    <%= image_tag video.miniature,
+                                  style: "width:100%; height:100%; object-fit:cover; display:block;",
+                                  alt: video.titre %>
+                  <% else %>
+                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:32px;">🎬</div>
+                  <% end %>
+
+                  <%# Bouton play centré %>
+                  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.92); display:flex; align-items:center; justify-content:center;">
+                    <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+                      <path d="M2 1.5 L13 8 L2 14.5 Z" fill="#2e2926"/>
+                    </svg>
+                  </div>
+                <% end %>
+
+                <%# Dégradé bas + logo Instagram — toujours visible %>
+                <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 50%); pointer-events:none;"></div>
+                <div style="position:absolute; top:10px; right:10px; pointer-events:none;">
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <rect x="1.5" y="1.5" width="15" height="15" rx="4.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+                    <circle cx="9" cy="9" r="3.5" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+                    <circle cx="13" cy="5" r="1" fill="rgba(255,255,255,0.9)"/>
+                  </svg>
+                </div>
+              </div>
+
+              <%# Titre et tag sous la miniature %>
+              <div class="video-meta">
+                <div class="video-name"><%= video.titre %></div>
+                <% if video.tag.present? %>
+                  <div class="video-tag"><%= video.tag.humanize %></div>
+                <% end %>
+              </div>
+
+            </a>
+          <% end %>
         </div>
-        <div class="video-card">
-          <div class="video-thumb vt2">
-            <div class="play-btn">
-              <svg width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M2 1 L12 7.5 L2 14 Z" fill="#2e2926"/></svg>
-            </div>
-          </div>
-          <div class="video-meta">
-            <div class="video-name">Résultat volume</div>
-            <div class="video-tag">Résultat · 45s</div>
-          </div>
-        </div>
-        <div class="video-card">
-          <div class="video-thumb vt3">
-            <div class="play-btn">
-              <svg width="13" height="15" viewBox="0 0 13 15" fill="none"><path d="M2 1 L12 7.5 L2 14 Z" fill="#2e2926"/></svg>
-            </div>
-          </div>
-          <div class="video-meta">
-            <div class="video-name">Rehaussement</div>
-            <div class="video-tag">Résultat · 30s</div>
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
+    <% end %>
 
     <%# ---- INSTAGRAM ---- %>
     <%# Grille 3x2 de vignettes stylisées (placeholder) + lien vers le profil %>
@@ -320,6 +372,29 @@
       et scroll vers la bonne section selon le filtre sélectionné.
     ==================================================================== %>
 <script>
+  // ---- PREVIEW VIDÉO AU SURVOL ----
+  // Pour chaque card avec un élément <video>, on lance la lecture au mouseenter
+  // et on met en pause + remet à zéro au mouseleave
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.video-thumb').forEach(function(thumb) {
+      const video = thumb.querySelector('video.video-player');
+      if (!video) return; // pas de fichier vidéo sur cette card
+
+      // Survol entrant → lancer la vidéo
+      thumb.addEventListener('mouseenter', function() {
+        video.play();
+        thumb.classList.add('playing'); // masque l'overlay play
+      });
+
+      // Survol sortant → mettre en pause et revenir au début
+      thumb.addEventListener('mouseleave', function() {
+        video.pause();
+        video.currentTime = 0;
+        thumb.classList.remove('playing'); // réaffiche l'overlay play
+      });
+    });
+  });
+
   // Nombre de photos affichées au départ avant le bouton "Voir plus"
   const LIMITE_PHOTOS = 8;
 

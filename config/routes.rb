@@ -114,6 +114,14 @@ Rails.application.routes.draw do
       end
     end
 
+    # Vidéos Instagram : Syam peut ajouter, modifier, supprimer et réordonner
+    resources :videos, only: [:index, :new, :create, :edit, :update, :destroy] do
+      collection do
+        # Endpoint AJAX pour sauvegarder le nouvel ordre après drag-and-drop
+        patch :reordonner
+      end
+    end
+
     # Agenda semaine : vue sur 7 jours
     get 'agenda', to: 'dashboard#agenda', as: :agenda
   end

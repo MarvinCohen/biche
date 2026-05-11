@@ -20,8 +20,8 @@ class BookingsController < ApplicationController
 
     if @booking.save
       if @booking.mode_paiement == 'acompte'
-        # Calcul de l'acompte : 30% du prix de la prestation, en centimes
-        acompte_cents = (@booking.prestation.prix_cents * 0.30).ceil
+        # Acompte calculé par le modèle (30% du prix) — évite la duplication de logique métier
+        acompte_cents = @booking.acompte_calcule_cents
 
         # Création de la session Stripe Checkout — Stripe héberge la page de paiement
         session = Stripe::Checkout::Session.create(
@@ -83,9 +83,15 @@ class BookingsController < ApplicationController
 
   # GET /bookings/creneaux — retourne les créneaux disponibles pour une date (AJAX)
   def creneaux
-    date       = Date.parse(params[:date])
-    prestation = Prestation.find(params[:prestation_id])
-    duree      = prestation.duree_minutes.minutes
+    # Date.parse lève ArgumentError si le paramètre est absent ou malformé → on retourne []
+    date = Date.parse(params[:date].to_s) rescue nil
+    # find_by retourne nil au lieu de lever RecordNotFound si l'id est invalide
+    prestation = Prestation.find_by(id: params[:prestation_id])
+
+    # Paramètres invalides → réponse vide (évite une erreur 500)
+    return render json: [] unless date && prestation
+
+    duree = prestation.duree_minutes.minutes
 
     # Créneaux de travail : 9h → 16h30 par tranches de 1h30
     tous_les_creneaux = (9..17).step(1.5).map do |h|

@@ -90,12 +90,19 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
-  # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # ============================================================
+  # Hôtes autorisés en production (anti DNS rebinding)
+  # Rails 8 bloque par défaut toute requête venant d'un hôte non listé.
+  # On autorise :
+  #   - Tous les sous-domaines *.up.railway.app (URL générée par Railway)
+  #   - Tous les sous-domaines *.railway.app (au cas où)
+  #   - Le domaine custom si la variable APP_HOST est définie (ex: biche.fr)
+  # ============================================================
+  config.hosts << /.*\.up\.railway\.app/
+  config.hosts << /.*\.railway\.app/
+  config.hosts << ENV["APP_HOST"] if ENV["APP_HOST"].present?
+
+  # Le endpoint /up (healthcheck Rails) doit rester accessible
+  # même si l'hôte n'est pas dans la liste (utile pour Railway).
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end

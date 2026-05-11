@@ -27,3 +27,8 @@
 
 /* Styles de l'interface admin Syam (planning, fiches soins, clientes) */
 @import "admin.css";
+
+/* Adaptations responsive pour tablette (≥768px) et desktop (≥1024px) */
+/* IMPORTANT : doit être importé en DERNIER pour que ses media queries
+   écrasent les styles mobiles définis dans les fichiers ci-dessus */
+@import "desktop.css";

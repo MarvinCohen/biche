@@ -109,12 +109,12 @@
         <% if @soin_historique.present? %>
           <%# La fiche existe : proposer de la modifier %>
           <%= link_to "✏ Modifier la fiche technique",
-                      edit_admin_soin_historique_path(@soin_historique),
+                      edit_admin_soins_historique_path(@soin_historique),
                       class: "btn-admin-fiche" %>
         <% else %>
           <%# Pas encore de fiche : proposer de la créer %>
           <%= link_to "✏ Remplir la fiche technique",
-                      new_admin_soin_historique_path(booking_id: @booking.id),
+                      new_admin_soins_historique_path(booking_id: @booking.id),
                       class: "btn-admin-fiche" %>
         <% end %>
       <% end %>

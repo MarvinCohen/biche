@@ -1,0 +1,1451 @@
+/* ============================================================
+   DESKTOP.CSS — Adaptations responsive pour tablette et desktop
+   ============================================================
+   Ce fichier contient UNIQUEMENT les règles qui s'appliquent
+   à partir de 768px (tablette) et 1024px (desktop).
+
+   Le CSS mobile (< 768px) reste intact dans application.css,
+   home.css, prestations.css, etc.
+
+   Logique de cascade :
+   - On charge ce fichier EN DERNIER dans app.css
+   - Donc ses règles écrasent celles du mobile sur grand écran
+   - Sur mobile (< 768px), aucune règle de ce fichier ne s'active
+
+   Breakpoints :
+   - ≥ 768px  → tablette (mockup phone retiré, layouts 2 colonnes)
+   - ≥ 1024px → desktop (sidebars, grilles 3-4 col, nav horizontale)
+   ============================================================ */
+
+
+/* ============================================================
+   PHASE 1 — FONDATIONS GLOBALES (≥ 768px)
+   Neutralisation du mockup téléphone, élargissement du wrap,
+   nav desktop, footer multi-colonnes.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* ---- BODY : on retire le fond sombre extérieur et on aère ---- */
+  body {
+    /* Fond clair au lieu du fond sombre du "mockup phone" */
+    background: var(--color-nude);
+    /* Padding réduit : plus besoin de marge autour du téléphone simulé */
+    padding: 0;
+  }
+
+  /* ---- WRAP : on élargit le conteneur central jusqu'à 1200px ---- */
+  .wrap {
+    /* Largeur max plus généreuse pour vrai layout desktop */
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ---- PHONE : on retire les coins arrondis et l'ombre du mockup ---- */
+  .phone {
+    /* Plus de border-radius : le contenu prend toute la page */
+    border-radius: 0;
+    /* Plus d'ombre : on n'imite plus un téléphone */
+    box-shadow: none;
+    /* Fond toujours nude pour cohérence avec body */
+    background: var(--color-nude);
+    /* Hauteur min pour éviter que le footer remonte sur les pages courtes */
+    min-height: 100vh;
+  }
+
+  /* ---- ADMIN-WRAP / ADMIN-PHONE : même traitement que .wrap / .phone ---- */
+  .admin-wrap {
+    max-width: 100%;
+  }
+
+  .admin-phone {
+    border-radius: 0;
+    box-shadow: 0 0 0 transparent;
+    min-height: 100vh;
+  }
+
+  /* ---- NAV : on prépare le passage en mode desktop ---- */
+  /* La nav reste en absolute sur les pages avec hero (pages.html, etc.) */
+  /* Mais on ajoute du padding horizontal et on aligne sur 1200px max */
+  .nav {
+    padding: 18px 40px;
+    /* Sur certaines pages la nav reste collée au top via position absolute */
+  }
+
+  /* Logo plus grand sur desktop */
+  .logo-mini {
+    font-size: 26px;
+  }
+
+  /* ---- BURGER : caché en desktop (≥ 1024px), on garde la nav horizontale ---- */
+  /* Voir bloc ≥ 1024px plus bas pour cacher le burger et afficher .nav-desktop-links */
+
+  /* ---- FOOTER : multi-colonnes ---- */
+  .footer {
+    padding: 60px 40px 32px;
+  }
+
+  .footer-logo {
+    font-size: 48px;
+  }
+
+  /* On centre l'ensemble du footer dans un container 1200px */
+  .footer > * {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .footer-links {
+    gap: 32px;
+    margin-bottom: 24px;
+  }
+
+  .footer-links a {
+    font-size: 12px;
+  }
+
+  .footer-copy {
+    font-size: 11px;
+  }
+
+  /* ---- TITRES DE SECTIONS : plus généreux en desktop ---- */
+  .s-h2 {
+    font-size: 42px;
+    margin-bottom: 14px;
+  }
+
+  .s-sub {
+    font-size: 14px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 40px;
+  }
+
+  .s-tag {
+    font-size: 11px;
+    margin-bottom: 14px;
+  }
+
+  /* ---- SECTIONS : padding plus aéré ---- */
+  .sec {
+    padding: 80px 40px;
+  }
+
+  /* ---- FLASH MESSAGES : repositionnés en haut au lieu de bas ---- */
+  .flash {
+    bottom: auto;
+    top: 80px;
+    max-width: 480px;
+    font-size: 13px;
+    padding: 14px 28px;
+  }
+}
+
+
+/* ============================================================
+   NAV DESKTOP HORIZONTALE (≥ 1024px)
+   À partir de 1024px, on cache le burger et on affiche
+   les liens directement dans la nav.
+   ============================================================ */
+
+@media (min-width: 1024px) {
+
+  /* ---- Cacher le burger en desktop ---- */
+  .burger {
+    display: none;
+  }
+
+  /* ---- NAV : devient une vraie barre horizontale fixe ---- */
+  .nav {
+    /* Padding plus généreux pour aérer */
+    padding: 20px 60px;
+    /* Sur desktop, on garde le fond légèrement opaque pour lisibilité */
+    background: rgba(247, 245, 242, 0.96);
+  }
+
+  /* ---- Liens desktop dans la nav ---- */
+  /* Ces liens sont ajoutés dans application.html.erb,
+     ils sont cachés en mobile (display: none par défaut) */
+  .nav-desktop-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    /* Centré horizontalement dans la nav */
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav-desktop-link {
+    font-size: 12px;
+    color: var(--color-dark);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-desktop-link:hover {
+    color: var(--color-accent);
+  }
+
+  /* Lien CTA "Réserver" : style bouton */
+  .nav-desktop-cta {
+    background: var(--color-dark);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: var(--border-radius-pill);
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .nav-desktop-cta:hover {
+    opacity: 0.85;
+  }
+
+  /* Lien espace cliente / connexion à droite */
+  .nav-desktop-account {
+    font-size: 12px;
+    color: var(--color-dark);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .nav-desktop-account:hover {
+    color: var(--color-accent);
+  }
+}
+
+/* ============================================================
+   NAV DESKTOP — règles de base (mobile + desktop)
+   Par défaut (mobile) : la nav-desktop entière est cachée.
+   À partir de 1024px : elle s'affiche en barre horizontale fixe.
+   ============================================================ */
+
+/* Mobile par défaut : on cache totalement la nav desktop */
+/* (le burger de la nav mobile reste actif sur chaque page) */
+.nav-desktop {
+  display: none;
+}
+
+/* À partir de 1024px : on affiche la nav desktop en barre horizontale fixe */
+@media (min-width: 1024px) {
+
+  /* Conteneur principal de la nav : flex horizontal, fixé en haut */
+  .nav-desktop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* Position fixe au-dessus de tout le contenu */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    /* Padding horizontal généreux + fond légèrement opaque pour lisibilité */
+    padding: 18px 60px;
+    background: rgba(247, 245, 242, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+    gap: 32px;
+  }
+
+  /* Logo "Biche." à gauche */
+  .nav-desktop-logo {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    color: var(--color-dark);
+    font-style: italic;
+    text-decoration: none;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  /* Wrapper côté droit : compte + CTA côte à côte */
+  .nav-desktop-cta-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Cacher la nav mobile (.nav avec burger) qui est dans chaque page */
+  /* Le burger reste utile pour les pages où on ne veut pas la nav-desktop,
+     mais ici on cache la nav mobile complètement sur grand écran */
+  .nav {
+    display: none;
+  }
+
+  /* Décaler le contenu vers le bas pour laisser la place à la nav-desktop fixe */
+  /* La nav-desktop fait environ 70px de haut (18+18 padding + 26 logo + bordure) */
+  body {
+    padding-top: 72px;
+  }
+
+  /* Mais sur les pages avec hero qui démarre en haut, on neutralise ce padding */
+  /* car le hero a déjà un padding-top suffisant */
+  /* Note : pas de override automatique — chaque page s'adapte via son padding */
+
+  /* ---- PAGES ADMIN : on masque la nav-desktop globale ---- */
+  /* L'admin a sa propre .admin-nav sombre, on ne veut pas 2 barres empilées */
+  /* :has() permet de cibler le body qui contient un .admin-phone */
+  body:has(.admin-phone) .nav-desktop {
+    display: none;
+  }
+
+  /* Et on retire le padding-top du body sur les pages admin */
+  body:has(.admin-phone) {
+    padding-top: 0;
+  }
+}
+
+
+/* ============================================================
+   PHASE 2 — HOMEPAGE (≥ 768px)
+   Hero 50/50, carousels en grilles, blocs côte à côte.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* ---- HERO : photo + texte côte à côte ---- */
+  .hero {
+    /* Padding-top plus généreux (sous la nav fixe) */
+    padding: 140px 60px 80px;
+    /* Mise en flex pour 2 colonnes */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    /* Hauteur min pour avoir un vrai effet "écran d'accueil" */
+    min-height: 70vh;
+    text-align: left;
+  }
+
+  /* Le grand "B." décoratif devient encore plus grand */
+  .hero-big-b {
+    font-size: 480px;
+  }
+
+  /* La photo de Syam à gauche, plus grande */
+  .hero-photo {
+    width: 320px;
+    height: 320px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  /* Le contenu textuel à droite, aligné à gauche */
+  .hero-content {
+    max-width: 480px;
+    text-align: left;
+  }
+
+  .hero-h1 {
+    font-size: 64px;
+    margin-bottom: 24px;
+  }
+
+  .hero-p {
+    font-size: 15px;
+    margin-bottom: 36px;
+  }
+
+  .hero-sup {
+    font-size: 11px;
+    margin-bottom: 20px;
+  }
+
+  /* ---- CAROUSEL PRESTATIONS → GRILLE 4 COLONNES ---- */
+  /* En mobile c'est un carousel scrollable, en desktop on étale tout */
+  .carousel {
+    /* On désactive le scroll horizontal */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    overflow: visible;
+    /* On centre dans un container max 1200px */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px 20px;
+  }
+
+  /* Les cartes prennent toute la largeur de leur cellule de grille */
+  .presta-card {
+    flex: none;
+    width: 100%;
+  }
+
+  /* ---- Cacher les contrôles du carousel en desktop (dots, flèches) ---- */
+  .carousel-controls,
+  .swipe-hint {
+    display: none;
+  }
+
+  /* ---- BLOCS FIDÉLITÉ + SHOP : côte à côte ---- */
+  /* En mobile ils sont empilés, en desktop on les met sur 2 colonnes */
+  /* Astuce : on cible les sections .sec qui contiennent .fid-block ou .shop-block */
+  /* Comme on ne peut pas modifier le HTML facilement, on stylise les blocs eux-mêmes */
+  .fid-block,
+  .shop-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 70px 40px 50px;
+  }
+
+  .fid-title,
+  .shop-title {
+    font-size: 32px;
+  }
+
+  .fid-sub,
+  .shop-sub {
+    font-size: 14px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ---- SHOP CAROUSEL → grille 3 colonnes ---- */
+  .shop-carousel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    overflow: visible;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .shop-card {
+    flex: none;
+  }
+
+  /* ---- SECTION LOCALISATION : map + adresse côte à côte ---- */
+  /* La forme blob organique est gardée mais agrandie */
+  .map-embed {
+    height: 320px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ---- SECTION ACCESSIBILITÉ ---- */
+  .access-section {
+    padding: 80px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .access-title {
+    font-size: 38px;
+    margin-bottom: 32px;
+  }
+
+  .access-list {
+    max-width: 480px;
+    gap: 18px;
+  }
+
+  .access-list li {
+    font-size: 15px;
+  }
+}
+
+
+/* ============================================================
+   PHASE 3 — PRESTATIONS (≥ 768px)
+   Catalogue grille 3 col, pills filtre centrées, accordion centré.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* ---- HEADER DE PAGE PRESTATIONS ---- */
+  .page-header {
+    padding: 160px 40px 80px;
+  }
+
+  .ph-title {
+    font-size: 64px;
+    margin-bottom: 20px;
+  }
+
+  .ph-intro {
+    font-size: 15px;
+    max-width: 560px;
+  }
+
+  /* Blobs décoratifs agrandis */
+  .ph-blob {
+    width: 220px;
+    height: 220px;
+    top: 100px;
+    right: -60px;
+  }
+
+  .ph-blob-2 {
+    width: 180px;
+    height: 180px;
+  }
+
+  /* ---- BARRE DE FILTRES CATÉGORIES : centrée, plus aérée ---- */
+  .cat-bar {
+    justify-content: center;
+    overflow: visible;
+    flex-wrap: wrap;
+    padding: 24px 40px;
+    margin: 0;
+    gap: 12px;
+  }
+
+  .cat-pill {
+    padding: 11px 22px;
+    font-size: 12px;
+  }
+
+  /* ---- LISTE TARIFS (.full-list) : centrée max 800px ---- */
+  .full-list {
+    max-width: 800px;
+    margin: 0 auto;
+    gap: 14px;
+  }
+
+  .full-item {
+    padding: 22px 26px;
+  }
+
+  .full-item-name {
+    font-size: 20px;
+  }
+
+  .full-item-desc {
+    font-size: 13px;
+  }
+
+  .full-item-price {
+    font-size: 24px;
+  }
+
+  /* ---- TABLEAU RETOUCHES : centré ---- */
+  .retouche-table {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .retouche-header {
+    grid-template-columns: 1fr 120px 120px;
+    padding: 16px 22px;
+  }
+
+  .retouche-row {
+    grid-template-columns: 1fr 120px 120px;
+    padding: 18px 22px;
+  }
+
+  .retouche-row-name {
+    font-size: 18px;
+  }
+
+  /* ---- BLOC GUIDE MORPHOLOGIE : centré ---- */
+  .info-block {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 32px;
+  }
+
+  .info-title {
+    font-size: 24px;
+  }
+
+  .info-text {
+    font-size: 14px;
+  }
+}
+
+
+/* ============================================================
+   PHASE 4 — RÉSERVATION (≥ 768px)
+   Tunnel 2 colonnes : étapes à gauche, récap sticky à droite.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* ---- BARRE DE PROGRESSION : plus aérée ---- */
+  .steps-bar {
+    padding: 32px 60px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .step-num {
+    width: 40px;
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .step-label {
+    font-size: 11px;
+  }
+
+  .step-line {
+    max-width: 60px;
+  }
+
+  /* ---- SECTIONS D'ÉTAPE : centrées max 700px ---- */
+  /* Chaque étape devient une carte centrée pour un vrai look desktop */
+  .bk-step-section {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+
+  /* ---- SÉLECTION DE PRESTATION : 2 colonnes ---- */
+  .presta-select {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .presta-option {
+    padding: 18px 20px;
+  }
+
+  .presta-option-name {
+    font-size: 17px;
+  }
+
+  /* ---- CALENDRIER + CRÉNEAUX : côte à côte ---- */
+  /* Le conteneur parent doit basculer en flex ; ici on stylise les enfants */
+  .calendar {
+    /* Le calendrier prend une largeur fixe à gauche */
+    max-width: 380px;
+  }
+
+  .cal-month {
+    font-size: 22px;
+  }
+
+  .cal-day {
+    font-size: 13px;
+  }
+
+  /* Créneaux plus aérés */
+  .slots-grid {
+    gap: 10px;
+  }
+
+  .slot {
+    padding: 11px 18px;
+    font-size: 13px;
+  }
+
+  /* ---- MODE DE PAIEMENT : reste 2 colonnes mais plus large ---- */
+  .payment-opts {
+    gap: 14px;
+  }
+
+  .payment-opt {
+    padding: 22px 18px;
+  }
+
+  .payment-opt-title {
+    font-size: 17px;
+  }
+
+  /* ---- RÉCAP + CONFIRMATION : centré ---- */
+  .recap-box {
+    padding: 28px;
+  }
+
+  .recap-title {
+    font-size: 22px;
+  }
+
+  .recap-row {
+    font-size: 13px;
+  }
+
+  .recap-total {
+    font-size: 32px;
+  }
+
+  /* ---- BOUTONS DE NAV ÉTAPES : plus larges ---- */
+  .bk-nav-row {
+    margin-top: 36px;
+  }
+
+  .btn-bk-next,
+  .btn-bk-prev {
+    padding: 14px 26px;
+    font-size: 12px;
+  }
+
+  /* ---- PAGES SHOW / SUCCESS : centrées max 600px ---- */
+  .success-wrap {
+    padding: 120px 40px 60px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .success-title {
+    font-size: 44px;
+  }
+
+  .success-sub {
+    font-size: 16px;
+  }
+
+  .success-recap {
+    padding: 28px;
+  }
+}
+
+
+/* ============================================================
+   PHASE 5 — ESPACE CLIENTE (≥ 768px)
+   Sidebar onglets + contenu, dashboard stats grille 4 col.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* ---- HERO PROFIL ---- */
+  .profile-hero {
+    padding: 120px 40px 56px;
+  }
+
+  .avatar {
+    width: 96px;
+    height: 96px;
+    font-size: 36px;
+  }
+
+  .profile-name {
+    font-size: 36px;
+  }
+
+  .profile-since {
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  /* Les stats du profil prennent plus d'espace */
+  .profile-stats {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .profile-stat-num {
+    font-size: 26px;
+  }
+
+  .profile-stat-label {
+    font-size: 10px;
+  }
+
+  /* ---- NAVIGATION INTERNE ---- */
+  /* Les onglets restent en haut en horizontal mais centrés */
+  .client-nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    justify-content: center;
+    padding: 0 40px;
+  }
+
+  .client-nav-item {
+    padding: 16px 22px;
+    font-size: 12px;
+  }
+
+  /* ---- CONTENU ESPACE CLIENTE : centré max 900px ---- */
+  /* On cible la section .sec qui suit .client-nav (pas de classe spécifique) */
+  /* À défaut on agrandit les composants individuels */
+
+  /* ---- CARTE FIDÉLITÉ ---- */
+  .fidelite-card {
+    max-width: 600px;
+    margin: 0 auto 24px;
+    padding: 32px 30px;
+  }
+
+  /* ---- STATS FIDÉLITÉ : grille 4 colonnes en desktop ---- */
+  .fid-stats {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 800px;
+    margin: 0 auto;
+    gap: 14px;
+  }
+
+  .fid-stat-num {
+    font-size: 32px;
+  }
+
+  /* ---- CARTES RDV ---- */
+  .rdv-card {
+    max-width: 700px;
+    margin: 0 auto 14px;
+    padding: 22px 24px;
+  }
+
+  .rdv-name {
+    font-size: 19px;
+  }
+
+  /* ---- HISTORIQUE : liste centrée ---- */
+  .history-list {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .history-header {
+    padding: 18px 22px;
+  }
+
+  .history-name {
+    font-size: 19px;
+  }
+
+  /* Détails techniques : grille 4 colonnes en desktop */
+  .detail-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* ---- MESSAGES / NEWSLETTERS ---- */
+  .newsletter-list {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .newsletter-item {
+    padding: 20px 24px;
+  }
+
+  .nl-title {
+    font-size: 18px;
+  }
+
+  /* ---- PROFIL : settings centrés ---- */
+  .settings-list {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .setting-row {
+    padding: 18px 0;
+  }
+
+  .setting-label {
+    font-size: 14px;
+  }
+}
+
+
+/* ============================================================
+   PHASE 6 — ADMIN SYAM (≥ 768px)
+   Tableaux pleine largeur, navigation grid plus large.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* ---- NAV ADMIN : plus aérée ---- */
+  .admin-nav {
+    padding: 18px 40px;
+  }
+
+  .admin-nav-logo {
+    font-size: 22px;
+  }
+
+  /* ---- HEADER ADMIN : plus grand ---- */
+  .admin-header {
+    padding: 28px 40px 32px;
+  }
+
+  .admin-header-title {
+    font-size: 32px;
+  }
+
+  .admin-header-sub {
+    font-size: 13px;
+  }
+
+  /* ---- STATS RAPIDES : grille 4 colonnes au lieu de 2x2 ---- */
+  .admin-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* La 2e ligne n'a plus besoin de border-top en mode 4 colonnes */
+  .admin-stat--border-top {
+    border-top: none;
+  }
+
+  /* La 4e stat n'a pas de bordure droite */
+  .admin-stat:nth-child(4n) {
+    border-right: none;
+  }
+
+  /* La 2e n'est plus la dernière, on lui remet la bordure */
+  .admin-stat:nth-child(2n) {
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .admin-stat {
+    padding: 22px 16px;
+  }
+
+  .admin-stat-num {
+    font-size: 32px;
+  }
+
+  /* ---- SECTIONS ADMIN ---- */
+  .admin-sec {
+    padding: 32px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* ---- GRILLE NAVIGATION TUILES : 4 colonnes ---- */
+  .admin-nav-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .admin-nav-tile {
+    padding: 26px 14px 22px;
+  }
+
+  .admin-nav-tile-icon {
+    font-size: 32px;
+  }
+
+  .admin-nav-tile-label {
+    font-size: 10px;
+  }
+
+  /* ---- CARTES RDV ADMIN : pleine largeur ---- */
+  .admin-rdv-card {
+    max-width: 100%;
+    padding: 18px 22px;
+  }
+
+  .admin-rdv-heure {
+    width: 60px;
+    height: 60px;
+    font-size: 16px;
+  }
+
+  .admin-rdv-cliente {
+    font-size: 16px;
+  }
+
+  /* ---- LISTE CLIENTES : grille 2 colonnes ---- */
+  /* Plus efficace que des lignes pleine largeur sur grand écran */
+  .admin-user-card {
+    padding: 16px 22px;
+  }
+
+  /* ---- DATE NAV ---- */
+  .admin-date-nav {
+    padding: 16px 40px;
+  }
+
+  .admin-date-label {
+    font-size: 19px;
+  }
+
+  /* ---- FORMULAIRES ADMIN : centrés max 700px ---- */
+  .admin-field {
+    margin-bottom: 20px;
+  }
+
+  /* Les boutons d'action passent en ligne (3 côte à côte) au lieu d'empilés */
+  .btn-admin-confirmer,
+  .btn-admin-terminer,
+  .btn-admin-annuler,
+  .btn-admin-fiche {
+    display: inline-block;
+    width: auto;
+    padding: 12px 24px;
+    margin-right: 8px;
+  }
+}
+
+
+/* ============================================================
+   ADMIN ≥ 1024px : Layout 2 colonnes (sidebar + contenu)
+   ============================================================ */
+
+@media (min-width: 1024px) {
+
+  /* ---- ADMIN-PHONE devient un container 2 colonnes ---- */
+  /* Note : l'admin n'utilise pas encore de sidebar latérale dans le HTML.
+     On reste sur le layout vertical mais en pleine largeur centré. */
+  .admin-phone {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* La grille des tuiles passe à 5 colonnes sur grand écran */
+  .admin-nav-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+
+/* ============================================================
+   PHASE 7 — PAGES STATIQUES (≥ 768px)
+   About 2 col, FAQ 2 col, galerie/shop grille 3-4 col, contact 2 col.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* ---- PAGE À PROPOS — Hero portrait ---- */
+  .portrait-hero {
+    padding-top: 100px;
+  }
+
+  .portrait-wrap {
+    /* Photo + texte côte à côte */
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    padding: 80px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .portrait-img {
+    width: 260px;
+    height: 320px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .portrait-name {
+    font-size: 64px;
+    text-align: left;
+  }
+
+  .portrait-sup,
+  .portrait-role {
+    text-align: left;
+  }
+
+  /* ---- VALEURS : grille 4 colonnes ---- */
+  .values-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1000px;
+    margin: 0 auto;
+    gap: 16px;
+  }
+
+  .value-card {
+    padding: 24px 18px;
+  }
+
+  .value-name {
+    font-size: 18px;
+  }
+
+  .value-desc {
+    font-size: 12px;
+  }
+
+  /* ---- TIMELINE : centrée ---- */
+  .timeline {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .timeline-title {
+    font-size: 19px;
+  }
+
+  /* ---- STUDIO : image plus grande ---- */
+  .studio-img {
+    height: 360px;
+    border-radius: 32px;
+    max-width: 1000px;
+    margin: 0 auto 24px;
+  }
+
+  .studio-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1000px;
+    margin: 0 auto 24px;
+    gap: 14px;
+  }
+
+  .studio-item {
+    height: 180px;
+  }
+
+  .studio-addr {
+    max-width: 600px;
+    margin: 0 auto 20px;
+    padding: 24px;
+  }
+
+  /* ---- PAGE FAQ : 2 colonnes ---- */
+  .faq-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .faq-q {
+    padding: 22px 24px;
+  }
+
+  .faq-q-text {
+    font-size: 18px;
+  }
+
+  .faq-a {
+    padding: 0 24px 22px;
+    font-size: 13px;
+  }
+
+  /* ---- PAGE CONTACT : liens + formulaire en 2 colonnes ---- */
+  /* Quick links plus grands */
+  .quick-links {
+    max-width: 600px;
+    margin: 0 auto 16px;
+  }
+
+  .quick-link {
+    padding: 20px 22px;
+  }
+
+  .quick-link-name {
+    font-size: 18px;
+  }
+
+  /* Formulaire + map côte à côte (on cible le wrapper de section) */
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 16px 18px;
+    font-size: 14px;
+  }
+
+  .form-textarea {
+    height: 140px;
+  }
+
+  /* Carte d'horaires plus grande */
+  .hours-card {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 28px;
+  }
+
+  .hours-title {
+    font-size: 22px;
+  }
+
+  /* ---- PAGE AVIS ---- */
+  .rating-hero {
+    max-width: 800px;
+    margin: 0 auto 32px;
+    padding: 48px 32px;
+  }
+
+  .rating-score {
+    font-size: 96px;
+  }
+
+  .rating-bars {
+    max-width: 700px;
+    margin: 0 auto 32px;
+  }
+
+  /* Liste des avis en grille 2 colonnes */
+  .avis-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .avis-card {
+    padding: 26px;
+  }
+
+  .avis-text {
+    font-size: 17px;
+  }
+
+  /* ---- PAGE GALERIE ---- */
+  .filter-bar {
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 24px 40px;
+  }
+
+  /* Collage hero plus grand */
+  .collage-hero {
+    height: 540px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* Zoom les blobs du collage */
+  .col-main {
+    width: 320px;
+    height: 420px;
+    top: 0;
+    left: 60px;
+  }
+
+  .col-sec {
+    width: 240px;
+    height: 220px;
+    top: 40px;
+    right: 80px;
+  }
+
+  .col-third {
+    width: 280px;
+    height: 140px;
+    bottom: 40px;
+    left: 200px;
+  }
+
+  .col-accent {
+    width: 140px;
+    height: 150px;
+    bottom: 40px;
+    right: 100px;
+  }
+
+  /* Masonry : 4 colonnes au lieu de 2 */
+  .masonry {
+    columns: 4;
+    column-gap: 14px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .masonry-item {
+    margin-bottom: 14px;
+    border-radius: 18px;
+  }
+
+  /* Hauteurs de masonry plus grandes */
+  .masonry-item.tall   .masonry-bg,
+  .masonry-item.tall   .masonry-photo,
+  .masonry-item.tall   .masonry-bg-placeholder { height: 280px; }
+
+  .masonry-item.short  .masonry-bg,
+  .masonry-item.short  .masonry-photo,
+  .masonry-item.short  .masonry-bg-placeholder { height: 180px; }
+
+  .masonry-item.medium .masonry-bg,
+  .masonry-item.medium .masonry-photo,
+  .masonry-item.medium .masonry-bg-placeholder { height: 220px; }
+
+  /* Grille Instagram : 6 colonnes au lieu de 3 */
+  .insta-grid {
+    grid-template-columns: repeat(6, 1fr);
+    max-width: 800px;
+    margin: 0 auto 24px;
+    gap: 8px;
+  }
+
+  /* Vidéos : carrousel devient grille 4 col */
+  .video-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    overflow: visible;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .video-card {
+    flex: none;
+  }
+
+  /* Avant/Après en grille */
+  .avap-wrap {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    overflow: visible;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 0 16px;
+  }
+
+  .avap-card {
+    flex: none;
+  }
+
+  /* ---- PAGE MORPHOLOGIE ---- */
+  .steps-indicator {
+    padding: 32px 60px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .step-circle {
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .techniques-carousel {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    overflow: visible;
+    padding: 0 40px 16px;
+    margin: 0 auto;
+    max-width: 1100px;
+  }
+
+  .tech-card {
+    flex: none;
+  }
+
+  .tech-card-img {
+    height: 160px;
+  }
+
+  .eye-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 900px;
+    margin: 0 auto 8px;
+  }
+
+  .result-card {
+    max-width: 800px;
+    margin: 0 auto 16px;
+    padding: 40px 32px;
+  }
+
+  .result-eye-name {
+    font-size: 36px;
+  }
+
+  .reco-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* ---- PAGE SHOP ---- */
+  .shop-nav-inner {
+    justify-content: center;
+    padding: 0 40px;
+  }
+
+  .shop-nav-item {
+    padding: 18px 22px;
+    font-size: 12px;
+  }
+
+  /* Visuel carte cadeau plus grand */
+  .gift-visual {
+    max-width: 480px;
+    margin: 0 auto 24px;
+    padding: 32px 36px;
+  }
+
+  .gift-visual-amount {
+    font-size: 48px;
+  }
+
+  .gift-card-box {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 44px 36px;
+  }
+
+  .gift-title {
+    font-size: 32px;
+  }
+
+  /* Packs : grille 3 colonnes */
+  .packs-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .pack-name {
+    font-size: 26px;
+  }
+
+  /* Produits routine : grille 4 colonnes */
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 16px;
+  }
+
+  .product-img {
+    height: 180px;
+  }
+
+  .product-name {
+    font-size: 18px;
+  }
+
+  /* ---- CTA section bas de page ---- */
+  .cta-sec {
+    padding: 80px 40px;
+  }
+
+  .cta-big {
+    font-size: 48px;
+  }
+
+  .cta-sub {
+    font-size: 15px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+
+/* ============================================================
+   FORMULAIRES D'AUTHENTIFICATION DEVISE (≥ 768px)
+   Sign in / Sign up centrés en carte sur grand écran.
+   ============================================================ */
+
+@media (min-width: 768px) {
+
+  /* Carte d'auth centrée max 480px (les vues utilisent .sec) */
+  .auth-field {
+    margin-bottom: 18px;
+  }
+
+  .auth-input {
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+
+  .auth-submit {
+    padding: 16px;
+    font-size: 13px;
+  }
+
+  /* On laisse les vues Devise dans leur conteneur .sec actuel,
+     mais on limite la largeur du contenu de la section pour un look "carte" */
+}

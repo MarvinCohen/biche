@@ -19,7 +19,8 @@
 
     <div class="admin-header">
       <div class="admin-header-title">Clientes</div>
-      <div class="admin-header-sub"><%= @users.count %> cliente<%= @users.count > 1 ? 's' : '' %></div>
+      <%# total_count est fourni par Kaminari — donne le total réel même en page 2+ %>
+      <div class="admin-header-sub"><%= @users.total_count %> cliente<%= @users.total_count > 1 ? 's' : '' %></div>
     </div>
 
     <div class="admin-sec">
@@ -55,6 +56,26 @@
       <% else %>
         <div class="admin-empty">
           <div class="admin-empty-text">Aucune cliente enregistrée.</div>
+        </div>
+      <% end %>
+
+      <%# Pagination Kaminari — n'apparaît que si plusieurs pages %>
+      <% if @users.total_pages > 1 %>
+        <div style="display:flex; justify-content:center; gap:8px; padding:20px 0 8px; font-size:13px;">
+          <%# Page précédente %>
+          <% unless @users.first_page? %>
+            <%= link_to "← Précédent", admin_users_path(page: @users.current_page - 1),
+                        style: "color:var(--color-dark); text-decoration:none; padding:6px 12px; border:1px solid var(--color-border); border-radius:20px;" %>
+          <% end %>
+          <%# Indicateur de page %>
+          <span style="padding:6px 12px; color:var(--color-muted);">
+            Page <%= @users.current_page %> / <%= @users.total_pages %>
+          </span>
+          <%# Page suivante %>
+          <% unless @users.last_page? %>
+            <%= link_to "Suivant →", admin_users_path(page: @users.current_page + 1),
+                        style: "color:var(--color-dark); text-decoration:none; padding:6px 12px; border:1px solid var(--color-border); border-radius:20px;" %>
+          <% end %>
         </div>
       <% end %>
     </div>

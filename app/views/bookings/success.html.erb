@@ -22,8 +22,14 @@
         </svg>
       </div>
 
-      <h1 class="success-title">Acompte reçu !</h1>
-      <p class="success-sub">Votre rendez-vous est confirmé.<br>À très bientôt chez Biche.</p>
+      <%# Titre et message adaptés selon le mode de paiement choisi %>
+      <% if @booking.mode_paiement == 'acompte' %>
+        <h1 class="success-title">Acompte reçu !</h1>
+        <p class="success-sub">Votre rendez-vous est confirmé.<br>À très bientôt chez Biche.</p>
+      <% else %>
+        <h1 class="success-title">Réservation enregistrée !</h1>
+        <p class="success-sub">Syam vous confirmera le créneau très bientôt.<br>À très bientôt chez Biche.</p>
+      <% end %>
 
       <%# Récapitulatif du booking %>
       <div class="success-recap">
@@ -43,11 +49,14 @@
           <span>Lieu</span>
           <span>Calao Studio, Bordeaux</span>
         </div>
-        <div class="success-recap-row">
-          <span>Acompte payé</span>
-          <%# Affiche l'acompte en euros — peut être nil si webhook pas encore reçu %>
-          <span><%= @booking.acompte_cents ? number_to_currency(@booking.acompte_cents / 100.0, unit: "€", format: "%n%u", precision: 0) : "En cours…" %></span>
-        </div>
+        <%# Ligne acompte affichée uniquement si un paiement a eu lieu %>
+        <% if @booking.mode_paiement == 'acompte' %>
+          <div class="success-recap-row">
+            <span>Acompte payé</span>
+            <%# Peut être nil si le webhook n'a pas encore traité — affiche "En cours…" %>
+            <span><%= @booking.acompte_cents ? number_to_currency(@booking.acompte_cents / 100.0, unit: "€", format: "%n%u", precision: 0) : "En cours…" %></span>
+          </div>
+        <% end %>
       </div>
 
       <%# Actions %>

@@ -1882,21 +1882,25 @@
 
 .video-row::-webkit-scrollbar { display: none; }
 
-/* Carte vidéo */
+/* Carte vidéo — maintenant un lien <a> vers Instagram */
 .video-card {
-  flex: 0 0 150px;
+  flex: 0 0 168px;          /* Plus large pour mieux afficher la miniature portrait */
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--color-border);
+  text-decoration: none;    /* Supprimer le soulignement du lien */
+  display: block;
+  background: #fff;
 }
 
 /* Thumbnail de la vidéo */
 .video-thumb {
-  height: 190px;
+  height: 220px;            /* Hauteur augmentée pour le format portrait Instagram */
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .vt1 { background: linear-gradient(145deg, #2e2926, #5e5a56); }
@@ -1933,6 +1937,22 @@
   font-size: 10px;
   color: #988e88;
   letter-spacing: 0.5px;
+}
+
+/* Overlay play affiché par défaut, caché quand la vidéo joue */
+.video-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+/* Quand la vidéo joue, l'overlay s'efface */
+.video-thumb.playing .video-play-overlay {
+  opacity: 0;
 }
 
 /* Section Instagram */

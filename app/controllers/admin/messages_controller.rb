@@ -17,14 +17,18 @@ module Admin
     def create
       # Si user_id = "all", on crée un message pour chaque cliente
       if params[:message][:user_id] == 'all'
-        User.where(admin: false).each do |cliente|
-          Message.create!(
-            user:         cliente,
-            titre:        message_params[:titre],
-            contenu:      message_params[:contenu],
-            type_message: message_params[:type_message],
-            lu:           false  # Nouveau message non lu par défaut
-          )
+        # Transaction : si un Message.create! échoue en cours de route,
+        # tous les inserts précédents sont annulés → pas d'envoi partiel
+        ActiveRecord::Base.transaction do
+          User.where(admin: false).each do |cliente|
+            Message.create!(
+              user:         cliente,
+              titre:        message_params[:titre],
+              contenu:      message_params[:contenu],
+              type_message: message_params[:type_message],
+              lu:           false  # Nouveau message non lu par défaut
+            )
+          end
         end
         redirect_to admin_root_path, notice: "Message envoyé à toutes les clientes."
       else

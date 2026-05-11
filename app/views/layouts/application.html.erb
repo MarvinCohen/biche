@@ -15,12 +15,33 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
-    <!-- Feuilles de style de l'application -->
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%# ============================================================
+        FEUILLES DE STYLE DE L'APPLICATION
+        On charge chaque CSS directement (au lieu de passer par app.css
+        avec des @import qui causaient des 404 avec Propshaft).
+        Propshaft sert chaque fichier avec son hash digest correct.
+
+        Ordre IMPORTANT :
+        1. application.css → variables + reset + composants globaux
+        2. fichiers de pages (home, prestations, etc.)
+        Note : desktop.css est chargé EN DERNIER, après yield :head,
+        pour que ses media queries écrasent les styles inline des pages
+        (ex: <style> dans content_for :head de prestations/index).
+    ============================================================ %>
+    <%= stylesheet_link_tag "application", "home", "prestations", "bookings",
+                            "espace_cliente", "pages", "admin",
+                            "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
-    <!-- Slot pour les balises head spécifiques à chaque page (meta, scripts, etc.) -->
+    <!-- Slot pour les balises head spécifiques à chaque page (meta, scripts, styles inline) -->
     <%= yield :head %>
+
+    <%# ============================================================
+        MODE DESKTOP DÉSACTIVÉ TEMPORAIREMENT
+        Pour réactiver : décommenter la ligne ci-dessous ET le bloc
+        <nav class="nav-desktop"> plus bas dans le body.
+    ============================================================ %>
+    <%# = stylesheet_link_tag "desktop", "data-turbo-track": "reload" %>
   </head>
 
   <body>
@@ -31,6 +52,35 @@
     <% if alert.present? %>
       <div class="flash flash--alert"><%= alert %></div>
     <% end %>
+
+    <%# ============================================================
+        NAV DESKTOP HORIZONTALE — DÉSACTIVÉE TEMPORAIREMENT
+        Pour réactiver : décommenter ce bloc ET le stylesheet_link_tag
+        "desktop" dans le <head>.
+    ============================================================ %>
+    <%#
+    <nav class="nav-desktop" aria-label="Navigation principale desktop">
+      <%= link_to "Biche.", root_path, class: "nav-desktop-logo" %>
+
+      <div class="nav-desktop-links">
+        <%= link_to "Accueil",      root_path,        class: "nav-desktop-link" %>
+        <%= link_to "Prestations",  prestations_path, class: "nav-desktop-link" %>
+        <%= link_to "Galerie",      galerie_path,     class: "nav-desktop-link" %>
+        <%= link_to "À propos",     about_path,       class: "nav-desktop-link" %>
+        <%= link_to "Contact",      contact_path,     class: "nav-desktop-link" %>
+        <%= link_to "Shop",         shop_path,        class: "nav-desktop-link" %>
+      </div>
+
+      <div class="nav-desktop-cta-wrap">
+        <% if user_signed_in? %>
+          <%= link_to "Mon espace", espace_cliente_root_path, class: "nav-desktop-account" %>
+        <% else %>
+          <%= link_to "Connexion", new_user_session_path, class: "nav-desktop-account" %>
+        <% end %>
+        <%= link_to "Réserver", new_booking_path, class: "nav-desktop-cta" %>
+      </div>
+    </nav>
+    %>
 
     <!-- Contenu principal de chaque page -->
     <%= yield %>

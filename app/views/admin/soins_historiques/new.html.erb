@@ -29,7 +29,8 @@
 
       <%# form_with envoie POST vers /admin/soins_historiques %>
       <%# booking_id est transmis en hidden pour que le controller sache à quel RDV lier la fiche %>
-      <%= form_with model: [:admin, @soin_historique], local: true do |f| %>
+      <%# url: explicite car le nom de ressource soins_historiques ne correspond pas au nom du modèle %>
+      <%= form_with model: [:admin, @soin_historique], url: admin_soins_historiques_path, local: true do |f| %>
 
         <%# Champ caché : lien avec la réservation %>
         <%= f.hidden_field :booking_id, value: @booking.id %>

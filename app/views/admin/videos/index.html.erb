@@ -1,0 +1,176 @@
+<% content_for :title, "Admin — Vidéos" %>
+
+<%#
+  ============================================================
+  VUE — Liste des vidéos Instagram avec drag-and-drop
+  Données : @videos (triées par position)
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Dashboard", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <div class="admin-header">
+      <div class="admin-header-title">Vidéos Instagram</div>
+      <div class="admin-header-sub"><%= @videos.count %> vidéo<%= @videos.count > 1 ? 's' : '' %></div>
+    </div>
+
+    <%# Bouton d'ajout %>
+    <div style="padding: 0 20px 16px;">
+      <%= link_to "+ Ajouter une vidéo", new_admin_video_path, class: "btn-admin-terminer", style: "display:block; text-align:center;" %>
+    </div>
+
+    <div class="admin-sec">
+      <% if @videos.any? %>
+        <%# Liste drag-and-drop — même logique que la galerie photos %>
+        <ul id="videos-sortable" style="list-style:none; padding:0; margin:0;">
+          <% @videos.each do |video| %>
+            <li class="admin-video-item" data-id="<%= video.id %>">
+
+              <%# Poignée de drag %>
+              <span class="admin-drag-handle">⠿</span>
+
+              <%# Miniature ou placeholder %>
+              <div class="admin-video-thumb">
+                <% if video.miniature.attached? %>
+                  <%= image_tag video.miniature, style: "width:100%; height:100%; object-fit:cover; border-radius:6px;" %>
+                <% else %>
+                  <%# Placeholder si pas de miniature %>
+                  <div style="width:100%; height:100%; background:var(--color-sand); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:20px;">🎬</div>
+                <% end %>
+                <%# Indicateur de statut (actif / masqué) %>
+                <% unless video.actif %>
+                  <div style="position:absolute; inset:0; background:rgba(0,0,0,0.4); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; letter-spacing:0.5px;">MASQUÉ</div>
+                <% end %>
+              </div>
+
+              <%# Infos de la vidéo %>
+              <div class="admin-video-info">
+                <div class="admin-video-titre"><%= video.titre %></div>
+                <div class="admin-video-tag" style="font-size:10px; color:var(--color-muted); text-transform:uppercase; letter-spacing:0.5px;">
+                  <%= video.tag.present? ? video.tag : "Sans tag" %>
+                </div>
+              </div>
+
+              <%# Actions %>
+              <div class="admin-video-actions">
+                <%= link_to "✏", edit_admin_video_path(video), class: "admin-icon-btn" %>
+                <%= button_to "✕", admin_video_path(video),
+                              method: :delete,
+                              data: { turbo_confirm: "Supprimer \"#{video.titre}\" ?" },
+                              class: "admin-icon-btn admin-icon-btn--delete" %>
+              </div>
+
+            </li>
+          <% end %>
+        </ul>
+
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">Aucune vidéo ajoutée.</div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>
+
+<%# ---- CSS inline pour les éléments spécifiques à cette page ---- %>
+<% content_for :head do %>
+<style>
+  .admin-video-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+    cursor: grab;
+    position: relative;
+  }
+  .admin-video-item:last-child { border-bottom: none; }
+  .admin-video-item.sortable-ghost { opacity: 0.4; }
+
+  .admin-drag-handle {
+    color: var(--color-muted);
+    font-size: 18px;
+    cursor: grab;
+    flex-shrink: 0;
+  }
+
+  .admin-video-thumb {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .admin-video-info { flex: 1; min-width: 0; }
+  .admin-video-titre {
+    font-size: 13px;
+    color: var(--color-dark);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-video-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .admin-icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--color-dark);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .admin-icon-btn--delete { color: #c47a7a; border-color: #e8c8c8; }
+</style>
+<% end %>
+
+<%# ---- JS : drag-and-drop via SortableJS (même lib que la galerie) ---- %>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const liste = document.getElementById('videos-sortable');
+    if (!liste || typeof Sortable === 'undefined') return;
+
+    // Initialisation du drag-and-drop
+    Sortable.create(liste, {
+      handle: '.admin-drag-handle',
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+
+      // Après chaque réordonnancement, envoie le nouvel ordre au serveur
+      onEnd: function() {
+        const ids = Array.from(liste.querySelectorAll('[data-id]')).map(el => el.dataset.id);
+
+        fetch('<%= reordonner_admin_videos_path %>', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: JSON.stringify({ ordre: ids })
+        });
+      }
+    });
+  });
+</script>

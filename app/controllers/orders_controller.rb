@@ -103,9 +103,15 @@ class OrdersController < ApplicationController
   # GET /orders/success?session_id=cs_xxx
   # Page de confirmation après paiement Stripe réussi
   def success
-    # Retrouver la session Stripe pour vérifier le paiement
-    stripe_session = Stripe::Checkout::Session.retrieve(params[:session_id])
-    @order = Order.find(stripe_session.metadata.order_id)
+    # Retrouver la session Stripe — rescue si Stripe est indisponible ou session_id invalide
+    begin
+      stripe_session = Stripe::Checkout::Session.retrieve(params[:session_id])
+      @order = Order.find(stripe_session.metadata.order_id)
+    rescue Stripe::StripeError, ActiveRecord::RecordNotFound => e
+      Rails.logger.error "orders#success — erreur récupération session Stripe : #{e.message}"
+      redirect_to shop_path, alert: "Impossible de retrouver votre commande. Contactez Syam si le paiement a été débité."
+      return
+    end
 
     # Sécurité — vérifier que c'est bien la commande de l'utilisateur connecté
     unless @order.user == current_user
@@ -138,8 +144,9 @@ class OrdersController < ApplicationController
   # GET /orders/:id
   def show
     @order = Order.find(params[:id])
+    # Sans le `return`, Rails continue à rendre la vue après la redirection → DoubleRenderError
     unless @order.user == current_user
-      redirect_to root_path, alert: "Accès non autorisé."
+      redirect_to root_path, alert: "Accès non autorisé." and return
     end
   end
 

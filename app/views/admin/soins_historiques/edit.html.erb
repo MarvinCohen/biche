@@ -27,8 +27,8 @@
     <div class="admin-sec">
       <div class="admin-sec-title"><%= @booking.prestation.nom %></div>
 
-      <%# form_with PATCH vers /admin/soins_historiques/:id %>
-      <%= form_with model: [:admin, @soin_historique], local: true do |f| %>
+      <%# url: et method: explicites car le nom de ressource soins_historiques ne correspond pas au nom du modèle %>
+      <%= form_with model: [:admin, @soin_historique], url: admin_soins_historique_path(@soin_historique), method: :patch, local: true do |f| %>
 
         <div class="admin-grid-2">
 

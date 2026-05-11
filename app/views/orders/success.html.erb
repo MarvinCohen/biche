@@ -41,7 +41,12 @@
 
       <div style="font-family:'Cormorant Garamond',serif; font-size:30px; color:#2e2926; margin-bottom:8px;">Paiement confirmé</div>
       <div style="font-size:13px; color:#8e8480; line-height:1.7; max-width:280px; margin:0 auto 32px;">
-        La carte a été envoyée à <strong><%= @order.destinataire_email %></strong>.
+        <%# destinataire_email peut être nil si la cliente ne l'a pas renseigné %>
+        <% if @order.destinataire_email.present? %>
+          La carte a été envoyée à <strong><%= @order.destinataire_email %></strong>.
+        <% else %>
+          Votre carte cadeau est prête.
+        <% end %>
       </div>
 
       <%# Visuel de la carte %>

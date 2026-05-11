@@ -34,6 +34,9 @@ class PagesController < ApplicationController
     # Les 4 premières photos ayant une image attachée — utilisées pour le collage hero
     # On filtre avec select pour ne garder que celles qui ont vraiment un fichier
     @collage_photos = @galerie_photos.select { |p| p.image.attached? }.first(4)
+
+    # Vidéos Instagram actives triées par position, avec miniature préchargée
+    @videos = Video.actives.avec_miniature
   end
 
   # GET /morphologie

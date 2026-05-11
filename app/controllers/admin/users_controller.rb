@@ -7,10 +7,12 @@ module Admin
     # GET /admin/users — liste de toutes les clientes (hors admins)
     def index
       # On exclut les comptes admin (Syam elle-même)
-      # Triées par ordre alphabétique du prénom
+      # Triées par ordre alphabétique — paginées par 30 pour éviter une page trop lourde
       @users = User
                  .where(admin: false)
                  .order(:last_name, :first_name)
+                 .page(params[:page])
+                 .per(30)
     end
 
     # GET /admin/users/:id — profil complet d'une cliente

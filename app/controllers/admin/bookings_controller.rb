@@ -8,9 +8,15 @@ module Admin
     # GET /admin/bookings/creneaux — créneaux disponibles toutes les 15 min (AJAX admin)
     # Même logique anti-chevauchement que le controller client, mais toutes les 15 min
     def creneaux
-      date       = Date.parse(params[:date])
-      prestation = Prestation.find(params[:prestation_id])
-      duree      = prestation.duree_minutes.minutes
+      # Date.parse lève ArgumentError si le paramètre est absent ou malformé → on retourne []
+      date = Date.parse(params[:date].to_s) rescue nil
+      # find_by retourne nil au lieu de lever RecordNotFound si l'id est invalide
+      prestation = Prestation.find_by(id: params[:prestation_id])
+
+      # Paramètres invalides → réponse vide (évite une erreur 500)
+      return render json: [] unless date && prestation
+
+      duree = prestation.duree_minutes.minutes
 
       # Créneaux de 8h00 à 19h45 toutes les 15 minutes
       tous_les_creneaux = (8..19).flat_map do |h|
@@ -66,8 +72,8 @@ module Admin
     # GET /admin/bookings/new — formulaire de création manuelle d'un RDV
     def new
       @booking = Booking.new
-      # Pré-remplir la date si passée en paramètre (depuis le planning)
-      @booking.date = params[:date] ? Date.parse(params[:date]) : Date.today
+      # Pré-remplir la date si passée en paramètre (depuis le planning) — rescue si malformée
+      @booking.date = params[:date] ? (Date.parse(params[:date]) rescue Date.today) : Date.today
 
       # Listes pour les selects du formulaire
       @clientes    = User.where(admin: false).order(:last_name, :first_name)
@@ -111,8 +117,8 @@ module Admin
 
     # GET /admin/bookings — liste de tous les RDV, filtrée par date
     def index
-      # Date filtrée (aujourd'hui par défaut)
-      @date = params[:date] ? Date.parse(params[:date]) : Date.today
+      # Date filtrée (aujourd'hui par défaut) — rescue si le paramètre est malformé
+      @date = params[:date] ? (Date.parse(params[:date]) rescue Date.today) : Date.today
 
       # Tous les RDV de la date, triés par heure, avec user et prestation préchargés
       @bookings = Booking
