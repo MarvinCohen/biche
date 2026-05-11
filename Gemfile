@@ -29,8 +29,12 @@ gem "rqrcode"
 # Pagination des listes
 gem "kaminari"
 
-# Traductions françaises pour Rails (dates, ActiveRecord, Devise…)
+# Traductions françaises pour Rails (dates, ActiveRecord…)
 gem "rails-i18n"
+
+# Traductions françaises pour Devise (messages d'erreur connexion/inscription, etc.)
+# Fournit automatiquement le fichier devise.fr.yml — pas besoin de le créer à la main.
+gem "devise-i18n"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
