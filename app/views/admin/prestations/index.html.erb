@@ -24,7 +24,8 @@
     <% @prestations_par_categorie.each do |categorie, prestations| %>
       <div class="admin-sec">
         <div class="admin-sec-title">
-          <%= { 'extensions' => 'Extensions', 'retouche' => 'Retouches',
+          <%# Mapping catégorie interne (en base) → libellé affiché en admin %>
+          <%= { 'extensions' => 'Extensions', 'retouche' => 'Remplissages',
                 'rehaussement' => 'Rehaussement', 'depose' => 'Dépose' }[categorie] || categorie.capitalize %>
         </div>
 

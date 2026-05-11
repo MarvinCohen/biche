@@ -13,7 +13,8 @@
     <div class="admin-header">
       <div class="admin-header-title"><%= @prestation.nom %></div>
       <div class="admin-header-sub">
-        <%= { 'extensions' => 'Extensions', 'retouche' => 'Retouches',
+        <%# Mapping catégorie interne → libellé affiché en admin %>
+        <%= { 'extensions' => 'Extensions', 'retouche' => 'Remplissages',
               'rehaussement' => 'Rehaussement', 'depose' => 'Dépose' }[@prestation.categorie] %>
       </div>
     </div>

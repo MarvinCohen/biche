@@ -16,6 +16,10 @@ class PagesController < ApplicationController
     # disponible par catégorie de galerie pour illustrer les cartes.
     galerie = GaleriePhoto.avec_image.select { |p| p.image.attached? }
     @galerie_par_categorie = galerie.group_by(&:categorie).transform_values(&:first)
+
+    # URL de la dernière vidéo TikTok à afficher (gérée par Syam depuis l'admin).
+    # Nil ou vide → la section TikTok ne s'affiche pas (logique dans le partial).
+    @tiktok_url = SiteSetting.get("tiktok_latest_url")
   end
 
   # GET /a-propos
@@ -37,6 +41,9 @@ class PagesController < ApplicationController
 
     # Vidéos Instagram actives triées par position, avec miniature préchargée
     @videos = Video.actives.avec_miniature
+
+    # URL de la dernière vidéo TikTok (idem que sur la home — gérée par Syam).
+    @tiktok_url = SiteSetting.get("tiktok_latest_url")
   end
 
   # GET /morphologie

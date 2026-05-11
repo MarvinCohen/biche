@@ -1195,42 +1195,6 @@
     padding: 24px 40px;
   }
 
-  /* Collage hero plus grand */
-  .collage-hero {
-    height: 540px;
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
-  /* Zoom les blobs du collage */
-  .col-main {
-    width: 320px;
-    height: 420px;
-    top: 0;
-    left: 60px;
-  }
-
-  .col-sec {
-    width: 240px;
-    height: 220px;
-    top: 40px;
-    right: 80px;
-  }
-
-  .col-third {
-    width: 280px;
-    height: 140px;
-    bottom: 40px;
-    left: 200px;
-  }
-
-  .col-accent {
-    width: 140px;
-    height: 150px;
-    bottom: 40px;
-    right: 100px;
-  }
-
   /* Masonry : 4 colonnes au lieu de 2 */
   .masonry {
     columns: 4;
@@ -1256,14 +1220,6 @@
   .masonry-item.medium .masonry-bg,
   .masonry-item.medium .masonry-photo,
   .masonry-item.medium .masonry-bg-placeholder { height: 220px; }
-
-  /* Grille Instagram : 6 colonnes au lieu de 3 */
-  .insta-grid {
-    grid-template-columns: repeat(6, 1fr);
-    max-width: 800px;
-    margin: 0 auto 24px;
-    gap: 8px;
-  }
 
   /* Vidéos : carrousel devient grille 4 col */
   .video-row {

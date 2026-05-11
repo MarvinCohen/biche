@@ -124,6 +124,12 @@ Rails.application.routes.draw do
 
     # Agenda semaine : vue sur 7 jours
     get 'agenda', to: 'dashboard#agenda', as: :agenda
+
+    # Réglages du site : édition de réglages globaux clé/valeur
+    # (ex : URL de la dernière vidéo TikTok à afficher sur home + galerie)
+    # `resource` (singulier) car il n'y a qu'une seule page de réglages,
+    # pas une liste de réglages à parcourir.
+    resource :site_settings, only: %i[edit update]
   end
 
   # ============================================================

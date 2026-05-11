@@ -44,7 +44,10 @@
     <%# = stylesheet_link_tag "desktop", "data-turbo-track": "reload" %>
   </head>
 
-  <body>
+  <%# `data-admin` exposé à tout le JS : permet au script en bas de page
+      d'injecter un bouton "Admin" dans la navbar de chaque vue, sans
+      avoir à modifier les 22 fichiers qui contiennent <nav class="nav">. %>
+  <body data-admin="<%= user_signed_in? && current_user.admin? %>">
     <!-- Messages flash (erreurs Devise, confirmations d'actions) -->
     <% if notice.present? %>
       <div class="flash flash--notice"><%= notice %></div>
@@ -53,34 +56,37 @@
       <div class="flash flash--alert"><%= alert %></div>
     <% end %>
 
-    <%# ============================================================
-        NAV DESKTOP HORIZONTALE — DÉSACTIVÉE TEMPORAIREMENT
-        Pour réactiver : décommenter ce bloc ET le stylesheet_link_tag
-        "desktop" dans le <head>.
-    ============================================================ %>
-    <%#
-    <nav class="nav-desktop" aria-label="Navigation principale desktop">
-      <%= link_to "Biche.", root_path, class: "nav-desktop-logo" %>
+    <%# ============================================================ %>
+    <%# NAV DESKTOP HORIZONTALE — DÉSACTIVÉE TEMPORAIREMENT          %>
+    <%# Pour réactiver : remplacer "if false" par "if true" ci-       %>
+    <%# dessous ET décommenter le stylesheet_link_tag "desktop".      %>
+    <%# On utilise un bloc Ruby "if false" plutôt qu'un commentaire   %>
+    <%# ERB multi-ligne, car ERB ne sait pas commenter un bloc qui    %>
+    <%# contient lui-même des balises ERB de sortie.                  %>
+    <%# ============================================================ %>
+    <% if false %>
+      <nav class="nav-desktop" aria-label="Navigation principale desktop">
+        <%= link_to "Biche.", root_path, class: "nav-desktop-logo" %>
 
-      <div class="nav-desktop-links">
-        <%= link_to "Accueil",      root_path,        class: "nav-desktop-link" %>
-        <%= link_to "Prestations",  prestations_path, class: "nav-desktop-link" %>
-        <%= link_to "Galerie",      galerie_path,     class: "nav-desktop-link" %>
-        <%= link_to "À propos",     about_path,       class: "nav-desktop-link" %>
-        <%= link_to "Contact",      contact_path,     class: "nav-desktop-link" %>
-        <%= link_to "Shop",         shop_path,        class: "nav-desktop-link" %>
-      </div>
+        <div class="nav-desktop-links">
+          <%= link_to "Accueil",      root_path,        class: "nav-desktop-link" %>
+          <%= link_to "Prestations",  prestations_path, class: "nav-desktop-link" %>
+          <%= link_to "Galerie",      galerie_path,     class: "nav-desktop-link" %>
+          <%= link_to "À propos",     about_path,       class: "nav-desktop-link" %>
+          <%= link_to "Contact",      contact_path,     class: "nav-desktop-link" %>
+          <%= link_to "Shop",         shop_path,        class: "nav-desktop-link" %>
+        </div>
 
-      <div class="nav-desktop-cta-wrap">
-        <% if user_signed_in? %>
-          <%= link_to "Mon espace", espace_cliente_root_path, class: "nav-desktop-account" %>
-        <% else %>
-          <%= link_to "Connexion", new_user_session_path, class: "nav-desktop-account" %>
-        <% end %>
-        <%= link_to "Réserver", new_booking_path, class: "nav-desktop-cta" %>
-      </div>
-    </nav>
-    %>
+        <div class="nav-desktop-cta-wrap">
+          <% if user_signed_in? %>
+            <%= link_to "Mon espace", espace_cliente_root_path, class: "nav-desktop-account" %>
+          <% else %>
+            <%= link_to "Connexion", new_user_session_path, class: "nav-desktop-account" %>
+          <% end %>
+          <%= link_to "Réserver", new_booking_path, class: "nav-desktop-cta" %>
+        </div>
+      </nav>
+    <% end %>
 
     <!-- Contenu principal de chaque page -->
     <%= yield %>
@@ -196,6 +202,51 @@
         document.addEventListener('keydown', function(e) {
           if (e.key === 'Escape') closeMenu();
         });
+      })();
+    </script>
+
+    <%# ============================================================
+        INJECTION DU BOUTON ADMIN DANS CHAQUE NAVBAR
+        Plutôt que de modifier les 22 vues qui contiennent
+        <nav class="nav"><div class="nav-right">..., on injecte
+        ici un petit lien "Admin" en tête de .nav-right via JS,
+        uniquement si l'utilisateur connecté est admin (flag exposé
+        sur <body data-admin="true|false">).
+    ============================================================ %>
+    <script>
+      (function() {
+        // Lit le flag admin posé sur <body> côté serveur
+        if (document.body.dataset.admin !== 'true') return;
+
+        // -------- 1) Côté public : bouton "Admin" dans la navbar --------
+        // Cherche la zone droite de la navbar dans la page publique
+        var navRight = document.querySelector('.nav-right');
+        if (navRight) {
+          var adminLink = document.createElement('a');
+          adminLink.href = '/admin';
+          adminLink.className = 'nav-admin-link';
+          adminLink.textContent = '⚙ Admin';
+          // Insertion en tout début (avant l'icône compte)
+          navRight.insertBefore(adminLink, navRight.firstChild);
+        }
+
+        // -------- 2) Côté admin : bouton "↩ Site" dans la nav admin --------
+        // Sur les pages admin, on injecte un lien retour vers le site public,
+        // placé juste avant le lien "Déconnexion" (qui est à droite).
+        var adminNav = document.querySelector('.admin-nav');
+        if (adminNav) {
+          var logoutLink = adminNav.querySelector('.admin-logout');
+          var backLink = document.createElement('a');
+          backLink.href = '/';
+          backLink.className = 'admin-back-to-site';
+          backLink.textContent = '↩ Site';
+          // Insertion avant "Déconnexion" si présent, sinon en fin de nav
+          if (logoutLink) {
+            adminNav.insertBefore(backLink, logoutLink);
+          } else {
+            adminNav.appendChild(backLink);
+          }
+        }
       })();
     </script>
 

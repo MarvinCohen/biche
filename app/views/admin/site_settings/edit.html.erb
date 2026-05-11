@@ -1,0 +1,58 @@
+<% content_for :title, "Admin — Réglages du site" %>
+
+<%#
+  ============================================================
+  VUE — Formulaire d'édition des réglages globaux du site
+  Pour l'instant : URL de la dernière vidéo TikTok à afficher
+  sur la home et la galerie.
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <%# ---- NAVIGATION ADMIN ---- %>
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Retour", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="admin-header">
+      <div class="admin-header-title">Réglages du site</div>
+      <div class="admin-header-sub">Modifications instantanées sur le site public</div>
+    </div>
+
+    <%# ---- FORMULAIRE ---- %>
+    <div class="admin-sec">
+      <%# `form_with url:` car le controller ne suit pas le pattern CRUD
+          classique (clé/valeur, pas un enregistrement par ressource). %>
+      <%= form_with url: admin_site_settings_path, method: :patch, local: true do %>
+
+        <%# ---- TIKTOK ---- %>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label for="tiktok_latest_url"
+                 style="display:block; font-size:12px; color:var(--color-muted); margin-bottom:6px;">
+            URL de la dernière vidéo TikTok
+          </label>
+          <%= url_field_tag "site_settings[tiktok_latest_url]",
+                            @tiktok_latest_url,
+                            id: "tiktok_latest_url",
+                            placeholder: "https://www.tiktok.com/@atelier_b.iche/video/...",
+                            class: "admin-input" %>
+          <div style="font-size:10px; color:var(--color-muted); margin-top:4px;">
+            Copie l'URL d'une vidéo depuis TikTok (bouton "Partager" → "Copier le lien").
+            Laisser vide pour masquer la section TikTok sur le site.
+          </div>
+        </div>
+
+        <%= submit_tag "Enregistrer", class: "btn-admin-terminer" %>
+        <%= link_to "Annuler", admin_root_path, class: "btn-admin-fiche", style: "margin-top:8px;" %>
+
+      <% end %>
+    </div>
+
+  </div>
+</div>

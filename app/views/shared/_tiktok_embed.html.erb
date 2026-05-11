@@ -1,0 +1,95 @@
+<%#
+  ============================================================
+  PARTIAL — Embed de la dernière vidéo TikTok
+  Réutilisé sur la home et la galerie.
+
+  Variable attendue :
+    `tiktok_url` (string ou nil) — URL de la vidéo TikTok à afficher
+
+  Comportement :
+    - Si l'URL est vide ou nil → on n'affiche RIEN (pas de section vide)
+    - Sinon → on affiche la section avec l'embed officiel TikTok
+
+  L'embed officiel = un <blockquote class="tiktok-embed"> + un script
+  qui transforme ce blockquote en iframe TikTok au chargement.
+  Doc : https://developers.tiktok.com/doc/embed-videos
+  ============================================================
+%>
+
+<% if tiktok_url.present? %>
+  <%# On extrait l'ID de la vidéo depuis l'URL pour le passer en data-video-id.
+      L'URL d'une vidéo TikTok ressemble à :
+        https://www.tiktok.com/@atelier_b.iche/video/7123456789012345678
+      L'ID est le grand nombre à la fin. La regex le capture.
+      Si on ne le trouve pas, on laisse vide → TikTok se débrouille avec le `cite`. %>
+  <% video_id = tiktok_url.match(%r{/video/(\d+)}).try(:[], 1) %>
+
+  <section class="tiktok-sec">
+    <p class="tiktok-tag">@atelier_b.iche</p>
+    <h2 class="tiktok-title">Dernière vidéo TikTok</h2>
+
+    <%# Conteneur centré qui limite la largeur (TikTok recommande min 325, max 605) %>
+    <div class="tiktok-wrap">
+      <blockquote class="tiktok-embed"
+                  cite="<%= tiktok_url %>"
+                  data-video-id="<%= video_id %>"
+                  style="max-width:605px; min-width:325px; margin:0 auto;">
+        <%# Section vide obligatoire pour que TikTok puisse y injecter l'iframe %>
+        <section></section>
+      </blockquote>
+    </div>
+
+    <%# Lien vers le compte complet sous la vidéo %>
+    <%= link_to "Voir le compte TikTok",
+                "https://www.tiktok.com/@atelier_b.iche",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                class: "tiktok-link" %>
+  </section>
+
+  <%# ============================================================
+      Chargement du script TikTok officiel.
+      Subtilité : avec Turbo (Hotwire), les navigations entre pages
+      ne rechargent pas le navigateur → le script "embed.js" déjà
+      téléchargé une fois n'est jamais re-exécuté → le blockquote
+      reste tel quel et la vidéo ne s'affiche pas.
+
+      Solution : on écoute l'événement `turbo:load` (et `DOMContentLoaded`
+      pour le 1er chargement) et on (re)charge `embed.js` à chaque fois
+      en supprimant l'ancienne balise script. TikTok détectera alors
+      les nouveaux blockquotes et les transformera en iframes.
+  ============================================================ %>
+  <script>
+    (function() {
+      // Fonction qui (re)charge le script TikTok pour qu'il rescanne la page
+      function loadTiktokScript() {
+        // Ne fait rien si aucune balise embed n'est présente sur cette page
+        if (!document.querySelector('.tiktok-embed')) return;
+
+        // Supprime l'ancienne balise script (si présente) pour forcer
+        // une nouvelle exécution — sinon le navigateur la considère
+        // comme déjà chargée et l'ignore.
+        var oldScript = document.getElementById('tiktok-embed-script');
+        if (oldScript) oldScript.remove();
+
+        // Réinjecte une balise script fraîche → le navigateur la
+        // télécharge (ou la sort du cache) et l'exécute immédiatement.
+        var script = document.createElement('script');
+        script.id = 'tiktok-embed-script';
+        script.async = true;
+        script.src = 'https://www.tiktok.com/embed.js';
+        document.body.appendChild(script);
+      }
+
+      // 1) Au premier chargement de la page (sans Turbo)
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadTiktokScript);
+      } else {
+        loadTiktokScript();
+      }
+
+      // 2) À chaque navigation Turbo (clic sur un lien interne)
+      document.addEventListener('turbo:load', loadTiktokScript);
+    })();
+  </script>
+<% end %>

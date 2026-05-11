@@ -642,3 +642,29 @@ body {
 #error_explanation ul li::before {
   content: "· ";
 }
+
+/* ============================================================
+   BOUTON "ADMIN" DANS LA NAVBAR
+   Injecté en JS dans .nav-right uniquement pour les admins.
+   Style discret pour ne pas casser le visuel de la navbar mobile
+   (qui contient déjà : icône compte, bouton Réserver, burger).
+   ============================================================ */
+.nav-admin-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  margin-right: 4px;
+  border-radius: var(--border-radius-pill);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background 0.15s;
+}
+
+.nav-admin-link:hover {
+  background: var(--color-dark);
+}

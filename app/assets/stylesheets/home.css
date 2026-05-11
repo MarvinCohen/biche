@@ -394,20 +394,22 @@
   display: inline-block;
 }
 
-/* CARTE LOCALISATION — forme organique avec carte embarquée */
+/* CARTE LOCALISATION — format rectangle paysage avec coins arrondis */
 .map-embed {
-  /* Forme blob organique identique à l'ancien placeholder */
-  border-radius: 60% 40% 50% 50% / 45% 55% 45% 55%;
-  overflow: hidden; /* clips l'iframe à la forme organique */
-  height: 200px;
+  /* Format rectangle 16:10 → plus large que haut, classique pour une map */
+  aspect-ratio: 16 / 10;
+  /* Petits coins arrondis pour rester doux sans être un "blob" organique */
+  border-radius: 12px;
+  overflow: hidden; /* clips l'iframe aux coins arrondis */
   margin-bottom: 16px;
   box-shadow: 0 4px 20px rgba(46, 41, 38, 0.1);
 }
 
-/* L'iframe doit remplir entièrement le conteneur blob */
+/* L'iframe doit remplir entièrement le conteneur rectangulaire */
 .map-embed iframe {
-  border-radius: 0 !important; /* la forme est gérée par le parent */
+  border-radius: 0 !important; /* le radius est appliqué sur le parent */
   height: 100% !important;
+  width: 100% !important;
 }
 
 /* Lien "Voir sur Google Maps" sous le blob */

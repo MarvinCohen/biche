@@ -1572,99 +1572,6 @@
   border-color: var(--color-dark);
 }
 
-/* Collage hero avec 4 blocs flottants */
-.collage-hero {
-  position: relative;
-  height: 360px;
-  background: #fff;
-  overflow: hidden;
-}
-
-/* Bloc principal — grand blob multi-lobes, haut gauche */
-/* Forme cloud avec bosses prononcées sur tous les côtés */
-.col-main {
-  position: absolute;
-  top: -5px;
-  left: 8px;
-  width: 200px;
-  height: 265px;
-  background: #c4b09e;
-  clip-path: path('M 90,8 C 105,0 125,-2 148,10 C 168,20 185,40 192,65 C 198,88 190,105 196,128 C 202,150 196,175 178,194 C 162,210 140,220 118,234 C 97,246 70,255 46,244 C 23,233 5,210 2,184 C -1,160 10,140 5,116 C 0,93 -6,68 5,45 C 15,23 38,8 62,6 C 72,4 80,12 90,8 Z');
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Blob secondaire — forme arrondie irrégulière, haut droite */
-.col-sec {
-  position: absolute;
-  top: 25px;
-  right: 10px;
-  width: 148px;
-  height: 138px;
-  background: #d8c8b8;
-  clip-path: path('M 58,6 C 80,-2 112,2 132,20 C 150,36 152,62 144,84 C 136,104 114,118 88,122 C 62,126 34,116 16,96 C 0,78 -2,50 10,30 C 20,12 40,12 58,6 Z');
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Blob tertiaire — large et très plat, style "flaque" ou "splash", bas */
-.col-third {
-  position: absolute;
-  bottom: 14px;
-  left: 40px;
-  width: 178px;
-  height: 88px;
-  background: #b8a898;
-  clip-path: path('M 48,10 C 68,0 98,-4 128,4 C 154,11 172,28 170,50 C 168,68 150,80 124,87 C 98,93 68,92 44,80 C 22,69 4,52 5,35 C 6,20 26,18 48,10 Z');
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Blob accent — petit, très irrégulier, style étoile de mer, bas droite */
-.col-accent {
-  position: absolute;
-  bottom: 18px;
-  right: 18px;
-  width: 92px;
-  height: 96px;
-  background: var(--color-dark);
-  clip-path: path('M 42,4 C 56,-2 74,4 82,20 C 90,34 88,52 96,66 C 102,78 92,95 76,96 C 60,97 44,86 30,88 C 16,90 2,80 2,64 C 2,48 14,34 10,20 C 6,7 28,9 42,4 Z');
-  z-index: 4;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-/* Photo réelle dans un bloc du collage — remplace les SVG placeholders */
-/* object-fit: cover garantit que la photo remplit le bloc sans déformation */
-.col-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Lettre "B." dans le bloc accent */
-.col-accent span {
-  font-family: var(--font-serif);
-  font-size: 26px;
-  color: var(--color-accent);
-  font-style: italic;
-}
-
-/* SVG decoratifs dans les blocs du collage */
-.col-ico { opacity: 0.35; }
-
 /* Indicateur du filtre actif */
 .filter-active-info {
   background: var(--color-cream);
@@ -1955,74 +1862,115 @@
   opacity: 0;
 }
 
-/* Section Instagram */
+/* ============================================================
+   Section Instagram — refonte "premium"
+   On enveloppe le contenu dans une carte centrée avec ombre douce,
+   et on utilise le dégradé officiel Instagram (jaune → rose → violet)
+   pour l'icône ronde et le bouton CTA, afin que la section ait
+   plus de caractère.
+   ============================================================ */
+
+/* Conteneur extérieur de la section : fond crème, beaucoup d'air vertical */
 .insta-sec {
-  padding: 28px 20px;
+  padding: 48px 20px;
   background: var(--color-cream);
   text-align: center;
+}
+
+/* La carte centrée qui contient toute la section.
+   max-width pour ne pas s'étaler sur tablette/desktop. */
+.insta-card {
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 36px 24px 32px;
+  background: #fff;
+  border-radius: 24px;
+  /* Ombre douce pour donner de la profondeur sans être agressive */
+  box-shadow: 0 8px 32px rgba(46, 41, 38, 0.08);
+  border: 1px solid var(--color-border);
+}
+
+/* Pastille ronde colorée qui accueille l'icône Instagram en SVG blanc.
+   Le dégradé reprend exactement les couleurs officielles de la marque
+   Instagram (jaune → orange → rose → magenta → violet). */
+.insta-icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  background: linear-gradient(45deg,
+                              #f09433 0%,
+                              #e6683c 25%,
+                              #dc2743 50%,
+                              #cc2366 75%,
+                              #bc1888 100%);
+  /* Ombre teintée pour faire "flotter" la pastille au-dessus de la carte */
+  box-shadow: 0 6px 18px rgba(220, 39, 67, 0.25);
 }
 
 /* Titre de la section Instagram */
 .insta-title {
   font-family: var(--font-serif);
-  font-size: 24px;
+  font-size: 26px;
   color: var(--color-dark);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  line-height: 1.2;
 }
 
-/* Texte descriptif */
+/* Texte descriptif sous le titre */
 .insta-sub {
-  font-size: 12px;
+  font-size: 13px;
   color: #6e6560;
   line-height: 1.6;
   margin-bottom: 18px;
 }
 
-/* Grille 3x2 de vignettes Instagram */
-.insta-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-  margin-bottom: 18px;
-}
-
-/* Vignette carrée */
-.insta-item { aspect-ratio: 1; border-radius: 10px; }
-
-/* Dégradés de couleur des vignettes */
-.ig1 { background: linear-gradient(145deg, #b8b2a8, #7a7470); }
-.ig2 { background: linear-gradient(145deg, #ccc5bb, #a09890); }
-.ig3 { background: linear-gradient(145deg, #7a7470, #5e5a56); }
-.ig4 { background: linear-gradient(145deg, #ddd6cc, #b8b2a8); }
-.ig5 { background: linear-gradient(145deg, #a09890, #7a7470); }
-.ig6 { background: linear-gradient(145deg, #2e2926, #5e5a56); }
-
-/* Handle Instagram (@atelier_b.iche) */
+/* Handle Instagram (@atelier_b.iche) — en italique pour rappeler le ton serif */
 .insta-handle {
   font-family: var(--font-serif);
   font-size: 18px;
   color: var(--color-dark);
-  margin-bottom: 14px;
+  margin-bottom: 20px;
   font-style: italic;
 }
 
-/* Bouton "Voir sur Instagram" */
+/* Bouton CTA "Voir sur Instagram" avec dégradé brand Instagram et texte blanc.
+   Plus marquant que l'ancien bouton transparent, donne envie de cliquer. */
 .insta-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
-  border: 1px solid var(--color-dark);
+  padding: 13px 26px;
+  border: none;
   border-radius: var(--border-radius-pill);
-  background: transparent;
+  /* Même dégradé que la pastille pour une cohérence visuelle */
+  background: linear-gradient(45deg,
+                              #f09433 0%,
+                              #e6683c 25%,
+                              #dc2743 50%,
+                              #cc2366 75%,
+                              #bc1888 100%);
   font-size: 11px;
-  color: var(--color-dark);
+  color: #fff;
   letter-spacing: 1.5px;
   cursor: pointer;
   text-transform: uppercase;
   font-family: var(--font-sans);
   font-weight: 500;
   text-decoration: none;
+  /* Ombre teintée légère pour que le bouton "lévite" sur la carte blanche */
+  box-shadow: 0 4px 14px rgba(220, 39, 67, 0.3);
+  /* Transition pour le hover (effet léger d'enfoncement) */
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* État hover : très léger zoom + ombre plus marquée pour feedback visuel */
+.insta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(220, 39, 67, 0.4);
 }
 
 /* ============================================================
@@ -2500,4 +2448,71 @@
   text-transform: uppercase;
   font-family: var(--font-sans);
   font-weight: 500;
+}
+
+/* ============================================================
+   SECTION TIKTOK — utilisée sur home + galerie
+   Affiche le dernier reel TikTok de Syam via l'embed officiel.
+   ============================================================ */
+
+/* Section TikTok : padding cohérent avec les autres sections de page */
+.tiktok-sec {
+  padding: var(--section-padding);
+  background: #fff;
+  text-align: center;
+}
+
+/* Petit tag au-dessus du titre (comme .s-tag dans la galerie) */
+.tiktok-tag {
+  font-size: 11px;
+  color: var(--color-accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  font-family: var(--font-sans);
+}
+
+/* Titre de la section */
+.tiktok-title {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--color-dark);
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+/* Conteneur de l'iframe TikTok — centré, marges verticales */
+.tiktok-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+/* L'iframe générée par TikTok est injectée dans le blockquote.
+   On la centre et on lui donne un border-radius léger pour rester
+   cohérent avec le reste du design. */
+.tiktok-wrap .tiktok-embed {
+  margin: 0 auto !important;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Lien "Voir le compte TikTok" sous la vidéo */
+.tiktok-link {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 20px;
+  border: 1px solid var(--color-dark);
+  border-radius: var(--border-radius-pill);
+  color: var(--color-dark);
+  text-decoration: none;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  transition: background 0.2s, color 0.2s;
+}
+
+.tiktok-link:hover {
+  background: var(--color-dark);
+  color: #fff;
 }

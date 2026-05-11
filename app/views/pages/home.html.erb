@@ -49,6 +49,11 @@
       </div>
     </section>
 
+    <%# ---- DERNIÈRE VIDÉO TIKTOK ---- %>
+    <%# Affichée juste après le hero pour maximiser la visibilité.
+        Le partial ne rend rien si @tiktok_url est vide → pas de section vide. %>
+    <%= render "shared/tiktok_embed", tiktok_url: @tiktok_url %>
+
     <%# ---- PROGRAMME FIDÉLITÉ (en premier pour inciter à créer un compte) ---- %>
     <section class="sec sec-nude">
       <div class="fid-block">

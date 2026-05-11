@@ -1,110 +1,64 @@
-# Plan — Version Desktop de Biche. ✅ TERMINÉ
+# Plan — Embed dernière vidéo TikTok (home + galerie)
 
 ## Objectif
-Adapter l'app Biche. (mobile-first) pour offrir une vraie expérience desktop sur tablette et grand écran, sans casser le mobile.
+Afficher la dernière vidéo TikTok de Syam (compte `@atelier_b.iche`) sur la home ET la galerie,
+via l'embed officiel TikTok. Syam met à jour l'URL depuis son admin quand elle poste une nouvelle vidéo.
 
-## Approche retenue : Fichier `desktop.css` unique
-Au lieu d'éparpiller les media queries dans chaque fichier CSS, on a créé **un seul fichier `desktop.css`** qui regroupe TOUTES les règles responsive ≥768px et ≥1024px.
+## Choix techniques
+- **Stockage** : un seul modèle générique `SiteSetting` (key/value) — extensible pour de futurs réglages
+- **Embed** : `<blockquote class="tiktok-embed">` + `https://www.tiktok.com/embed.js` (officiel)
+- **Admin** : nouvelle vue `admin/site_settings#edit` pour modifier l'URL
 
-**Pourquoi ce choix** :
-- ✅ Tout le desktop dans un seul endroit (facile à comprendre/désactiver)
-- ✅ Aucune modification des CSS mobiles existants → zéro risque de régression
-- ✅ Importé en dernier dans `app.css` → la cascade fait écraser les règles mobiles uniquement sur grand écran
+## Fichiers impactés
 
-## Breakpoints utilisés
-- **< 768px** → expérience mobile actuelle (intacte, mockup phone conservé)
-- **≥ 768px** → tablette : mockup retiré, layouts 2 colonnes
-- **≥ 1024px** → desktop : nav horizontale fixe, sidebars, grilles 3-4 col
+### Backend (modèle + migration)
+- `db/migrate/XXXX_create_site_settings.rb` — table `site_settings(key:string unique, value:text)`
+- `app/models/site_setting.rb` — méthode helper `SiteSetting.get(key)` / `.set(key, value)`
+- `db/seeds.rb` — seed `tiktok_latest_url` (vide au départ)
 
-## Fichiers modifiés (3 seulement)
-- ✅ `app/assets/stylesheets/desktop.css` — **NOUVEAU** (~870 lignes, toutes les règles desktop)
-- ✅ `app/assets/stylesheets/app.css` — ajout d'1 ligne `@import "desktop.css"` en fin
-- ✅ `app/views/layouts/application.html.erb` — ajout de la `<nav class="nav-desktop">` (cachée < 1024px)
+### Admin
+- `config/routes.rb` — ajouter `resource :site_settings, only: %i[edit update]` dans le namespace admin
+- `app/controllers/admin/site_settings_controller.rb` — actions `edit` / `update`
+- `app/views/admin/site_settings/edit.html.erb` — formulaire simple (1 champ URL)
+- `app/views/admin/dashboard/index.html.erb` — ajouter un lien "Réglages du site"
 
-## Étapes effectuées
+### Vues publiques
+- `app/views/shared/_tiktok_embed.html.erb` — partial réutilisable (affiche l'embed si URL présente, sinon rien)
+- `app/views/pages/home.html.erb` — render du partial dans une nouvelle section
+- `app/views/pages/galerie.html.erb` — render du partial juste avant le bloc Instagram
+- `app/controllers/pages_controller.rb` — charger `@tiktok_url` dans `home` et `galerie`
 
-### 🧱 Phase 1 — Fondations (layout global)
-- [x] Neutralisation du `.phone` (border-radius, shadow, max-width) à ≥768px
-- [x] Body fond clair, padding 0
-- [x] Wrap élargi à 100% (la nav-desktop centre son contenu en interne)
-- [x] Nav desktop horizontale fixe à ≥1024px (cachée < 1024px)
-- [x] Burger caché à ≥1024px
-- [x] Footer multi-colonnes (gap 32px, padding 60px)
-- [x] Titres `.s-h2` agrandis (28→42px), sous-titres `.s-sub` aérés
-- [x] Flash messages déplacés en haut de page
+### CSS
+- `app/assets/stylesheets/pages.css` — styles section TikTok galerie (titre, conteneur)
+- `app/assets/stylesheets/home.css` — styles section TikTok home
 
-### 🏠 Phase 2 — Homepage
-- [x] Hero 50/50 (photo 320px à gauche, texte à droite)
-- [x] Hero h1 38→64px, big-B 320→480px
-- [x] Carousel prestations → grille 4 colonnes
-- [x] Shop carousel → grille 3 colonnes
-- [x] Map embed agrandie (200→320px)
-- [x] Section accessibilité centrée max 800px
+## Étapes
+- [ ] Générer migration `site_settings` (key, value, timestamps + index unique sur key)
+- [ ] Créer modèle `SiteSetting` avec helpers `.get(key)` / `.set(key, value)`
+- [ ] Ajouter seed `tiktok_latest_url` (chaîne vide par défaut)
+- [ ] `rails db:migrate db:seed` en local
+- [ ] Ajouter route admin `resource :site_settings, only: %i[edit update]`
+- [ ] Créer `Admin::SiteSettingsController` avec `edit` + `update` (params permit `tiktok_latest_url`)
+- [ ] Créer la vue `admin/site_settings/edit.html.erb` (1 input URL + bouton enregistrer)
+- [ ] Ajouter un lien "Réglages du site" dans le dashboard admin
+- [ ] Créer partial `shared/_tiktok_embed.html.erb` — affiche le blockquote + charge le script
+- [ ] Charger `@tiktok_url = SiteSetting.get("tiktok_latest_url")` dans `PagesController#home` et `#galerie`
+- [ ] Insérer le partial dans `home.html.erb` (à placer entre quelles sections — à confirmer)
+- [ ] Insérer le partial dans `galerie.html.erb` juste avant la section Instagram
+- [ ] Styliser la section TikTok (titre type "Dernière vidéo", conteneur centré)
+- [ ] Tester en local : sans URL → rien ne s'affiche / avec URL valide → embed visible
+- [ ] Tester depuis l'admin : modifier l'URL → l'embed change sur les 2 pages
 
-### 📋 Phase 3 — Prestations
-- [x] Header de page agrandi (h1 42→64px)
-- [x] Pills filtre catégories centrées et flex-wrap
-- [x] Liste tarifs `.full-list` centrée max 800px
-- [x] Tableau retouches centré
-- [x] Bloc info morphologie centré max 600px
+## Question avant de démarrer
+**Sur la home, à quel endroit insérer la section TikTok ?**
+Options possibles :
+- (a) Juste après le hero (très visible)
+- (b) Entre le carousel prestations et le bloc fidélité
+- (c) Entre le bloc shop et la section localisation
+- (d) Juste avant le footer
 
-### 📅 Phase 4 — Réservation
-- [x] Steps-bar agrandie (cercles 32→40px)
-- [x] Sections d'étape centrées max 700px
-- [x] Sélection prestation : grille 2 colonnes
-- [x] Calendrier max 380px
-- [x] Récap + total agrandis (26→32px)
-- [x] Pages success / show centrées max 700px
-
-### 👤 Phase 5 — Espace cliente
-- [x] Profile-hero agrandi (avatar 72→96px, name 26→36px)
-- [x] Stats du profil sur max 600px
-- [x] Client-nav onglets centrés max 1200px
-- [x] Carte fidélité centrée max 600px
-- [x] **Stats fidélité : grille 4 colonnes** (au lieu de 2x2)
-- [x] **Détails techniques historique : grille 4 colonnes**
-- [x] Newsletters / settings centrés
-
-### 🔐 Phase 6 — Admin Syam
-- [x] Nav admin agrandie (logo 18→22px)
-- [x] Header admin agrandi (titre 24→32px)
-- [x] **Stats : grille 4 colonnes** (au lieu de 2x2)
-- [x] **Tuiles navigation : 4 colonnes ≥768px, 5 colonnes ≥1024px**
-- [x] Cartes RDV pleine largeur (heure 48→60px)
-- [x] Boutons d'action en ligne (au lieu d'empilés)
-- [x] Nav-desktop globale masquée sur pages admin (via `:has()`)
-
-### 📄 Phase 7 — Pages statiques
-- [x] **About** : portrait + nom côte à côte, valeurs grille 4 col, studio 4 col
-- [x] **FAQ** : grille 2 colonnes
-- [x] **Contact** : quick-links agrandis, form-inputs aérés
-- [x] **Avis** : grille 2 colonnes pour les avis, rating 96px
-- [x] **Galerie** : collage agrandi, masonry 4 colonnes, vidéos 4 col, Instagram 6 col
-- [x] **Morphologie** : techniques 4 colonnes, eye-grid 3 col, reco-grid 4 col
-- [x] **Shop** : packs 3 col, produits 4 col, gift-card max 600px
-- [x] **Auth Devise** : inputs agrandis (14→16px font)
-
-### ✅ Phase 8 — Vérifications cohérence
-- [x] Toutes les règles desktop sont dans `@media (min-width: 768px)` ou `(min-width: 1024px)` → mobile intact
-- [x] La nav-desktop est cachée par défaut (`display: none`), visible uniquement ≥1024px
-- [x] Le burger reste actif sur mobile et tablette (<1024px)
-- [x] Sur les pages admin, la nav-desktop est masquée pour éviter double-nav
-- [x] Les pages auth Devise utilisent les classes `.auth-*` agrandies en desktop
-
-## À tester en navigateur
-- [ ] Résolution 375px (iPhone) → mockup phone conservé
-- [ ] Résolution 768px (iPad) → mockup retiré, layouts 2 col
-- [ ] Résolution 1440px (laptop) → nav horizontale, layouts 3-4 col
-- [ ] Vérifier que le burger fonctionne toujours sur mobile
-- [ ] Vérifier le focus des liens nav-desktop au clavier (accessibilité)
-
-## Notes pour la suite
-- Si tu veux revenir au mobile partout pour tester, commente la ligne `@import "desktop.css"` dans `app.css`
-- Si une page desktop ne te plaît pas, tu peux modifier juste sa section dans `desktop.css` (chaque phase est commentée)
-- Le `:has()` est supporté sur Chrome 105+, Safari 15.4+, Firefox 121+ → safe en 2026
-
-## Mémoire de session
-- 7 phases CSS faites en 1 seul fichier `desktop.css` (~870 lignes)
-- 1 modif au layout (nav-desktop)
-- 1 modif à app.css (import)
-- En attente : retours de Syam sur Railway pour le déploiement
+## Notes
+- L'embed TikTok charge un iframe qui peut être lourd → on ne le rend QUE si `@tiktok_url` est présente
+- Le script `embed.js` n'est chargé qu'une fois (le partial inclut un `content_for :head` ou un check)
+- L'URL TikTok doit être au format `https://www.tiktok.com/@compte/video/123456789` (pas le lien court)
+- Pas de validation regex stricte côté modèle pour rester souple — on fait confiance à Syam

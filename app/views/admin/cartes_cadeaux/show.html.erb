@@ -38,7 +38,7 @@
             <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:6px;">Prestation (optionnel)</label>
             <%# Suggestions rapides pour remplir la description en un tap %>
             <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-              <% ['Pose cil à cil', 'Volume russe', 'Retouche', 'Rehaussement', 'Sourcils'].each do |soin| %>
+              <% ['Pose cil à cil', 'Volume russe', 'Remplissage', 'Rehaussement', 'Sourcils'].each do |soin| %>
                 <button type="button"
                         onclick="document.getElementById('desc-input').value = '<%= soin %>'"
                         style="padding:5px 12px; border-radius:20px; border:1px solid #e2dbd2; background:#f6f4f1; color:var(--color-muted); font-size:11px; cursor:pointer; font-family:inherit;">

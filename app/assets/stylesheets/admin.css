@@ -1000,3 +1000,23 @@
   border-color: #3d3530;
   box-shadow: 0 4px 14px rgba(46,41,38,0.3);
 }
+
+/* ============================================================
+   BOUTON "↩ SITE" DANS LA NAV ADMIN
+   Injecté via JS dans .admin-nav, placé juste avant Déconnexion.
+   Style aligné sur .admin-logout pour rester cohérent visuellement.
+   ============================================================ */
+.admin-back-to-site {
+  font-size: 10px;
+  color: var(--color-accent);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  margin-right: 12px;
+  transition: color 0.15s;
+}
+
+.admin-back-to-site:hover {
+  color: #fff;
+}

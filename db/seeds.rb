@@ -68,7 +68,7 @@ prestations = [
   # RETOUCHES 2 SEMAINES (remplissages)
   # ============================================================
   {
-    nom: "Retouche Demi-pose — 2 semaines",
+    nom: "Remplissage Demi-pose — 2 semaines",
     description: "Remplissage de la demi-pose à 2 semaines.",
     duree_minutes: 45,
     prix_cents: 3000,          # 30€
@@ -76,7 +76,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Cil à cil — 2 semaines",
+    nom: "Remplissage Cil à cil — 2 semaines",
     description: "Remplissage cil à cil à 2 semaines.",
     duree_minutes: 60,
     prix_cents: 3000,          # 30€
@@ -84,7 +84,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Effet mouillé — 2 semaines",
+    nom: "Remplissage Effet mouillé — 2 semaines",
     description: "Remplissage effet mouillé à 2 semaines.",
     duree_minutes: 60,
     prix_cents: 3500,          # 35€
@@ -92,7 +92,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Volume léger — 2 semaines",
+    nom: "Remplissage Volume léger — 2 semaines",
     description: "Remplissage volume léger à 2 semaines.",
     duree_minutes: 60,
     prix_cents: 3500,          # 35€
@@ -100,7 +100,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Volume intense — 2 semaines",
+    nom: "Remplissage Volume intense — 2 semaines",
     description: "Remplissage volume intense à 2 semaines.",
     duree_minutes: 75,
     prix_cents: 4000,          # 40€
@@ -108,7 +108,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Manga — 2 semaines",
+    nom: "Remplissage Manga — 2 semaines",
     description: "Remplissage pose manga à 2 semaines.",
     duree_minutes: 75,
     prix_cents: 4500,          # 45€
@@ -121,7 +121,7 @@ prestations = [
   # Note : pas de retouche 3 semaines pour la Pose Manga
   # ============================================================
   {
-    nom: "Retouche Demi-pose — 3 semaines",
+    nom: "Remplissage Demi-pose — 3 semaines",
     description: "Remplissage de la demi-pose à 3 semaines.",
     duree_minutes: 60,
     prix_cents: 4000,          # 40€
@@ -129,7 +129,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Cil à cil — 3 semaines",
+    nom: "Remplissage Cil à cil — 3 semaines",
     description: "Remplissage cil à cil à 3 semaines.",
     duree_minutes: 75,
     prix_cents: 4000,          # 40€
@@ -137,7 +137,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Effet mouillé — 3 semaines",
+    nom: "Remplissage Effet mouillé — 3 semaines",
     description: "Remplissage effet mouillé à 3 semaines.",
     duree_minutes: 75,
     prix_cents: 4500,          # 45€
@@ -145,7 +145,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Volume léger — 3 semaines",
+    nom: "Remplissage Volume léger — 3 semaines",
     description: "Remplissage volume léger à 3 semaines.",
     duree_minutes: 75,
     prix_cents: 4500,          # 45€
@@ -153,7 +153,7 @@ prestations = [
     disponible: true
   },
   {
-    nom: "Retouche Volume intense — 3 semaines",
+    nom: "Remplissage Volume intense — 3 semaines",
     description: "Remplissage volume intense à 3 semaines.",
     duree_minutes: 90,
     prix_cents: 5000,          # 50€
@@ -214,9 +214,9 @@ puts "Création des produits shop..."
 
 produits = [
   { nom: "Carte cadeau",        description: "Valable sur toutes les prestations. La destinataire choisit sa date.", prix_cents: 6000, type_produit: "carte_cadeau", actif: true },
-  { nom: "Pack 3 retouches",    description: "3 retouches à utiliser en 3 mois. Économie de 15€.",                 prix_cents: 12000, type_produit: "pack",         actif: true },
-  { nom: "Pack 5 retouches",    description: "5 retouches sur 5 mois. Brossette offerte. Économie de 30€.",        prix_cents: 19500, type_produit: "pack",         actif: true },
-  { nom: "Pack 10 retouches",   description: "Un an de regard parfait. 1 pose offerte. Économie de 70€.",          prix_cents: 38000, type_produit: "pack",         actif: true },
+  { nom: "Pack 3 remplissages", description: "3 remplissages à utiliser en 3 mois. Économie de 15€.",              prix_cents: 12000, type_produit: "pack",         actif: true },
+  { nom: "Pack 5 remplissages", description: "5 remplissages sur 5 mois. Brossette offerte. Économie de 30€.",     prix_cents: 19500, type_produit: "pack",         actif: true },
+  { nom: "Pack 10 remplissages",description: "Un an de regard parfait. 1 pose offerte. Économie de 70€.",          prix_cents: 38000, type_produit: "pack",         actif: true },
   { nom: "Nettoyant cils",      description: "Mousse douce sans huile ni alcool.",                                  prix_cents: 1800,  type_produit: "routine",      actif: true },
   { nom: "Brossette cils",      description: "Pack de 10 brossettes jetables.",                                     prix_cents: 800,   type_produit: "routine",      actif: true },
   { nom: "Sérum cils",          description: "Sérum fortifiant pour cils naturels.",                                prix_cents: 3200,  type_produit: "routine",      actif: true },
@@ -237,4 +237,18 @@ user = User.find_or_create_by!(email: "marie@test.com") do |u|
 end
 
 puts "  → marie@test.com / password123"
+
+# ============================================================
+# RÉGLAGES DU SITE — clés/valeurs éditables depuis l'admin
+# On pré-crée les clés attendues avec une valeur vide pour que
+# Syam les voie tout de suite dans le formulaire admin.
+# `find_or_create_by!` → idempotent : ne crée pas de doublon si
+# on relance les seeds plusieurs fois.
+# ============================================================
+puts "\nCréation des réglages du site..."
+SiteSetting.find_or_create_by!(key: "tiktok_latest_url") do |s|
+  s.value = ""  # Vide au départ → section TikTok masquée sur le site public
+end
+puts "  → tiktok_latest_url (vide)"
+
 puts "\n✅ Seeds terminés ! #{Prestation.count} prestations, #{Product.count} produits."

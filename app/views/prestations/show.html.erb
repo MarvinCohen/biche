@@ -204,7 +204,8 @@
     <div class="presta-body">
 
       <%# Catégorie en petit au-dessus du nom %>
-      <% labels = { 'extensions' => 'Extensions', 'retouche' => 'Retouches',
+      <%# Mapping catégorie interne → libellé affiché côté cliente %>
+      <% labels = { 'extensions' => 'Extensions', 'retouche' => 'Remplissages',
                     'rehaussement' => 'Rehaussement', 'depose' => 'Dépose' } %>
       <div class="presta-cat"><%= labels[@prestation.categorie] || @prestation.categorie.capitalize %></div>
 

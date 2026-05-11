@@ -50,56 +50,6 @@
       </div>
     </div>
 
-    <%# ---- COLLAGE HERO ---- %>
-    <%#
-      Si on a au moins 1 photo en BDD → collage avec vraies photos
-      Sinon → fallback sur les formes SVG décoratives
-    %>
-    <div class="collage-hero">
-
-      <%# Bloc principal (grand ovale) — photo 1 ou fond gris dégradé %>
-      <div class="col-main">
-        <% if @collage_photos[0] %>
-          <%# Photo réelle : couvre tout le bloc avec object-fit: cover %>
-          <%= image_tag @collage_photos[0].image,
-                        alt: @collage_photos[0].legende,
-                        class: "col-photo" %>
-        <% else %>
-          <%# Pas de photo — le fond coloré du blob suffit comme décoration %>
-        <% end %>
-      </div>
-
-      <%# Blob secondaire haut droite — photo 2 %>
-      <div class="col-sec">
-        <% if @collage_photos[1] %>
-          <%= image_tag @collage_photos[1].image,
-                        alt: @collage_photos[1].legende,
-                        class: "col-photo" %>
-        <% end %>
-      </div>
-
-      <%# Blob allongé bas centre-gauche — photo 3 %>
-      <div class="col-third">
-        <% if @collage_photos[2] %>
-          <%= image_tag @collage_photos[2].image,
-                        alt: @collage_photos[2].legende,
-                        class: "col-photo" %>
-        <% end %>
-      </div>
-
-      <%# Petit blob bas droite — photo 4 ou logo "B." %>
-      <div class="col-accent">
-        <% if @collage_photos[3] %>
-          <%= image_tag @collage_photos[3].image,
-                        alt: @collage_photos[3].legende,
-                        class: "col-photo" %>
-        <% else %>
-          <span>B.</span>
-        <% end %>
-      </div>
-
-    </div>
-
     <%# ---- GRILLE MASONRY ---- %>
     <%# Chaque item a un data-cat pour le filtre JS %>
     <section class="sec" id="section-tout">
@@ -326,28 +276,47 @@
       </section>
     <% end %>
 
+    <%# ---- DERNIÈRE VIDÉO TIKTOK ---- %>
+    <%# Affichée juste avant la section Instagram.
+        Le partial ne rend rien si @tiktok_url est vide. %>
+    <%= render "shared/tiktok_embed", tiktok_url: @tiktok_url %>
+
     <%# ---- INSTAGRAM ---- %>
-    <%# Grille 3x2 de vignettes stylisées (placeholder) + lien vers le profil %>
+    <%# Carte invitation : icône avec dégradé brand Instagram + titre + handle + CTA.
+        Pas de grille (on ne peut pas afficher les photos Instagram sans API).
+        Visuel pensé "premium" : carte centrée avec ombre douce, icône large,
+        bouton avec le dégradé officiel Instagram pour ramener l'œil. %>
     <div class="insta-sec">
-      <div class="insta-title">Suivez l'atelier</div>
-      <p class="insta-sub">Dernières réalisations et disponibilités sur Instagram.</p>
-      <div class="insta-grid">
-        <div class="insta-item ig1"></div>
-        <div class="insta-item ig2"></div>
-        <div class="insta-item ig3"></div>
-        <div class="insta-item ig4"></div>
-        <div class="insta-item ig5"></div>
-        <div class="insta-item ig6"></div>
+      <div class="insta-card">
+
+        <%# Cercle décoratif contenant le logo Instagram en SVG.
+            Le dégradé est appliqué via .insta-icon-circle (CSS). %>
+        <div class="insta-icon-circle">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="#fff" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="4.5" stroke="#fff" stroke-width="1.8"/>
+            <circle cx="17.5" cy="6.5" r="1.2" fill="#fff"/>
+          </svg>
+        </div>
+
+        <div class="insta-title">Suivez l'atelier</div>
+        <p class="insta-sub">Découvrez les dernières réalisations,<br>conseils et coulisses sur Instagram.</p>
+        <div class="insta-handle">@atelier_b.iche</div>
+
+        <%# Bouton CTA — couleurs du brand Instagram appliquées en CSS %>
+        <a href="https://www.instagram.com/atelier_b.iche/"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="insta-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="1.5" y="1.5" width="11" height="11" rx="3" stroke="#fff" stroke-width="1.3"/>
+            <circle cx="7" cy="7" r="2.5" stroke="#fff" stroke-width="1.3"/>
+            <circle cx="10" cy="4" r="0.7" fill="#fff"/>
+          </svg>
+          Voir sur Instagram
+        </a>
+
       </div>
-      <div class="insta-handle">@atelier_b.iche</div>
-      <a href="https://www.instagram.com/atelier_b.iche/" target="_blank" rel="noopener noreferrer" class="insta-btn">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="1.5" y="1.5" width="11" height="11" rx="3" stroke="#2e2926" stroke-width="1.3"/>
-          <circle cx="7" cy="7" r="2.5" stroke="#2e2926" stroke-width="1.3"/>
-          <circle cx="10" cy="4" r="0.7" fill="#2e2926"/>
-        </svg>
-        Voir sur Instagram
-      </a>
     </div>
 
     <%# ---- FOOTER ---- %>

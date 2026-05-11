@@ -872,7 +872,9 @@
       <%# ---- PILLS DE FILTRE — dynamiques depuis les catégories en base ---- %>
       <div class="cat-bar" id="catBar">
         <span class="cat-pill active" data-cat="toutes">Toutes</span>
-        <% labels = { 'extensions' => 'Extensions', 'retouche' => 'Retouches',
+        <%# Mapping clé interne (categorie en base) → libellé affiché à la cliente.
+            On garde 'retouche' comme clé technique mais on affiche "Remplissages". %>
+        <% labels = { 'extensions' => 'Extensions', 'retouche' => 'Remplissages',
                       'rehaussement' => 'Rehaussement', 'depose' => 'Dépose' } %>
         <% @prestations.map(&:categorie).uniq.each do |cat| %>
           <span class="cat-pill" data-cat="<%= cat %>"><%= labels[cat] || cat.capitalize %></span>
@@ -1036,7 +1038,8 @@
         <% retouches = @prestations.select { |p| p.categorie == "retouche" } %>
         <% unless retouches.empty? %>
           <div class="tarif-cat-header" onclick="toggleCat(this)">
-            <span>Retouches</span>
+            <%# Libellé visible — la valeur en base reste "retouche" côté DB %>
+            <span>Remplissages</span>
             <svg class="tarif-cat-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M4 6 L8 10 L12 6" stroke="#3a2a1e" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
