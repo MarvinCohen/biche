@@ -40,10 +40,8 @@
         <%# --- Mot de passe --- %>
         <div class="auth-field">
           <%= f.label :password, "Mot de passe", class: "auth-label" %>
-          <%= f.password_field :password,
-                               autocomplete: "current-password",
-                               placeholder: "••••••••",
-                               class: "auth-input" %>
+          <%= render "devise/shared/password_field",
+                     f: f, field: :password, autocomplete: "current-password" %>
         </div>
 
         <%# --- Se souvenir de moi (si le module rememberable est actif) --- %>

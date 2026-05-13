@@ -75,6 +75,34 @@ body {
 }
 
 /* ============================================================
+   Mode "plein écran" sur mobile réel (< 480px) :
+   sur desktop on garde l'effet mockup téléphone (cadre arrondi
+   + ombre sur fond sombre), mais sur un VRAI téléphone ce cadre
+   est inutile et moche → on supprime padding, ombre, radius et
+   on aligne la couleur de fond pour que le rendu soit edge-to-edge.
+============================================================ */
+@media (max-width: 480px) {
+  body {
+    /* Plus de padding extérieur sombre — la page touche les bords */
+    padding: 0;
+    /* Le fond du body doit matcher celui du .phone pour éviter
+       toute bande visible si le contenu ne couvre pas tout l'écran. */
+    background: var(--color-nude);
+  }
+  .phone {
+    /* Les coins arrondis et l'ombre n'ont plus de sens sur un vrai écran */
+    border-radius: 0;
+    box-shadow: none;
+    /* On laisse le téléphone occuper toute la hauteur disponible */
+    min-height: 100vh;
+  }
+  .wrap {
+    /* On lève la contrainte de largeur pour aller jusqu'aux bords */
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
    NAVIGATION — barre du haut fixée
    ============================================================ */
 .nav {
@@ -547,6 +575,45 @@ body {
 /* Focus : bordure plus visible */
 .auth-input:focus {
   border-color: var(--color-accent);
+}
+
+/* ============================================================
+   Bouton œil pour afficher/masquer un mot de passe.
+   On positionne l'input relativement et on superpose un petit
+   bouton à droite à l'intérieur du champ. Padding-right ajusté
+   sur l'input pour que le texte ne passe pas sous l'icône.
+============================================================ */
+.auth-password-wrap {
+  position: relative;
+}
+.auth-password-wrap .auth-input {
+  /* Espace à droite pour ne pas chevaucher l'icône œil */
+  padding-right: 42px;
+}
+.auth-password-toggle {
+  /* Positionné en surimpression sur la droite du champ */
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--color-muted, #8e8480);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Léger hover pour donner un retour visuel */
+  transition: color 0.15s;
+}
+.auth-password-toggle:hover {
+  color: var(--color-dark);
+}
+.auth-password-toggle svg {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 /* Indice de longueur minimale du mot de passe */
