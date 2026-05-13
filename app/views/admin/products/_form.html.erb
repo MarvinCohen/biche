@@ -19,19 +19,51 @@
 </div>
 
 <%# ---- TYPE ---- %>
+<%# data-product-type-select sert d'identifiant pour le JS qui affiche/cache
+    les champs spécifiques aux packs (prestation + nb_remplissages) en fonction
+    de la valeur choisie ici. %>
 <div class="admin-field">
   <%= f.label :type_produit, "Type", class: "admin-label" %>
   <%= f.select :type_produit,
                options_for_select(
                  [
                    ["Routine (produit d'entretien)", "routine"],
-                   ["Pack multi-visites",            "pack"],
+                   ["Pack de remplissages",          "pack"],
                    ["Carte cadeau",                  "carte_cadeau"]
                  ],
                  @product.type_produit
                ),
                { include_blank: "Choisir un type" },
-               class: "admin-select" %>
+               class: "admin-select",
+               data: { product_type_select: true } %>
+</div>
+
+<%# ---- CHAMPS SPÉCIFIQUES PACKS (visibles uniquement si type = pack) ---- %>
+<%# Le bloc est masqué par défaut côté serveur si type_produit != 'pack'.
+    Le petit JS en bas du formulaire toggle l'affichage quand la valeur change. %>
+<div data-product-pack-fields
+     style="<%= 'display:none;' unless @product.pack? %>">
+
+  <%# Pose associée — uniquement les prestations de catégorie "extensions" %>
+  <div class="admin-field">
+    <%= f.label :prestation_id, "Type de pose", class: "admin-label" %>
+    <%= f.collection_select :prestation_id,
+                            @poses_disponibles, :id, :nom,
+                            { include_blank: "Choisir une pose" },
+                            class: "admin-select" %>
+  </div>
+
+  <%# Nombre de remplissages inclus — uniquement 3 / 6 / 9 (constante du modèle) %>
+  <div class="admin-field">
+    <%= f.label :nb_remplissages, "Nombre de remplissages", class: "admin-label" %>
+    <%= f.select :nb_remplissages,
+                 options_for_select(
+                   Product::NB_REMPLISSAGES_AUTORISES.map { |n| [n, n] },
+                   @product.nb_remplissages
+                 ),
+                 { include_blank: "Choisir une quantité" },
+                 class: "admin-select" %>
+  </div>
 </div>
 
 <%# ---- PRIX ---- %>
@@ -91,3 +123,27 @@
     </label>
   </div>
 </div>
+
+<%# ============================================================
+    JS — Toggle des champs "pack" en fonction du type produit choisi.
+    Petit script inline (pas la peine d'un Stimulus pour un cas aussi simple).
+    Sur changement du select [data-product-type-select], on affiche
+    ou cache le bloc [data-product-pack-fields].
+============================================================ %>
+<script>
+  (function() {
+    // Récupère le select de type et le bloc des champs pack
+    var typeSelect = document.querySelector('[data-product-type-select]');
+    var packFields = document.querySelector('[data-product-pack-fields]');
+    if (!typeSelect || !packFields) return;
+
+    // Bascule l'affichage selon la valeur courante.
+    // Appelée au chargement (pour aligner l'UI avec la valeur initiale)
+    // et à chaque changement.
+    function toggle() {
+      packFields.style.display = (typeSelect.value === 'pack') ? '' : 'none';
+    }
+    typeSelect.addEventListener('change', toggle);
+    toggle();
+  })();
+</script>

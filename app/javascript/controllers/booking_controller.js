@@ -31,6 +31,9 @@ export default class extends Controller {
     // Étape 3 — paiement
     "paymentOpt",
     "paymentInput",      // input hidden
+    "creditOption",      // 3e option de paiement — affichée si un crédit est applicable
+    "creditCount",       // span "(X restants)" dans le libellé de l'option crédit
+    "creditIdInput",     // input hidden pour le credit_id sélectionné
 
     // Étape 4 — récap
     "recapPrestation",
@@ -39,7 +42,10 @@ export default class extends Controller {
     "recapHeureFin",
     "recapPrix",
     "recapAcompte",
-    "recapGarantie"
+    "recapAcompteRow",   // ligne entière "Acompte dû" — cachée si paiement par crédit
+    "recapGarantie",
+    "submitBtn",         // bouton de soumission — libellé adapté selon mode paiement
+    "confirmNote"        // note explicative sous le bouton — adaptée aussi
   ]
 
   // ============================================================
@@ -47,7 +53,17 @@ export default class extends Controller {
   // ============================================================
   static values = {
     creneauxUrl: String,   // URL de l'endpoint AJAX créneaux
-    prestationId: Number   // Prestation pré-sélectionnée (depuis le lien "Je réserve")
+    prestationId: Number,  // Prestation pré-sélectionnée (depuis le lien "Je réserve")
+    // Jours de la semaine fermés (0=dim … 6=sam) — vient de BusinessHour côté serveur
+    // Default vide : si la table n'est pas configurée, tous les jours sont ouverts.
+    joursFermes: { type: Array, default: [] },
+    // Dates spécifiques bloquées « jour entier » (format "YYYY-MM-DD") — vient d'Indisponibilite
+    // Permet de griser un lundi ponctuel sans toucher à la semaine type.
+    joursBloques: { type: Array, default: [] },
+    // Crédits actifs de la cliente — utilisés pour afficher dynamiquement
+    // l'option "Utiliser un crédit" si une retouche applicable est choisie.
+    // Format : [{ id, prestation_id, prestation_nom, nb_restant }, ...]
+    creditsActifs: { type: Array, default: [] }
   }
 
   // ============================================================
@@ -176,6 +192,47 @@ export default class extends Controller {
       const circle = opt.querySelector(".radio-circle")
       if (circle) circle.classList.toggle("checked", opt === el)
     })
+
+    // Actualiser l'option "Utiliser un crédit" en fonction de la prestation choisie
+    // (l'affiche si un crédit applicable existe, la cache sinon).
+    this.refreshCreditOption()
+  }
+
+  // Affiche ou masque l'option "Utiliser un crédit" à l'étape 3 en fonction
+  // de la prestation sélectionnée. Reprend la logique côté serveur de
+  // Credit#applicable_a? : matching insensible à la casse sur le nom de la pose.
+  // Stocke aussi l'id du crédit applicable dans `_applicableCreditId` pour le
+  // remplir dans le hidden field si la cliente choisit cette option.
+  refreshCreditOption() {
+    // Si le formulaire n'expose pas l'option (jamais de crédits actifs côté serveur)
+    // → rien à faire. hasCreditOptionTarget est un helper Stimulus.
+    if (!this.hasCreditOptionTarget) return
+
+    // Pas de prestation choisie : on cache l'option par sécurité
+    if (!this.selectedPrestationNom) {
+      this.creditOptionTarget.style.display = "none"
+      this._applicableCreditId = null
+      return
+    }
+
+    // Recherche FIFO : on prend le 1er crédit dont le nom de la pose est
+    // inclus dans le nom de la prestation choisie. creditsActifsValue est
+    // déjà trié par expiration la plus proche côté serveur.
+    const presta = this.selectedPrestationNom.toLowerCase()
+    const credit = this.creditsActifsValue.find(c =>
+      presta.includes(c.prestation_nom.toLowerCase())
+    )
+
+    if (credit) {
+      // Texte "(X restant·s)" — accord du pluriel à la française
+      const pluriel = credit.nb_restant > 1 ? "s" : ""
+      this.creditCountTarget.textContent = `(${credit.nb_restant} restant${pluriel})`
+      this.creditOptionTarget.style.display = "block"
+      this._applicableCreditId = credit.id
+    } else {
+      this.creditOptionTarget.style.display = "none"
+      this._applicableCreditId = null
+    }
   }
 
   // ============================================================
@@ -233,18 +290,20 @@ export default class extends Controller {
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const date     = new Date(this.calYear, this.calMonth, d)
       const dow      = date.getDay()  // 0=dim, 6=sam
+      const dateStr  = `${this.calYear}-${String(this.calMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
       const isPast   = date < new Date(today.getFullYear(), today.getMonth(), today.getDate())
       const isToday  = date.toDateString() === today.toDateString()
-      // Dimanches indisponibles (Syam ne travaille pas le dimanche)
-      const isClosed = dow === 0
+      // Jours fermés (semaine type) : lus depuis BusinessHour côté serveur
+      const isClosed = this.joursFermesValue.includes(dow)
+      // Date bloquée ponctuellement (indispo jour entier) : ex. "ce lundi je ne travaille pas"
+      // On compare via le format "YYYY-MM-DD" (date locale, pas Date.toISOString qui décale en UTC).
+      const isBlocked = this.joursBloquesValue.includes(dateStr)
 
       let classes = "cal-day"
-      if (isToday)               classes += " today"
-      if (isPast || isClosed)    classes += " unavailable"
+      if (isToday)                          classes += " today"
+      if (isPast || isClosed || isBlocked)  classes += " unavailable"
 
-      const dateStr = `${this.calYear}-${String(this.calMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
-
-      if (isPast || isClosed) {
+      if (isPast || isClosed || isBlocked) {
         html += `<div class="${classes}">${d}</div>`
       } else {
         html += `<div class="${classes}" data-date="${dateStr}" data-action="click->booking#selectDate">${d}</div>`
@@ -357,6 +416,14 @@ export default class extends Controller {
 
     this.selectedPayment = el.dataset.payment
     this.paymentInputTarget.value = this.selectedPayment
+
+    // Si la cliente choisit "crédit" → on remplit le hidden credit_id avec
+    // l'id du crédit applicable trouvé par refreshCreditOption(). Sinon on vide
+    // (au cas où elle aurait basculé crédit → acompte par exemple).
+    if (this.hasCreditIdInputTarget) {
+      this.creditIdInputTarget.value =
+        (this.selectedPayment === "credit" ? (this._applicableCreditId || "") : "")
+    }
   }
 
   // ============================================================
@@ -397,9 +464,44 @@ export default class extends Controller {
       this.recapAcompteTarget.textContent = `${acompte}€`
     }
 
-    // Mode de garantie
+    // Si paiement par crédit : on cache la ligne "Acompte dû" (rien à payer).
+    // Sinon on s'assure qu'elle reste visible.
+    if (this.hasRecapAcompteRowTarget) {
+      this.recapAcompteRowTarget.style.display =
+        (this.selectedPayment === "credit" ? "none" : "flex")
+    }
+
+    // Mode de garantie — 3 libellés selon le mode choisi
     if (this.hasRecapGarantieTarget) {
-      this.recapGarantieTarget.textContent = this.selectedPayment === "acompte" ? "Acompte 30%" : "Empreinte CB"
+      let label = "Empreinte CB"
+      if (this.selectedPayment === "acompte") label = "Acompte 30%"
+      else if (this.selectedPayment === "credit") label = "Crédit de pack"
+      this.recapGarantieTarget.textContent = label
+    }
+
+    // Adapter le libellé du bouton submit + la note explicative selon le mode.
+    // Pour un submit type="submit", on modifie `value` (input) ou `textContent` (button).
+    // En Rails, f.submit génère un <input type="submit"> → on utilise `value`.
+    if (this.hasSubmitBtnTarget) {
+      const btn = this.submitBtnTarget
+      if (this.selectedPayment === "credit") {
+        btn.value = "Confirmer avec mon crédit"
+      } else if (this.selectedPayment === "empreinte") {
+        btn.value = "Confirmer la réservation"
+      } else {
+        btn.value = "Confirmer et payer l'acompte"
+      }
+    }
+    if (this.hasConfirmNoteTarget) {
+      if (this.selectedPayment === "credit") {
+        this.confirmNoteTarget.innerHTML =
+          "Aucun paiement requis — votre crédit sera consommé après le rendez-vous.<br>" +
+          "Un email de confirmation vous sera envoyé."
+      } else {
+        this.confirmNoteTarget.innerHTML =
+          "Un email de confirmation + rappel 24h avant vous seront envoyés automatiquement.<br>" +
+          "Paiement sécurisé via Stripe."
+      }
     }
   }
 }

@@ -372,51 +372,123 @@
       </div>
     </div>
 
-    <%# ---- PACKS MULTI-VISITES — données depuis la base ---- %>
-    <% if @produits_packs.any? %>
+    <%# ============================================================
+        PACKS DE REMPLISSAGE — affichage filtré par type de pose
+        Sélecteur en pills (Cil à cil, Volume léger, etc.) → on n'affiche
+        que les 3 packs (3 / 6 / 9 remplissages) de la pose sélectionnée.
+        Par défaut, la première pose est active. Cas vide (aucun pack en BDD)
+        géré en amont par le `if`.
+    ============================================================ %>
+    <% if @packs_par_pose.any? %>
+      <%# Style local des pills + des 3 cards (réutilise le DS Biche.) %>
+      <style>
+        /* Bar des pills de filtre par pose */
+        .pose-pills {
+          display: flex;
+          gap: 8px;
+          overflow-x: auto;
+          padding: 4px 4px 16px;
+          margin: 0 -4px 8px;
+          scrollbar-width: none;
+        }
+        .pose-pills::-webkit-scrollbar { display: none; }
+        .pose-pill {
+          flex: 0 0 auto;
+          padding: 8px 16px;
+          border-radius: 20px;
+          background: #fff;
+          border: 1px solid var(--color-border, #e2dbd2);
+          font-size: 12px;
+          color: var(--color-dark, #2e2926);
+          cursor: pointer;
+          white-space: nowrap;
+          transition: all 0.18s ease;
+        }
+        .pose-pill.active {
+          background: var(--color-dark, #2e2926);
+          color: #fff;
+          border-color: var(--color-dark, #2e2926);
+        }
+        /* Groupe de 3 cards par pose — masqué par défaut, affiché si .active */
+        .pose-group { display: none; }
+        .pose-group.active { display: block; }
+      </style>
+
       <div class="sec sec-alt" id="section-packs">
         <div class="s-tag">Fidélité</div>
-        <div class="s-h2">Packs multi-visites</div>
-        <div class="s-sub">Pour les clientes régulières. Plus vous prenez, plus vous économisez.</div>
+        <div class="s-h2">Packs de remplissage</div>
+        <div class="s-sub">Choisissez votre type de pose, puis votre formule.</div>
 
-        <div class="packs-list">
-          <% @produits_packs.each_with_index do |pack, i| %>
-            <%# Le 2ème pack est mis en avant (featured) %>
-            <div class="pack-card <%= 'featured' if i == 1 %>">
-              <div class="pack-header">
-                <% if i == 1 %>
-                  <div class="pack-badge">⭐ Populaire</div>
-                <% end %>
-                <div class="pack-name"><%= pack.nom %></div>
-                <% if pack.description.present? %>
-                  <%# La description peut contenir des avantages séparés par des sauts de ligne %>
-                  <%# Première ligne = description courte, lignes suivantes = liste d'avantages %>
-                  <% lignes = pack.description.strip.split("\n").map(&:strip).reject(&:blank?) %>
-                  <div class="pack-desc"><%= lignes.first %></div>
-                  <% if lignes.size > 1 %>
-                    <div class="pack-includes">
-                      <% lignes.drop(1).each do |ligne| %>
-                        <div class="pack-include-item">
-                          <div class="pack-check">
-                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                              <path d="M2 5 L4 7 L8 3" stroke="#2e2926" stroke-width="1.2" stroke-linecap="round"/>
-                            </svg>
-                          </div>
-                          <%= ligne %>
-                        </div>
-                      <% end %>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
-              <div class="pack-footer">
-                <div class="pack-price"><%= pack.prix_euros.to_i %>€</div>
-                <%= link_to "Choisir", new_order_path(product_id: pack.id), class: "pack-btn" %>
-              </div>
-            </div>
+        <%# ---- PILLS DE FILTRE PAR POSE ---- %>
+        <%# data-pose-pill : sélecteur pour le JS. Valeur = id de la prestation. %>
+        <div class="pose-pills">
+          <% @packs_par_pose.keys.each_with_index do |pose, idx| %>
+            <button class="pose-pill <%= 'active' if idx.zero? %>"
+                    data-pose-pill="<%= pose.id %>">
+              <%= pose.nom %>
+            </button>
           <% end %>
         </div>
+
+        <%# ---- GROUPES DE PACKS PAR POSE (un seul affiché à la fois) ---- %>
+        <% @packs_par_pose.each_with_index do |(pose, packs), idx| %>
+          <%# data-pose-group : sélecteur pour le JS, doit matcher data-pose-pill %>
+          <div class="pose-group <%= 'active' if idx.zero? %>"
+               data-pose-group="<%= pose.id %>">
+            <div class="packs-list">
+              <% packs.each_with_index do |pack, i| %>
+                <%# Le pack du milieu (6 remplissages) est mis en avant.
+                    Comme `packs` est trié par nb_remplissages croissant
+                    (scope :par_pose), c'est toujours l'index 1. %>
+                <div class="pack-card <%= 'featured' if i == 1 %>">
+                  <div class="pack-header">
+                    <% if i == 1 %>
+                      <div class="pack-badge">⭐ Populaire</div>
+                    <% end %>
+                    <div class="pack-name">
+                      <%= pack.nb_remplissages %> remplissages
+                    </div>
+                    <% if pack.description.present? %>
+                      <div class="pack-desc"><%= pack.description %></div>
+                    <% end %>
+                  </div>
+                  <div class="pack-footer">
+                    <div class="pack-price"><%= pack.prix_euros.to_i %>€</div>
+                    <%# Lien vers le récap d'achat de pack (flux dédié, séparé de la carte cadeau) %>
+                    <%= link_to "Choisir", new_pack_orders_path(product_id: pack.id), class: "pack-btn" %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
       </div>
+
+      <%# ---- JS — bascule les groupes en fonction de la pill cliquée ---- %>
+      <%# Petit script inline, pas besoin de Stimulus pour un toggle aussi local. %>
+      <script>
+        (function() {
+          // Sélectionne toutes les pills de pose et tous les groupes correspondants
+          var pills  = document.querySelectorAll('[data-pose-pill]');
+          var groups = document.querySelectorAll('[data-pose-group]');
+          if (!pills.length || !groups.length) return;
+
+          pills.forEach(function(pill) {
+            pill.addEventListener('click', function() {
+              var poseId = pill.dataset.posePill;
+
+              // Met à jour visuellement la pill active
+              pills.forEach(function(p) { p.classList.remove('active'); });
+              pill.classList.add('active');
+
+              // Affiche le groupe correspondant, cache les autres
+              groups.forEach(function(g) {
+                g.classList.toggle('active', g.dataset.poseGroup === poseId);
+              });
+            });
+          });
+        })();
+      </script>
     <% end %>
 
     <%# ---- PRODUITS ROUTINE — données depuis la base ---- %>

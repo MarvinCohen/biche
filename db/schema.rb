@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_11_135929) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_13_090001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -45,6 +45,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_135929) do
   create_table "bookings", force: :cascade do |t|
     t.integer "acompte_cents"
     t.datetime "created_at", null: false
+    t.bigint "credit_id"
     t.date "date"
     t.time "heure"
     t.string "mode_paiement"
@@ -54,11 +55,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_135929) do
     t.string "stripe_payment_intent_id"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["credit_id"], name: "index_bookings_on_credit_id"
     t.index ["date", "statut"], name: "index_bookings_on_date_and_statut"
     t.index ["date"], name: "index_bookings_on_date"
     t.index ["prestation_id"], name: "index_bookings_on_prestation_id"
     t.index ["statut"], name: "index_bookings_on_statut"
     t.index ["user_id"], name: "index_bookings_on_user_id"
+  end
+
+  create_table "business_hours", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "day_of_week", null: false
+    t.time "heure_debut", null: false
+    t.time "heure_fin", null: false
+    t.boolean "ouvert", default: true, null: false
+    t.integer "pas_minutes", default: 90, null: false
+    t.time "pause_debut"
+    t.time "pause_fin"
+    t.datetime "updated_at", null: false
+    t.index ["day_of_week"], name: "index_business_hours_on_day_of_week", unique: true
   end
 
   create_table "carte_transactions", force: :cascade do |t|
@@ -82,6 +97,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_135929) do
     t.index ["active"], name: "index_cartes_cadeaux_on_active"
     t.index ["code"], name: "index_cartes_cadeaux_on_code", unique: true
     t.index ["order_id"], name: "index_cartes_cadeaux_on_order_id"
+  end
+
+  create_table "credits", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date_expiration", null: false
+    t.integer "nb_restant", null: false
+    t.integer "nb_total", null: false
+    t.bigint "order_id", null: false
+    t.bigint "prestation_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["order_id"], name: "index_credits_on_order_id"
+    t.index ["prestation_id"], name: "index_credits_on_prestation_id"
+    t.index ["user_id", "date_expiration"], name: "index_credits_on_user_id_and_date_expiration"
+    t.index ["user_id"], name: "index_credits_on_user_id"
   end
 
   create_table "fidelite_cards", force: :cascade do |t|
@@ -159,10 +189,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_135929) do
     t.boolean "actif"
     t.datetime "created_at", null: false
     t.text "description"
+    t.integer "nb_remplissages"
     t.string "nom"
+    t.bigint "prestation_id"
     t.integer "prix_cents"
     t.string "type_produit"
     t.datetime "updated_at", null: false
+    t.index ["prestation_id"], name: "index_products_on_prestation_id"
   end
 
   create_table "site_settings", force: :cascade do |t|
@@ -217,13 +250,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_11_135929) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "bookings", "credits"
   add_foreign_key "bookings", "prestations"
   add_foreign_key "bookings", "users"
   add_foreign_key "carte_transactions", "cartes_cadeaux"
   add_foreign_key "cartes_cadeaux", "orders"
+  add_foreign_key "credits", "orders"
+  add_foreign_key "credits", "prestations"
+  add_foreign_key "credits", "users"
   add_foreign_key "fidelite_cards", "users"
   add_foreign_key "messages", "users"
   add_foreign_key "orders", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "products", "prestations"
   add_foreign_key "soin_historiques", "bookings"
 end

@@ -57,6 +57,10 @@ Rails.application.routes.draw do
 
     # Profil et préférences
     resource :profil, only: [:show, :edit, :update], controller: "profil"
+
+    # Crédits de remplissage (issus des packs achetés en boutique)
+    # Page dédiée : la cliente consulte ses crédits actifs et l'historique.
+    resources :credits, only: [:index]
   end
 
   # ============================================================
@@ -66,8 +70,10 @@ Rails.application.routes.draw do
     # Tableau de bord : planning du jour + stats
     root to: "dashboard#index"
 
-    # Réservations : liste (avec filtre date), détail, changement de statut, création manuelle
-    resources :bookings, only: [:index, :show, :new, :create] do
+    # Réservations : détail, changement de statut, création manuelle.
+    # Plus d'action `index` : la liste du jour est intégrée au dashboard
+    # (admin/dashboard#index sert de planning du jour avec navigation par date).
+    resources :bookings, only: [:show, :new, :create] do
       collection do
         get :creneaux  # Créneaux disponibles toutes les 15 min (AJAX pour le formulaire admin)
       end
@@ -94,7 +100,9 @@ Rails.application.routes.draw do
     resources :products, only: [:index, :new, :create, :edit, :update, :destroy]
 
     # Indisponibilités : Syam peut bloquer des créneaux (pause, congé, etc.)
-    resources :indisponibilites, only: [:index, :new, :create, :destroy]
+    # `index` et `new` ne sont plus exposés : la gestion est centralisée dans la page
+    # `admin/disponibilites` (qui inclut un form de création et la liste).
+    resources :indisponibilites, only: [:create, :destroy]
 
     # Cartes cadeaux : Syam peut consulter les cartes, voir le solde et déduire un montant
     resources :cartes_cadeaux, only: [:index, :show] do
@@ -130,6 +138,14 @@ Rails.application.routes.draw do
     # `resource` (singulier) car il n'y a qu'une seule page de réglages,
     # pas une liste de réglages à parcourir.
     resource :site_settings, only: %i[edit update]
+
+    # Horaires d'ouverture hebdomadaires : Syam édite ses 7 jours depuis la page Disponibilités.
+    # On expose uniquement `update` — la liste est servie par `admin/disponibilites#index`.
+    resources :business_hours, only: %i[update]
+
+    # Page centralisée de gestion des disponibilités (horaires hebdo + fermetures exceptionnelles).
+    # Une seule action `index` car c'est une vue composite (pas un CRUD).
+    get 'disponibilites', to: 'disponibilites#index', as: :disponibilites
   end
 
   # ============================================================
@@ -139,6 +155,13 @@ Rails.application.routes.draw do
     collection do
       # Page de confirmation après paiement Stripe réussi
       get :success
+
+      # ----- Achat d'un pack de remplissages -----
+      # Flux séparé du flux carte cadeau (qui passe par Stripe).
+      # Pour la démo, l'achat est confirmé immédiatement (statut paye direct)
+      # et un Credit est créé pour la cliente. TODO : brancher Stripe plus tard.
+      get  :new_pack    # GET  /orders/new_pack?product_id=X — page de récap
+      post :create_pack # POST /orders/create_pack          — finalise l'achat
     end
   end
 

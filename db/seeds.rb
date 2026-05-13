@@ -212,19 +212,24 @@ puts "  → #{Prestation.count} prestations créées"
 # --- PRODUITS SHOP ---
 puts "Création des produits shop..."
 
+# Cartes cadeaux + produits routine — créés ici car simples et génériques.
+# Les PACKS de remplissage sont créés par un script dédié (db/setup_packs_remplissage.rb)
+# car ils sont déclinés par pose × nb_remplissages = 18 produits.
 produits = [
-  { nom: "Carte cadeau",        description: "Valable sur toutes les prestations. La destinataire choisit sa date.", prix_cents: 6000, type_produit: "carte_cadeau", actif: true },
-  { nom: "Pack 3 remplissages", description: "3 remplissages à utiliser en 3 mois. Économie de 15€.",              prix_cents: 12000, type_produit: "pack",         actif: true },
-  { nom: "Pack 5 remplissages", description: "5 remplissages sur 5 mois. Brossette offerte. Économie de 30€.",     prix_cents: 19500, type_produit: "pack",         actif: true },
-  { nom: "Pack 10 remplissages",description: "Un an de regard parfait. 1 pose offerte. Économie de 70€.",          prix_cents: 38000, type_produit: "pack",         actif: true },
-  { nom: "Nettoyant cils",      description: "Mousse douce sans huile ni alcool.",                                  prix_cents: 1800,  type_produit: "routine",      actif: true },
-  { nom: "Brossette cils",      description: "Pack de 10 brossettes jetables.",                                     prix_cents: 800,   type_produit: "routine",      actif: true },
-  { nom: "Sérum cils",          description: "Sérum fortifiant pour cils naturels.",                                prix_cents: 3200,  type_produit: "routine",      actif: true },
-  { nom: "Kit entretien",       description: "Nettoyant + brossettes + sérum.",                                     prix_cents: 5200,  type_produit: "routine",      actif: true }
+  { nom: "Carte cadeau",   description: "Valable sur toutes les prestations. La destinataire choisit sa date.", prix_cents: 6000, type_produit: "carte_cadeau", actif: true },
+  { nom: "Nettoyant cils", description: "Mousse douce sans huile ni alcool.",                                   prix_cents: 1800, type_produit: "routine",      actif: true },
+  { nom: "Brossette cils", description: "Pack de 10 brossettes jetables.",                                      prix_cents: 800,  type_produit: "routine",      actif: true },
+  { nom: "Sérum cils",     description: "Sérum fortifiant pour cils naturels.",                                 prix_cents: 3200, type_produit: "routine",      actif: true },
+  { nom: "Kit entretien",  description: "Nettoyant + brossettes + sérum.",                                      prix_cents: 5200, type_produit: "routine",      actif: true }
 ]
 
 produits.each { |attrs| Product.create!(attrs) }
-puts "  → #{Product.count} produits créés"
+
+# Chargement des packs de remplissage (idempotent : utilise find_or_create_by!).
+# Charge le script qui crée les 18 packs (6 poses × 3 quantités).
+load Rails.root.join('db', 'setup_packs_remplissage.rb')
+
+puts "  → #{Product.count} produits créés au total"
 
 # --- CLIENTE DE TEST ---
 puts "Création de la cliente de test..."
@@ -251,4 +256,49 @@ SiteSetting.find_or_create_by!(key: "tiktok_latest_url") do |s|
 end
 puts "  → tiktok_latest_url (vide)"
 
-puts "\n✅ Seeds terminés ! #{Prestation.count} prestations, #{Product.count} produits."
+# ============================================================
+# HORAIRES D'OUVERTURE — une ligne par jour de la semaine
+# Convention Ruby pour `day_of_week` : 0 = dimanche … 6 = samedi
+#
+# Défaut : Calao Studio mardi → samedi, 9h → 18h, pause 12h30-13h30
+# Dimanche et lundi : fermés (mais on crée quand même la ligne
+# avec ouvert: false pour que Syam puisse rouvrir depuis l'admin).
+#
+# `find_or_create_by!` → idempotent : si la ligne existe déjà
+# pour ce jour, on ne touche pas (Syam pourrait avoir modifié ses
+# horaires entre temps).
+# ============================================================
+puts "\nCréation des horaires d'ouverture (par défaut)..."
+
+# Horaires par défaut pour les jours ouvrés
+# Pas de pause déjeuner par défaut — Syam peut en ajouter une plus tard via l'admin
+horaires_ouvres = {
+  heure_debut: "09:00",
+  heure_fin:   "18:00",
+  pause_debut: nil,
+  pause_fin:   nil,
+  pas_minutes: 90,
+  ouvert:      true
+}
+
+# Définition des 7 jours
+# day_of_week => attributs (on override `ouvert` pour dim et lun)
+[
+  [0, { ouvert: false }],  # Dimanche fermé
+  [1, { ouvert: false }],  # Lundi fermé
+  [2, {}],                 # Mardi → Samedi : valeurs par défaut
+  [3, {}],
+  [4, {}],
+  [5, {}],
+  [6, {}]
+].each do |day, overrides|
+  BusinessHour.find_or_create_by!(day_of_week: day) do |bh|
+    # On part des valeurs ouvrées par défaut, et on applique les overrides
+    attrs = horaires_ouvres.merge(overrides)
+    bh.assign_attributes(attrs)
+  end
+  bh = BusinessHour.find_by(day_of_week: day)
+  puts "  → #{bh.nom_jour} : #{bh.horaires_affichage}"
+end
+
+puts "\n✅ Seeds terminés ! #{Prestation.count} prestations, #{Product.count} produits, #{BusinessHour.count} jours configurés."

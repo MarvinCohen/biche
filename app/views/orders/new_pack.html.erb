@@ -1,0 +1,196 @@
+<%# ============================================================
+    Page de récap avant achat d'un pack de remplissages.
+
+    Reprend le DS Biche. (variables CSS globales définies dans application.css
+    + design proche de la card pack de la boutique).
+
+    Pour la démo, le bouton "Confirmer l'achat" envoie un POST direct vers
+    /orders/create_pack qui crée l'Order + le Credit sans passer par Stripe.
+============================================================ %>
+<% content_for :title, "Achat du pack" %>
+
+<% content_for :head do %>
+<style>
+  /* Container principal — mêmes paddings que les autres pages "tunnel" */
+  .pack-recap-wrap { padding: 32px 20px 40px; }
+
+  /* Bouton "retour boutique" en haut — discret */
+  .pack-recap-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--color-muted, #8e8480);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 20px;
+  }
+
+  /* En-tête : titre + sous-titre */
+  .pack-recap-tag {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--color-muted, #988e88);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .pack-recap-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    color: var(--color-dark, #2e2926);
+    line-height: 1.2;
+    margin-bottom: 8px;
+    font-weight: 400;
+  }
+  .pack-recap-sub {
+    font-size: 13px;
+    color: var(--color-muted, #6e6560);
+    line-height: 1.6;
+    margin-bottom: 26px;
+  }
+
+  /* Carte récap — détails du pack acheté */
+  .pack-recap-card {
+    background: #fff;
+    border: 1px solid var(--color-border, #e2dbd2);
+    border-radius: 20px;
+    padding: 22px 20px;
+    margin-bottom: 22px;
+  }
+  .pack-recap-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border, #f0ede8);
+    font-size: 13px;
+  }
+  /* Dernière ligne — pas de bordure inférieure */
+  .pack-recap-row:last-of-type { border-bottom: none; }
+
+  .pack-recap-label {
+    color: var(--color-muted, #8e8480);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 10px;
+  }
+  .pack-recap-value {
+    color: var(--color-dark, #2e2926);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  /* Ligne total — plus grosse, séparateur épais au-dessus */
+  .pack-recap-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 16px;
+    border-top: 1.5px solid var(--color-dark, #2e2926);
+  }
+  .pack-recap-total-label {
+    font-size: 12px;
+    color: var(--color-dark, #2e2926);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .pack-recap-total-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    color: var(--color-dark, #2e2926);
+  }
+
+  /* Encart info sur le mode de paiement (démo : pas de Stripe) */
+  .pack-recap-info {
+    background: var(--color-cream, #f6f4f1);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--color-muted, #6e6560);
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+
+  /* Bouton principal de confirmation */
+  .pack-recap-btn {
+    display: block;
+    width: 100%;
+    background: var(--color-dark, #2e2926);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 15px 24px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: inherit;
+    cursor: pointer;
+  }
+</style>
+<% end %>
+
+<div class="wrap">
+  <div class="phone">
+    <div class="pack-recap-wrap">
+
+      <%# Lien retour boutique — toujours dispo pour annuler %>
+      <%= link_to shop_path, class: "pack-recap-back" do %>
+        ← Retour boutique
+      <% end %>
+
+      <%# En-tête %>
+      <div class="pack-recap-tag">Récapitulatif</div>
+      <div class="pack-recap-title">
+        Pack <%= @pack.nb_remplissages %> remplissages
+      </div>
+      <div class="pack-recap-sub">
+        Pour la pose <strong><%= @pack.prestation.nom %></strong>.
+        Vos crédits seront disponibles immédiatement dans votre espace cliente.
+      </div>
+
+      <%# Carte récap : pose + nombre de remplissages + expiration + prix %>
+      <div class="pack-recap-card">
+        <div class="pack-recap-row">
+          <div class="pack-recap-label">Pose</div>
+          <div class="pack-recap-value"><%= @pack.prestation.nom %></div>
+        </div>
+        <div class="pack-recap-row">
+          <div class="pack-recap-label">Remplissages</div>
+          <div class="pack-recap-value">
+            <%= @pack.nb_remplissages %> retouches incluses
+          </div>
+        </div>
+        <div class="pack-recap-row">
+          <div class="pack-recap-label">Valable jusqu'au</div>
+          <%# Format localisé : ex "13 novembre 2026" (locale fr dans config/locales) %>
+          <div class="pack-recap-value">
+            <%= I18n.l(@date_expiration_prevue, format: :long) %>
+          </div>
+        </div>
+
+        <%# Ligne total mise en avant %>
+        <div class="pack-recap-total">
+          <div class="pack-recap-total-label">Total</div>
+          <div class="pack-recap-total-value"><%= @pack.prix_euros.to_i %>€</div>
+        </div>
+      </div>
+
+      <%# Encart info — pendant la démo, on précise qu'il n'y a pas encore de paiement réel %>
+      <div class="pack-recap-info">
+        ℹ️ Mode démo — l'achat est confirmé immédiatement, sans paiement bancaire.
+        Le paiement Stripe sera activé en production.
+      </div>
+
+      <%# Formulaire de soumission — POST vers create_pack avec le product_id %>
+      <%# CSRF inclus automatiquement par Rails via button_to %>
+      <%= button_to "Confirmer l'achat",
+                    create_pack_orders_path(product_id: @pack.id),
+                    method: :post,
+                    class: "pack-recap-btn" %>
+
+    </div>
+  </div>
+</div>

@@ -14,7 +14,8 @@
       <%= link_to admin_root_path, class: "admin-nav-logo" do %>
         Biche. <span>Admin</span>
       <% end %>
-      <%= link_to "← Planning", admin_bookings_path(date: @booking.date), class: "admin-logout" %>
+      <%# Retour au planning du jour — la liste des RDV est intégrée au dashboard %>
+      <%= link_to "← Planning", admin_root_path(date: @booking.date), class: "admin-logout" %>
     </nav>
 
     <%# ---- HEADER : statut + nom cliente ---- %>

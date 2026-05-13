@@ -174,10 +174,8 @@
           <span class="admin-nav-tile-label">Agenda</span>
         <% end %>
 
-        <%= link_to admin_bookings_path, class: "admin-nav-tile" do %>
-          <span class="admin-nav-tile-icon">📋</span>
-          <span class="admin-nav-tile-label">Réservations</span>
-        <% end %>
+        <%# Tuile "Réservations" supprimée : la liste du jour est désormais affichée
+            directement en haut du dashboard (planning + navigation par date). %>
 
         <%= link_to admin_users_path, class: "admin-nav-tile" do %>
           <span class="admin-nav-tile-icon">👥</span>
@@ -194,9 +192,10 @@
           <span class="admin-nav-tile-label">Boutique</span>
         <% end %>
 
-        <%= link_to admin_indisponibilites_path, class: "admin-nav-tile" do %>
-          <span class="admin-nav-tile-icon">🚫</span>
-          <span class="admin-nav-tile-label">Bloqués</span>
+        <%# Tuile Disponibilités — page unique regroupant horaires hebdo + fermetures exceptionnelles %>
+        <%= link_to admin_disponibilites_path, class: "admin-nav-tile" do %>
+          <span class="admin-nav-tile-icon">📅</span>
+          <span class="admin-nav-tile-label">Disponibilités</span>
         <% end %>
 
         <%= link_to admin_cartes_cadeaux_path, class: "admin-nav-tile" do %>

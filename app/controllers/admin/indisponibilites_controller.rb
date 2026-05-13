@@ -3,32 +3,27 @@ module Admin
   # Indisponibilités — Syam peut bloquer des créneaux
   # Ex: pause déjeuner, congé, fermeture, formation, etc.
   # Ces plages sont exclues du calcul des créneaux disponibles.
+  #
+  # La liste et le formulaire de création sont servis par
+  # `Admin::DisponibilitesController#index` (vue centralisée).
+  # Ce controller ne gère plus que les actions create/destroy.
   # ============================================================
   class IndisponibilitesController < BaseController
-
-    # GET /admin/indisponibilites — liste des créneaux bloqués à venir
-    def index
-      # On affiche uniquement les indisponibilités futures et en cours
-      @indisponibilites = Indisponibilite.a_venir
-    end
-
-    # GET /admin/indisponibilites/new — formulaire de blocage
-    def new
-      @indisponibilite = Indisponibilite.new
-      # Pré-remplir la date de début si passée en paramètre (ex: depuis l'agenda)
-      @indisponibilite.date_debut = params[:date] ? Date.parse(params[:date]) : Date.today
-      @indisponibilite.date_fin   = @indisponibilite.date_debut
-    end
 
     # POST /admin/indisponibilites — créer un blocage
     def create
       @indisponibilite = Indisponibilite.new(indisponibilite_params)
 
       if @indisponibilite.save
-        redirect_to admin_indisponibilites_path,
-                    notice: "Créneau bloqué : #{@indisponibilite.plage_horaire} · #{@indisponibilite.plage_dates}."
+        redirect_to admin_disponibilites_path,
+                    notice: "Date bloquée : #{libelle_blocage(@indisponibilite)}."
       else
-        render :new, status: :unprocessable_entity
+        # En cas d'échec, on recharge la page Disponibilités complète
+        # en injectant l'instance en erreur pour afficher les messages.
+        @business_hours          = BusinessHour.triee_lundi_premier
+        @indisponibilites        = Indisponibilite.a_venir
+        @nouvelle_indisponibilite = @indisponibilite
+        render "admin/disponibilites/index", status: :unprocessable_entity
       end
     end
 
@@ -36,8 +31,7 @@ module Admin
     def destroy
       @indisponibilite = Indisponibilite.find(params[:id])
       @indisponibilite.destroy
-      redirect_to admin_indisponibilites_path,
-                  notice: "Créneau débloqué."
+      redirect_to admin_disponibilites_path, notice: "Date débloquée."
     end
 
     private
@@ -45,6 +39,13 @@ module Admin
     # Champs autorisés pour la création d'une indisponibilité
     def indisponibilite_params
       params.require(:indisponibilite).permit(:date_debut, :date_fin, :heure_debut, :heure_fin, :raison)
+    end
+
+    # Petit helper de libellé pour la notice flash
+    # ("Toute la journée" si convention 00:00 → 23:59, sinon plage horaire)
+    def libelle_blocage(indispo)
+      horaire = indispo.jour_entier? ? "toute la journée" : indispo.plage_horaire
+      "#{horaire} · #{indispo.plage_dates}"
     end
   end
 end

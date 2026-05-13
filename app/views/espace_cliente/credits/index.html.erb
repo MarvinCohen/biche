@@ -1,0 +1,244 @@
+<% content_for :title, "Mes crédits" %>
+
+<%#
+  ============================================================
+  VUE — Crédits de remplissage de la cliente
+
+  Sections :
+  - Crédits actifs : utilisables (nb_restant > 0 ET non expirés)
+  - Historique    : crédits épuisés ou expirés
+  ============================================================
+%>
+
+<% content_for :head do %>
+<style>
+  /* Card crédit — fond clair, info pose + compteur de remplissages */
+  .credit-card {
+    background: #fff;
+    border: 1px solid var(--color-border, #e2dbd2);
+    border-radius: 18px;
+    padding: 18px 18px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  /* Variante "expiré/épuisé" — opacité réduite + barré sur le compteur */
+  .credit-card--inactive {
+    opacity: 0.65;
+    background: var(--color-cream, #f6f4f1);
+  }
+  /* En-tête : nom de la pose + badge état */
+  .credit-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .credit-pose-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    color: var(--color-dark, #2e2926);
+    line-height: 1.2;
+  }
+  .credit-badge {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--color-accent, #b8a898);
+    color: #fff;
+    white-space: nowrap;
+  }
+  /* Badge "épuisé" / "expiré" — plus sombre */
+  .credit-badge--inactive {
+    background: var(--color-muted, #8e8480);
+  }
+  /* Compteur principal de remplissages — gros chiffre central */
+  .credit-counter {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .credit-counter-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    color: var(--color-dark, #2e2926);
+    line-height: 1;
+  }
+  .credit-counter-total {
+    font-size: 14px;
+    color: var(--color-muted, #8e8480);
+  }
+  .credit-counter-label {
+    font-size: 11px;
+    color: var(--color-muted, #6e6560);
+    margin-left: 6px;
+  }
+  /* Barre de progression du compteur (visite déjà faite) */
+  .credit-progress-bar {
+    height: 6px;
+    background: var(--color-border, #e2dbd2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .credit-progress-fill {
+    height: 100%;
+    background: var(--color-accent, #b8a898);
+    transition: width 0.3s ease;
+  }
+  /* Pied de carte : date expiration + CTA */
+  .credit-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--color-muted, #8e8480);
+    padding-top: 8px;
+    border-top: 1px solid var(--color-border, #f0ede8);
+  }
+  /* Pas de bouton sur les inactifs */
+  .credit-cta {
+    font-size: 11px;
+    color: var(--color-dark, #2e2926);
+    text-decoration: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  /* État vide — quand la cliente n'a aucun crédit du tout */
+  .credits-empty {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--color-muted, #8e8480);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .credits-empty-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--color-dark, #2e2926);
+    margin-bottom: 8px;
+  }
+</style>
+<% end %>
+
+<div class="wrap">
+  <div class="phone">
+
+    <%# ---- NAVIGATION ---- %>
+    <nav class="nav">
+      <%= link_to "Biche.", root_path, class: "logo-mini" %>
+      <div class="nav-right">
+        <%= link_to "← Mon espace", espace_cliente_root_path, class: "logout-btn" %>
+      </div>
+    </nav>
+
+    <%# ---- HERO PROFIL mini (même cadre que les autres pages cliente) ---- %>
+    <div class="profile-hero">
+      <div class="avatar"><%= current_user.initiale %></div>
+      <div class="profile-name"><%= current_user.full_name %></div>
+      <div class="profile-since">Mes crédits de remplissage</div>
+    </div>
+
+    <%# ============================================================
+        SECTION CRÉDITS ACTIFS
+        Affichés en premier, mis en avant.
+    ============================================================ %>
+    <div class="sec">
+      <p class="s-tag">Disponibles</p>
+      <h2 class="s-h2">Crédits actifs</h2>
+
+      <% if @credits_actifs.any? %>
+        <% @credits_actifs.each do |credit| %>
+          <%# Card individuelle — un crédit = une pose + un compteur %>
+          <div class="credit-card">
+            <div class="credit-card-top">
+              <div class="credit-pose-name"><%= credit.prestation.nom %></div>
+              <div class="credit-badge">Actif</div>
+            </div>
+
+            <%# Compteur "3 / 6 remplissages restants" %>
+            <div class="credit-counter">
+              <span class="credit-counter-num"><%= credit.nb_restant %></span>
+              <span class="credit-counter-total">/ <%= credit.nb_total %></span>
+              <span class="credit-counter-label">remplissages restants</span>
+            </div>
+
+            <%# Barre de progression — % utilisé (visuel "ce qui a déjà été consommé") %>
+            <% utilise = credit.nb_total - credit.nb_restant %>
+            <% pourcent = (utilise.to_f / credit.nb_total * 100).round %>
+            <div class="credit-progress-bar">
+              <%# Inversé : on remplit ce qui RESTE (plus parlant pour la cliente). %>
+              <div class="credit-progress-fill" style="width: <%= 100 - pourcent %>%"></div>
+            </div>
+
+            <%# Pied : date d'expiration + lien rapide vers la résa %>
+            <div class="credit-card-footer">
+              <span>
+                Valable jusqu'au
+                <strong><%= I18n.l(credit.date_expiration, format: :long) %></strong>
+              </span>
+              <%= link_to "Réserver →", new_booking_path, class: "credit-cta" %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <%# État vide : encourager l'achat d'un pack %>
+        <div class="credits-empty">
+          <div class="credits-empty-title">Pas encore de crédit</div>
+          <p>
+            Achetez un pack de remplissages en boutique pour économiser
+            sur vos retouches et garder vos extensions impeccables.
+          </p>
+          <div style="margin-top: 16px;">
+            <%= link_to "Voir les packs", shop_path, class: "btn-primary" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# ============================================================
+        SECTION HISTORIQUE (épuisés / expirés)
+        N'apparaît que si elle n'est pas vide.
+    ============================================================ %>
+    <% if @credits_historique.any? %>
+      <div class="sec sec-cream">
+        <p class="s-tag">Historique</p>
+        <h2 class="s-h2">Crédits passés</h2>
+
+        <% @credits_historique.each do |credit| %>
+          <%# État inactif : on affiche soit "épuisé" soit "expiré" selon le cas %>
+          <% etat = credit.epuise? ? "Épuisé" : "Expiré" %>
+          <div class="credit-card credit-card--inactive">
+            <div class="credit-card-top">
+              <div class="credit-pose-name"><%= credit.prestation.nom %></div>
+              <div class="credit-badge credit-badge--inactive"><%= etat %></div>
+            </div>
+
+            <div class="credit-counter">
+              <span class="credit-counter-num"><%= credit.nb_restant %></span>
+              <span class="credit-counter-total">/ <%= credit.nb_total %></span>
+              <span class="credit-counter-label">remplissages utilisés</span>
+            </div>
+
+            <div class="credit-card-footer">
+              <span>
+                Expiré le <strong><%= I18n.l(credit.date_expiration, format: :long) %></strong>
+              </span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# ---- FOOTER ---- %>
+    <footer class="footer">
+      <div class="footer-logo">Biche.</div>
+      <div class="footer-tag">Technicienne du regard · Bordeaux</div>
+      <div class="footer-copy">© <%= Date.today.year %> Biche. · Tous droits réservés</div>
+    </footer>
+
+  </div>
+</div>

@@ -14,7 +14,12 @@ class User < ApplicationRecord
   # ASSOCIATIONS — une cliente a plusieurs réservations, etc.
   # ============================================================
   has_many :bookings, dependent: :destroy           # Ses réservations
-  has_one  :fidelite_card, dependent: :destroy      # Sa carte fidélité (1 seule)
+  has_one  :fidelite_card, dependent: :destroy     # Sa carte fidélité (1 seule)
+  # Ordre important : les `credits` doivent être déclarés AVANT les `orders` car
+  # un Credit a une FK NOT NULL vers Order. Si on détruit un User, Rails respecte
+  # l'ordre de déclaration pour `dependent: :destroy` → les credits partent en
+  # premier, ce qui libère ensuite la suppression des orders sans violation FK.
+  has_many :credits, dependent: :destroy            # Ses crédits de remplissage (issus de packs)
   has_many :orders, dependent: :destroy             # Ses commandes shop
   has_many :messages, dependent: :destroy           # Ses messages/notifications
 
@@ -49,6 +54,21 @@ class User < ApplicationRecord
   # On inclut "en_attente" car la réservation est prise, juste pas encore validée par Syam
   def prochain_rdv
     bookings.where(statut: ['confirme', 'en_attente']).where('date >= ?', Date.today).order(:date, :heure).first
+  end
+
+  # Crédits encore utilisables (non épuisés, non expirés), triés par expiration
+  # la plus proche pour consommation FIFO. Helper utilisé partout (espace cliente
+  # + formulaire de booking) — évite de répéter le scope.
+  def credits_actifs
+    credits.actifs.par_expiration_proche
+  end
+
+  # Cherche un crédit actif applicable à la prestation donnée (ex: retouche
+  # Volume léger → crédit Volume léger). Retourne nil si aucun.
+  # Utilisé côté formulaire de booking pour proposer "Utiliser un crédit".
+  def credit_applicable(prestation)
+    return nil unless prestation
+    credits_actifs.includes(:prestation).find { |c| c.applicable_a?(prestation) }
   end
 
   private

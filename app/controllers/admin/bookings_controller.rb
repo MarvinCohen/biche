@@ -101,6 +101,9 @@ module Admin
       @booking.statut        = 'confirme'
       # Pas de paiement en ligne pour les RDV manuels — acompte par défaut
       @booking.mode_paiement = 'acompte'
+      # Bypass de la validation horaires d'ouverture : Syam peut forcer
+      # un créneau hors horaires (ex : amie qui passe en dehors des heures normales)
+      @booking.skip_business_hours_validation = true
 
       if @booking.save
         # Envoyer l'email de confirmation uniquement si la cliente a un vrai email
@@ -113,18 +116,6 @@ module Admin
         @prestations = Prestation.disponibles.order(:categorie, :nom)
         render :new, status: :unprocessable_entity
       end
-    end
-
-    # GET /admin/bookings — liste de tous les RDV, filtrée par date
-    def index
-      # Date filtrée (aujourd'hui par défaut) — rescue si le paramètre est malformé
-      @date = params[:date] ? (Date.parse(params[:date]) rescue Date.today) : Date.today
-
-      # Tous les RDV de la date, triés par heure, avec user et prestation préchargés
-      @bookings = Booking
-                    .where(date: @date)
-                    .order(:heure)
-                    .includes(:user, :prestation)
     end
 
     # GET /admin/bookings/:id — détail complet d'un RDV
@@ -159,8 +150,26 @@ module Admin
         fidelite = @booking.user.fidelite_card
         fidelite.ajouter_visite! if fidelite
 
-        redirect_to admin_booking_path(@booking),
-                    notice: "Soin marqué comme terminé. 1 point fidélité crédité."
+        # Si le RDV était payé avec un crédit de pack → décrémenter `nb_restant`.
+        # On le fait ici (et pas à la création du booking) pour 2 raisons :
+        # 1. Tant que le soin n'a pas eu lieu, le crédit n'est pas vraiment "consommé"
+        #    → une annulation suffit à le restituer sans logique supplémentaire.
+        # 2. Le terminer-marquage par Syam est l'évènement métier qui actualise tout
+        #    (fidélité, statut, et donc le crédit aussi — cohérent).
+        # `utiliser!` lève si le crédit est épuisé/expiré (cas anormal ici, déjà vérifié
+        # à la création du booking) — on log l'erreur et continue.
+        if @booking.credit
+          begin
+            @booking.credit.utiliser!
+          rescue => e
+            Rails.logger.error "terminer — erreur décrémentation crédit ##{@booking.credit_id} : #{e.message}"
+          end
+        end
+
+        # Message adapté selon que le RDV a consommé un crédit ou non
+        message = "Soin marqué comme terminé. 1 point fidélité crédité."
+        message += " 1 remplissage consommé sur le crédit." if @booking.credit
+        redirect_to admin_booking_path(@booking), notice: message
       else
         redirect_to admin_booking_path(@booking), alert: "Ce RDV ne peut pas être marqué comme terminé."
       end
@@ -177,7 +186,8 @@ module Admin
           BookingMailer.rdv_annule(@booking).deliver_later
         end
 
-        redirect_to admin_bookings_path(date: @booking.date), notice: "Réservation annulée. Email envoyé à la cliente."
+        # Le planning du jour est désormais sur le dashboard (admin_root_path)
+        redirect_to admin_root_path(date: @booking.date), notice: "Réservation annulée. Email envoyé à la cliente."
       else
         redirect_to admin_booking_path(@booking), alert: "Ce RDV est déjà annulé."
       end

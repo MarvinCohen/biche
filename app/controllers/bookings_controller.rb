@@ -9,16 +9,78 @@ class BookingsController < ApplicationController
   def new
     @booking     = Booking.new
     # On charge toutes les prestations dispo pour l'étape 1 (choix du soin)
-    @prestations = Prestation.disponibles.par_nom
+    # On exclut les prestations "sourcils" : Syam ne propose pas (encore)
+    # cette catégorie de soin. Pour la réactiver plus tard, supprimer le
+    # `.where.not(...)` et remettre la pill "Sourcils" dans la vue.
+    @prestations = Prestation.disponibles.par_nom.where.not(categorie: 'sourcils')
+    # Jours de la semaine fermés (0=dimanche … 6=samedi) — passé au JS Stimulus
+    # pour griser les jours fermés dans le calendrier de réservation.
+    @jours_fermes = BusinessHour.where(ouvert: false).pluck(:day_of_week)
+
+    # Dates couvertes par des indispos « jour entier » sur les 3 prochains mois
+    # (limite raisonnable du payload — la cliente ne réserve pas plus loin en pratique).
+    # Format : tableau de strings "YYYY-MM-DD" attendu par le JS du calendrier.
+    @jours_bloques = Indisponibilite.dates_jour_entier_entre(Date.today, Date.today + 3.months)
+
+    # Crédits de remplissage encore utilisables par la cliente.
+    # On les passe au JS via data-attributes pour afficher dynamiquement le banner
+    # "Utiliser un crédit" si la prestation choisie est applicable à un de ses crédits.
+    # `includes(:prestation)` évite N+1 (on affiche le nom de la pose dans le banner).
+    @credits_actifs = current_user.credits_actifs.includes(:prestation)
   end
 
   # POST /bookings — crée la réservation et redirige vers Stripe Checkout
+  # OU saute Stripe si la cliente utilise un crédit de pack.
   def create
     @booking = Booking.new(booking_params)
     @booking.user   = current_user
-    @booking.statut = 'en_attente'  # Statut initial — passe à 'confirme' après paiement Stripe
+
+    # ----- CAS CRÉDIT : la cliente utilise un crédit de pack -----
+    # On vérifie côté serveur (jamais confiance au form) :
+    #  1. le crédit existe ET appartient bien à la cliente connectée
+    #  2. il est encore actif (non épuisé, non expiré)
+    #  3. il est applicable à la prestation choisie (matching nom)
+    # Si tout est OK : pas de Stripe, statut direct `confirme`, mode `credit`.
+    credit = nil
+    if params[:booking][:credit_id].present?
+      # `current_user.credits` borne automatiquement à la cliente connectée
+      # → impossible d'utiliser un crédit d'une autre user (paramètre forgé).
+      credit = current_user.credits.actifs.find_by(id: params[:booking][:credit_id])
+
+      if credit && credit.applicable_a?(@booking.prestation)
+        # Pré-configure le booking : on saute le flux Stripe
+        @booking.statut         = 'confirme'
+        @booking.mode_paiement  = 'credit'
+        @booking.credit         = credit
+      else
+        # Crédit invalide / expiré / non applicable → on tombe en erreur explicite
+        # plutôt que de payer en Stripe (ce serait surprenant pour la cliente).
+        # Sourcils exclus (cf. action new) — Syam ne propose pas cette catégorie
+        @prestations    = Prestation.disponibles.par_nom.where.not(categorie: 'sourcils')
+        @jours_fermes   = BusinessHour.where(ouvert: false).pluck(:day_of_week)
+        @jours_bloques  = Indisponibilite.dates_jour_entier_entre(Date.today, Date.today + 3.months)
+        @credits_actifs = current_user.credits_actifs.includes(:prestation)
+        flash.now[:alert] = "Ce crédit n'est plus utilisable ou ne s'applique pas à cette prestation."
+        render :new, status: :unprocessable_entity
+        return
+      end
+    else
+      # Flux normal : statut initial → passe à `confirme` après paiement Stripe
+      @booking.statut = 'en_attente'
+    end
 
     if @booking.save
+      # ----- BRANCHE CRÉDIT : pas de Stripe, on redirige direct -----
+      if credit
+        # On ne décrémente PAS le crédit ici — c'est fait au moment où Syam
+        # marque le RDV "terminé" (cf. Admin::BookingsController#terminer).
+        # Logique : tant que le RDV n'a pas eu lieu, le crédit n'est pas consommé
+        # → ainsi une annulation suffit à le restituer (pas de logique complexe).
+        redirect_to @booking,
+                    notice: "Rendez-vous confirmé avec votre crédit. À très vite chez Biche."
+        return
+      end
+
       if @booking.mode_paiement == 'acompte'
         # Acompte calculé par le modèle (30% du prix) — évite la duplication de logique métier
         acompte_cents = @booking.acompte_calcule_cents
@@ -58,8 +120,13 @@ class BookingsController < ApplicationController
       end
 
     else
-      # Échec de validation : on réaffiche le formulaire avec les erreurs
-      @prestations = Prestation.disponibles.par_nom
+      # Échec de validation : on réaffiche le formulaire avec les erreurs.
+      # On recharge TOUTES les données nécessaires au render (sinon vues plantent).
+      # Sourcils exclus (cf. action new) — Syam ne propose pas cette catégorie
+      @prestations    = Prestation.disponibles.par_nom.where.not(categorie: 'sourcils')
+      @jours_fermes   = BusinessHour.where(ouvert: false).pluck(:day_of_week)
+      @jours_bloques  = Indisponibilite.dates_jour_entier_entre(Date.today, Date.today + 3.months)
+      @credits_actifs = current_user.credits_actifs.includes(:prestation)
       render :new, status: :unprocessable_entity
     end
   end
@@ -91,12 +158,12 @@ class BookingsController < ApplicationController
     # Paramètres invalides → réponse vide (évite une erreur 500)
     return render json: [] unless date && prestation
 
-    duree = prestation.duree_minutes.minutes
-
-    # Créneaux de travail : 9h → 16h30 par tranches de 1h30
-    tous_les_creneaux = (9..17).step(1.5).map do |h|
-      Time.parse("#{h.to_i}:#{(h % 1 * 60).to_i.to_s.rjust(2, '0')}")
-    end
+    # Créneaux de travail générés à partir de la semaine type configurée par Syam
+    # (table `business_hours`, éditable depuis l'admin).
+    # La méthode renvoie [] si le jour est fermé OU si aucun horaire n'est configuré
+    # → dans ce cas on court-circuite le calcul de conflits inutile.
+    tous_les_creneaux = BusinessHour.creneaux_pour(date, prestation.duree_minutes)
+    return render json: [] if tous_les_creneaux.empty?
 
     # Charger les RDVs existants du jour avec leur prestation (pour connaître la durée)
     rdvs_existants = Booking
@@ -146,7 +213,9 @@ class BookingsController < ApplicationController
   end
 
   # Paramètres autorisés pour créer une réservation (protection contre la manipulation)
+  # `:credit_id` est permis mais re-vérifié côté serveur dans `create` (sécurité :
+  # une cliente ne peut pas utiliser un crédit qui ne lui appartient pas).
   def booking_params
-    params.require(:booking).permit(:prestation_id, :date, :heure, :mode_paiement, :notes_cliente)
+    params.require(:booking).permit(:prestation_id, :date, :heure, :mode_paiement, :notes_cliente, :credit_id)
   end
 end

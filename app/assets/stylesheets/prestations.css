@@ -57,7 +57,7 @@
   position: relative;
   z-index: 2;
   font-size: 13px;
-  color: #6e6560;
+  color: var(--color-text-soft);
   line-height: 1.7;
   max-width: 320px;
   margin: 0 auto;
@@ -88,7 +88,7 @@
 
 .option-text {
   font-size: 13px;
-  color: #6e6560;
+  color: var(--color-text-soft);
   line-height: 1.5;
 }
 

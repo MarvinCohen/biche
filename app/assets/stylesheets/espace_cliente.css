@@ -175,7 +175,7 @@
 
 /* Badge de nombre de messages non lus */
 .nl-count-badge {
-  background: #c47a7a;
+  background: var(--color-danger);
   color: #fff;
   border-radius: 10px;
   font-size: 9px;
@@ -322,7 +322,7 @@
 
 /* Chaque case de stat */
 .fid-stat-card {
-  background: #f6f4f1;
+  background: var(--color-cream);
   border-radius: 16px;
   padding: 16px;
   border: 1px solid var(--color-border);
@@ -346,7 +346,7 @@
 
 /* ---- CARTE RDV (prochain rendez-vous) ---- */
 .rdv-card {
-  background: #f6f4f1;
+  background: var(--color-cream);
   border-radius: 18px;
   padding: 18px;
   border: 1px solid var(--color-border);
@@ -384,6 +384,30 @@
   text-transform: uppercase;
 }
 
+/* ============================================================
+   Variante de la pastille pour un crédit (un seul chiffre seul).
+   La .rdv-date d'origine était pensée pour 2 lignes (jour + mois)
+   donc le centrage flex avec une seule div semblait décalé.
+   Ici on utilise un grid 1×1 pour forcer un centrage absolu, et
+   on agrandit le chiffre puisqu'il a toute la place pour lui.
+============================================================ */
+.rdv-date.credit-pill-solo {
+  display: grid;
+  place-items: center;     /* centre parfait — vertical + horizontal */
+  padding: 0;              /* on neutralise tout padding hérité éventuel */
+}
+.credit-pill-solo-num {
+  font-family: var(--font-serif);
+  font-size: 28px;         /* chiffre plus généreux qu'avant (22px) */
+  color: #fff;
+  line-height: 1;          /* évite l'espace de descendante du font */
+  display: block;
+  /* Les chiffres en serif ont une baseline plus basse que leur centre
+     géométrique : on remonte légèrement pour un centrage visuel correct */
+  transform: translateY(-4px);
+}
+
+
 /* Informations du RDV (nom prestation, heure, tags) */
 .rdv-info { flex: 1; min-width: 0; }
 
@@ -408,7 +432,7 @@
   padding: 3px 8px;
   border-radius: 10px;
   background: #fff;
-  color: #6e6560;
+  color: var(--color-text-soft);
   border: 1px solid var(--color-border);
   letter-spacing: 0.5px;
 }
@@ -417,7 +441,7 @@
 .rdv-empty {
   text-align: center;
   padding: 24px;
-  background: #f6f4f1;
+  background: var(--color-cream);
   border-radius: 18px;
   border: 1px dashed var(--color-border);
 }
@@ -432,7 +456,7 @@
 .btn-rdv-cancel {
   flex: 1;
   background: transparent;
-  color: #c47a7a;
+  color: var(--color-danger);
   border: 1px solid #f0e0e0;
   border-radius: 30px;
   padding: 11px;
@@ -501,7 +525,7 @@
 .history-toggle {
   width: 24px; height: 24px;
   border-radius: 50%;
-  background: #f6f4f1;
+  background: var(--color-cream);
   border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -527,7 +551,7 @@
 .history-details {
   display: none;
   padding: 0 16px 16px;
-  border-top: 1px solid #f0ede8;
+  border-top: 1px solid var(--color-surface-soft);
 }
 
 /* Détails visibles quand la carte a la classe "open" */
@@ -545,7 +569,7 @@
 
 /* Chaque case de paramètre technique */
 .detail-item {
-  background: #f6f4f1;
+  background: var(--color-cream);
   border-radius: 12px;
   padding: 10px 12px;
 }
@@ -568,7 +592,7 @@
 
 /* Bloc note de Syam */
 .detail-note {
-  background: #f6f4f1;
+  background: var(--color-cream);
   border-radius: 12px;
   padding: 12px;
   margin-top: 10px;
@@ -585,7 +609,7 @@
 /* Texte de la note en italic */
 .detail-note-text {
   font-size: 12px;
-  color: #6e6560;
+  color: var(--color-text-soft);
   line-height: 1.6;
   font-style: italic;
 }
@@ -622,7 +646,7 @@
 
 /* Chaque message : icône + contenu + badge */
 .newsletter-item {
-  background: #f6f4f1;
+  background: var(--color-cream);
   border-radius: 16px;
   padding: 16px;
   border: 1px solid var(--color-border);
@@ -643,7 +667,7 @@
 
 /* Couleurs par type */
 .nl-icon-birthday { background: linear-gradient(135deg, #ddd6cc, #b8b2a8); }
-.nl-icon-promo    { background: linear-gradient(135deg, #2e2926, #5e5a56); }
+.nl-icon-promo    { background: linear-gradient(135deg, var(--color-dark), #5e5a56); }
 .nl-icon-news     { background: linear-gradient(135deg, #b8b2a8, #8e8882); }
 
 .nl-content { flex: 1; }
@@ -677,7 +701,7 @@
 
 /* Badge "Lu" : fond neutre grisé */
 .nl-badge.read {
-  background: #f0ede8;
+  background: var(--color-surface-soft);
   color: var(--color-muted);
 }
 
@@ -693,7 +717,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #f0ede8;
+  border-bottom: 1px solid var(--color-surface-soft);
 }
 
 .setting-row:last-child { border-bottom: none; }

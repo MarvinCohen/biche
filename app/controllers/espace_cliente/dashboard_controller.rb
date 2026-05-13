@@ -31,6 +31,12 @@ module EspaceCliente
 
       # ---- Badge de notifications : nombre de messages non lus ----
       @messages_non_lus_count = current_user.messages.non_lus.count
+
+      # ---- Crédits de remplissage actifs : utilisés dans le hero (nombre)
+      # et la mini-section de l'onglet Fidélité (preview + CTA vers /espace_cliente/credits).
+      # On limite à 3 dans la preview, on affiche le total et un lien "Voir tout".
+      @credits_actifs_preview = current_user.credits_actifs.includes(:prestation).limit(3)
+      @credits_actifs_count   = current_user.credits_actifs.count
     end
 
   end

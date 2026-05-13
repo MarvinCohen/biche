@@ -100,6 +100,83 @@ class OrdersController < ApplicationController
     end
   end
 
+  # ============================================================
+  # ACHAT D'UN PACK DE REMPLISSAGES
+  # ============================================================
+  # Flux séparé du flux carte cadeau :
+  # - Le prix est fixé par le pack (pas de montant libre).
+  # - Pour la démo, pas de Stripe : statut directement `paye`, et un Credit
+  #   est créé tout de suite pour la cliente (utilisable sur les retouches).
+  # - À terme, le passage à Stripe se fera ici (TODO ci-dessous).
+  # ============================================================
+
+  # GET /orders/new_pack?product_id=X
+  # Page de récap avant confirmation d'achat d'un pack
+  def new_pack
+    # Charge le pack ciblé. Si introuvable ou inactif → retour boutique.
+    @pack = Product.actifs.packs.where(id: params[:product_id]).first
+
+    unless @pack
+      redirect_to shop_path, alert: "Ce pack n'est plus disponible." and return
+    end
+
+    # Pré-construit l'Order pour l'affichage (non sauvegardé encore).
+    # Montant figé : on copie le prix du pack en BDD pour éviter toute manipulation côté form.
+    @order = Order.new(
+      product:       @pack,
+      montant_cents: @pack.prix_cents
+    )
+
+    # Date d'expiration prévisionnelle du crédit pour affichage
+    # (même règle que celle utilisée à la création : aujourd'hui + nb_remplissages mois).
+    @date_expiration_prevue = Date.today + @pack.nb_remplissages.months
+  end
+
+  # POST /orders/create_pack
+  # Finalise l'achat du pack — crée l'Order ET le Credit dans une transaction.
+  def create_pack
+    @pack = Product.actifs.packs.where(id: params[:product_id]).first
+
+    unless @pack
+      redirect_to shop_path, alert: "Ce pack n'est plus disponible." and return
+    end
+
+    # Transaction : si la création du Credit échoue, on annule l'Order aussi.
+    # Évite d'avoir un Order payé sans Credit associé (cliente lésée).
+    ActiveRecord::Base.transaction do
+      # TODO Stripe : remplacer ce flux par une Stripe Checkout Session.
+      # Pour la démo, on passe directement en `paye` sans paiement réel.
+      @order = Order.create!(
+        user:          current_user,
+        product:       @pack,
+        montant_cents: @pack.prix_cents,
+        statut:        'paye'
+      )
+
+      # Création du Credit associé au pack acheté.
+      # `nb_total` = `nb_restant` = nb_remplissages du pack (figé à l'achat).
+      # `date_expiration` = aujourd'hui + nb_remplissages mois (cf. CLAUDE.md).
+      Credit.create!(
+        user:            current_user,
+        order:           @order,
+        prestation:      @pack.prestation,
+        nb_total:        @pack.nb_remplissages,
+        nb_restant:      @pack.nb_remplissages,
+        date_expiration: Date.today + @pack.nb_remplissages.months
+      )
+    end
+
+    # Redirige vers l'espace cliente avec un message de confirmation.
+    # (On affichera la liste des crédits dans l'étape 14-15.)
+    redirect_to espace_cliente_root_path,
+                notice: "Pack acheté ! Vous avez désormais #{@pack.nb_remplissages} remplissages crédités."
+  rescue ActiveRecord::RecordInvalid => e
+    # En cas d'erreur de validation (rare ici, données contrôlées côté serveur),
+    # on retourne en boutique avec un message d'erreur générique.
+    Rails.logger.error "create_pack — erreur création Order/Credit : #{e.message}"
+    redirect_to shop_path, alert: "Impossible de finaliser l'achat. Réessayez ou contactez Syam."
+  end
+
   # GET /orders/success?session_id=cs_xxx
   # Page de confirmation après paiement Stripe réussi
   def success

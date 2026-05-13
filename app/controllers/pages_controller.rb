@@ -61,8 +61,16 @@ class PagesController < ApplicationController
   # GET /shop — Page boutique avec cartes cadeaux, packs et produits routine
   def shop
     # Produits actifs par type, avec photo préchargée (évite N+1)
-    @produits_routine     = Product.actifs.where(type_produit: 'routine').with_attached_photo
-    @produits_packs       = Product.actifs.where(type_produit: 'pack').with_attached_photo
-    @produits_carte       = Product.actifs.where(type_produit: 'carte_cadeau').first
+    @produits_routine = Product.actifs.where(type_produit: 'routine').with_attached_photo
+    @produits_carte   = Product.actifs.where(type_produit: 'carte_cadeau').first
+
+    # Packs de remplissage : groupés par pose pour permettre le filtrage en pills
+    # côté vue. On précharge :prestation (pour le nom de la pose) + photo.
+    # `par_pose` trie par nom de pose puis par nb_remplissages croissant
+    # → l'ordre 3/6/9 est garanti dans chaque groupe.
+    @produits_packs = Product.actifs.packs.par_pose.includes(:prestation).with_attached_photo
+    # Groupe par prestation (objet) pour ne pas avoir à le re-chercher dans la vue.
+    # Hash : { Prestation => [Pack3, Pack6, Pack9], ... }
+    @packs_par_pose = @produits_packs.group_by(&:prestation)
   end
 end

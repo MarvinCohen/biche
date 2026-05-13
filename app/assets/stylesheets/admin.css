@@ -90,7 +90,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* 2 colonnes = 2 stats par ligne */
   gap: 0;
-  background: #2e2926;
+  background: var(--color-dark);
   border-top: 1px solid rgba(255,255,255,0.06);
 }
 
@@ -130,7 +130,7 @@
 
 .admin-sec {
   padding: 20px;
-  border-bottom: 1px solid #f0ede8;
+  border-bottom: 1px solid var(--color-surface-soft);
 }
 
 .admin-sec:last-child {
@@ -224,14 +224,14 @@
 
 /* Confirmé */
 .admin-badge-confirme {
-  background: #e8f5e8;
-  color: #3a7a3a;
-  border: 1px solid #c0ddc0;
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
 }
 
 /* Terminé */
 .admin-badge-termine {
-  background: #f0ede8;
+  background: var(--color-surface-soft);
   color: var(--color-muted);
   border: 1px solid var(--color-border);
 }
@@ -239,7 +239,7 @@
 /* Annulé */
 .admin-badge-annule {
   background: #fdecea;
-  color: #c47a7a;
+  color: var(--color-danger);
   border: 1px solid #f5c6c6;
 }
 
@@ -252,9 +252,9 @@
   text-align: center;
   padding: 12px;
   border-radius: 30px;
-  background: #e8f5e8;
-  color: #3a7a3a;
-  border: 1px solid #c0ddc0;
+  background: var(--color-success-soft);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 1px;
@@ -293,7 +293,7 @@
   padding: 12px;
   border-radius: 30px;
   background: transparent;
-  color: #c47a7a;
+  color: var(--color-danger);
   border: 1px solid #f5c6c6;
   font-size: 11px;
   font-weight: 500;
@@ -340,7 +340,7 @@
   justify-content: space-between;
   align-items: baseline;
   padding: 10px 0;
-  border-bottom: 1px solid #f0ede8;
+  border-bottom: 1px solid var(--color-surface-soft);
 }
 
 .admin-detail-row:last-child {
@@ -475,7 +475,7 @@
 .admin-date-nav-btn {
   width: 32px; height: 32px;
   border-radius: 50%;
-  background: #f6f4f1;
+  background: var(--color-cream);
   border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -502,7 +502,7 @@
 .admin-empty {
   text-align: center;
   padding: 28px 20px;
-  background: #f6f4f1;
+  background: var(--color-cream);
   border-radius: 16px;
   border: 1px dashed var(--color-border);
 }
@@ -521,7 +521,7 @@
   padding: 12px 14px;
   border: 1px solid var(--color-border);
   font-size: 12px;
-  color: #6e6560;
+  color: var(--color-text-soft);
   line-height: 1.7;
   font-style: italic;
 }
@@ -575,7 +575,7 @@
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: #f0ede8;
+  background: var(--color-surface-soft);
   border: 1px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -593,7 +593,7 @@
 
 /* Bloc indisponibilité dans l'agenda */
 .admin-indispo-agenda {
-  background: #f6f4f1;
+  background: var(--color-cream);
   border: 1px dashed var(--color-border);
   border-radius: 12px;
   padding: 10px 14px;
@@ -622,7 +622,7 @@
   border-radius: 50%;
   background: transparent;
   border: 1px solid #f5c6c6;
-  color: #c47a7a;
+  color: var(--color-danger);
   font-size: 11px;
   cursor: pointer;
   display: flex;
@@ -648,7 +648,7 @@
   padding: 5px 12px;
   border-radius: 20px;
   border: 1px solid var(--color-border);
-  background: #f6f4f1;
+  background: var(--color-cream);
   color: var(--color-muted);
   font-size: 11px;
   cursor: pointer;
@@ -732,7 +732,7 @@
   border-radius: 50%;
   background: transparent;
   border: 1px solid #f5c6c6;
-  color: #c47a7a;
+  color: var(--color-danger);
   font-size: 11px;
   cursor: pointer;
   display: flex;

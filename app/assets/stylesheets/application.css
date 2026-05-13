@@ -15,8 +15,16 @@
   --color-sand:    #e8e2d8;   /* Sable — hero accueil */
   --color-accent:  #b8a898;   /* Beige rosé — accents, étoiles, fidélité */
   --color-muted:   #8e8480;   /* Gris chaud — textes secondaires */
-  --color-border:  #e2dbd2;   /* Bord des cartes */
-  --color-bg-dark: #241e1c;   /* Fond extérieur sombre */
+  --color-border:       #e2dbd2;   /* Bord des cartes */
+  --color-bg-dark:      #241e1c;   /* Fond extérieur sombre */
+  --color-surface-soft: #f0ede8;   /* Fond/bord doux : badges secondaires, séparateurs, pastilles */
+
+  /* Couleurs sémantiques — texte, erreurs, succès */
+  --color-text-soft:      #6e6560;   /* Texte secondaire (plus doux que --color-dark) */
+  --color-danger:         #c47a7a;   /* Rose terreux — erreurs, déconnexion, alertes */
+  --color-success:        #3a7a3a;   /* Vert foncé — texte de confirmation */
+  --color-success-soft:   #e8f5e8;   /* Vert très clair — fond des badges succès */
+  --color-success-border: #c0ddc0;   /* Vert clair — bordure des badges succès */
 
   /* Typographie */
   --font-serif:     'Cormorant Garamond', serif;   /* Titres élégants */
@@ -195,7 +203,7 @@ body {
 .nav-menu-close {
   width: 32px; height: 32px;
   border-radius: 50%;
-  background: #f0ede8;
+  background: var(--color-surface-soft);
   border: none;
   cursor: pointer;
   display: flex;
@@ -219,18 +227,19 @@ body {
   color: var(--color-dark);
   text-decoration: none;
   letter-spacing: 0.3px;
-  border-bottom: 1px solid #f0ede8;
+  border-bottom: 1px solid var(--color-surface-soft);
   transition: background 0.15s;
 }
 
 .nav-menu-link:hover {
-  background: #f6f4f1;
+  /* On utilise la variable --color-cream au lieu du hex hardcodé */
+  background: var(--color-cream);
 }
 
 /* Séparateur visuel entre sections */
 .nav-menu-sep {
   height: 6px;
-  background: #f0ede8;
+  background: var(--color-surface-soft);
   border: none;
   margin: 0;
 }
@@ -430,7 +439,7 @@ body {
 }
 
 .flash--alert {
-  background: #c47a7a;
+  background: var(--color-danger);
   color: #fff;
 }
 
@@ -583,7 +592,7 @@ body {
 /* Label "Se souvenir de moi" */
 .auth-remember-label {
   font-size: 12px;
-  color: #6e6560;
+  color: var(--color-text-soft);
   cursor: pointer;
 }
 
@@ -622,7 +631,7 @@ body {
 #error_explanation h2 {
   font-size: 12px;
   font-weight: 500;
-  color: #c47a7a;
+  color: var(--color-danger);
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -635,7 +644,7 @@ body {
 
 #error_explanation ul li {
   font-size: 12px;
-  color: #c47a7a;
+  color: var(--color-danger);
   padding: 2px 0;
 }
 

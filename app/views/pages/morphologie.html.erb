@@ -290,7 +290,10 @@
 
     <%# ---- ÉTAPE 3 : RECOMMANDATION PERSONNALISÉE ---- %>
     <%# Le contenu est mis à jour dynamiquement par selectEye() en JS %>
-    <section class="sec sec-cream" id="result-section">
+    <%# Fond blanc (classe .sec seule) pour créer une vraie cassure visuelle
+        avec l'étape 2 qui est en beige nude — sinon les deux fonds beiges
+        très proches (--color-nude vs --color-cream) se confondaient. %>
+    <section class="sec" id="result-section">
       <div class="s-num">Étape 3</div>
       <h2 class="s-h2">Votre recommandation</h2>
 
@@ -356,7 +359,8 @@
     </section>
 
     <%# ---- CONSEILS AVANT POSE ---- %>
-    <section class="sec">
+    <%# Fond crème pour créer une cassure avec l'étape 3 (blanche) juste au-dessus. %>
+    <section class="sec sec-cream">
       <p class="s-tag">Conseils</p>
       <h2 class="s-h2">Avant votre pose</h2>
 

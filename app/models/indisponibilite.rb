@@ -51,6 +51,40 @@ class Indisponibilite < ApplicationRecord
     (date_fin - date_debut).to_i + 1
   end
 
+  # Indique si l'indispo couvre la journée entière (convention : 00:00 → 23:59)
+  # Utilisé pour griser le jour entier dans le calendrier client.
+  def jour_entier?
+    return false if heure_debut.blank? || heure_fin.blank?
+    heure_debut.hour == 0 && heure_debut.min == 0 &&
+      heure_fin.hour == 23 && heure_fin.min == 59
+  end
+
+  # Liste de dates (objets Date) couvertes par des indispos « jour entier »
+  # entre `date_debut` et `date_fin` (bornes incluses).
+  # Sert au calendrier client pour griser ces jours.
+  # Renvoie un tableau de strings "YYYY-MM-DD" (format attendu par le JS).
+  def self.dates_jour_entier_entre(date_debut, date_fin)
+    # On charge toutes les indispos qui couvrent au moins un jour de l'intervalle
+    indispos = where('date_fin >= ? AND date_debut <= ?', date_debut, date_fin)
+    dates = []
+
+    indispos.each do |i|
+      # On ne s'intéresse qu'aux indispos « jour entier »
+      next unless i.jour_entier?
+
+      # On itère sur chaque jour couvert par l'indispo, en s'arrêtant à `date_fin`
+      jour = [i.date_debut, date_debut].max
+      derniere = [i.date_fin, date_fin].min
+      while jour <= derniere
+        dates << jour.strftime('%Y-%m-%d')
+        jour += 1
+      end
+    end
+
+    # Dédoublonnage au cas où deux indispos couvriraient les mêmes jours
+    dates.uniq
+  end
+
   private
 
   # date_fin >= date_debut

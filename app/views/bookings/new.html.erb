@@ -12,6 +12,18 @@
     - creneaux-url-value : l'URL de l'endpoint AJAX pour charger les créneaux
     - prestation-id-value : la prestation pré-sélectionnée si l'URL contient ?prestation_id=X
 %>
+<%# Sérialise les crédits actifs en JSON minimal pour le JS — uniquement les champs
+    nécessaires pour faire le matching prestation côté front (id, nom de la pose,
+    nb_restant pour le libellé "(X restants)"). %>
+<% credits_pour_js = @credits_actifs.map { |c|
+     {
+       id:             c.id,
+       prestation_id:  c.prestation_id,
+       prestation_nom: c.prestation.nom,
+       nb_restant:     c.nb_restant
+     }
+   } %>
+
 <%= form_with model: @booking,
               url: bookings_path,
               html: {
@@ -19,6 +31,14 @@
                   controller: "booking",
                   booking_creneaux_url_value: creneaux_bookings_path,
                   booking_prestation_id_value: params[:prestation_id].to_i,
+                  # Jours fermés (ex: [0, 1] = dim et lun) — lu par le JS pour griser le calendrier
+                  # Stimulus parse automatiquement les Array depuis le JSON.
+                  booking_jours_fermes_value: @jours_fermes.to_json,
+                  # Dates bloquées par des indispos « jour entier » (format "YYYY-MM-DD")
+                  booking_jours_bloques_value: @jours_bloques.to_json,
+                  # Crédits actifs de la cliente — utilisés pour afficher dynamiquement
+                  # l'option "Utiliser un crédit" en étape 3 si applicable à la prestation choisie.
+                  booking_credits_actifs_value: credits_pour_js.to_json,
                   turbo: false  # Désactivé pour permettre la redirection vers Stripe (URL externe)
                 }
               } do |f| %>
@@ -95,7 +115,9 @@
       <div class="bk-cat-bar">
         <span class="bk-cat-pill active" data-cat="extensions"   onclick="filterPrestations('extensions', this)">Extensions</span>
         <span class="bk-cat-pill"        data-cat="rehaussement" onclick="filterPrestations('rehaussement', this)">Rehaussement</span>
-        <span class="bk-cat-pill"        data-cat="sourcils"     onclick="filterPrestations('sourcils', this)">Sourcils</span>
+        <%# Pill "Sourcils" retirée : Syam ne propose pas (encore) cette
+            prestation. Pour la réactiver plus tard, remettre la ligne ici
+            ET ré-inclure la catégorie dans le controller (bookings#new). %>
         <%# data-cat="retouche" : valeur interne en base — le JS filtre dessus.
             Libellé affiché à la cliente : "Remplissages". %>
         <span class="bk-cat-pill"        data-cat="retouche"     onclick="filterPrestations('retouche', this)">Remplissages</span>
@@ -245,8 +267,27 @@
       <p class="s-tag">Étape 3</p>
       <h2 class="s-h2">Mode de garantie</h2>
 
-      <%# Deux options de garantie — cliquables, gérées par selectPayment() %>
+      <%# Deux options de garantie — cliquables, gérées par selectPayment().
+          Une 3e option "Utiliser un crédit" peut apparaître si la cliente a un
+          crédit de pack applicable à la prestation choisie (cf. JS refreshCreditOption). %>
       <div class="payment-opts">
+
+        <%# Option "crédit" — affichée uniquement si un crédit est applicable.
+            Double target : "paymentOpt" pour être traitée comme une option de paiement,
+            "creditOption" pour permettre au JS de la montrer/cacher dynamiquement. %>
+        <div class="payment-opt payment-opt--credit"
+             data-booking-target="paymentOpt creditOption"
+             data-action="click->booking#selectPayment"
+             data-payment="credit"
+             style="display:none;">
+          <div class="payment-opt-title">
+            Utiliser un crédit
+            <span data-booking-target="creditCount" style="font-weight:400; color: var(--color-muted, #8e8480); font-size: 0.85em;"></span>
+          </div>
+          <div class="payment-opt-sub">
+            Aucun paiement — un remplissage sera consommé après votre rendez-vous.
+          </div>
+        </div>
 
         <%# Option 1 : acompte 30% prélevé immédiatement via Stripe %>
         <div class="payment-opt"
@@ -268,8 +309,12 @@
 
       </div>
 
-      <%# Input caché pour le mode de paiement ("acompte" ou "empreinte") %>
+      <%# Input caché pour le mode de paiement ("acompte", "empreinte" ou "credit") %>
       <%= f.hidden_field :mode_paiement, data: { booking_target: "paymentInput" } %>
+
+      <%# Input caché pour le crédit utilisé — rempli par le JS uniquement si la cliente
+          choisit l'option "Utiliser un crédit". Re-vérifié côté serveur (sécurité). %>
+      <%= f.hidden_field :credit_id, data: { booking_target: "creditIdInput" } %>
 
       <%# Conditions de réservation — informatives uniquement %>
       <div class="conditions-box">
@@ -356,8 +401,9 @@
           <div class="recap-total" data-booking-target="recapPrix">—</div>
         </div>
 
-        <%# Acompte dû : 30% du prix total, calculé par updateRecap() %>
-        <div class="recap-row">
+        <%# Acompte dû : 30% du prix total, calculé par updateRecap().
+            La ligne entière est masquée si la cliente utilise un crédit (pas de paiement). %>
+        <div class="recap-row" data-booking-target="recapAcompteRow">
           <div class="recap-row-label">Acompte dû</div>
           <div class="recap-row-value" data-booking-target="recapAcompte">—</div>
         </div>
@@ -373,10 +419,14 @@
         </button>
       </div>
 
-      <%# Bouton de soumission — envoie le formulaire (POST /bookings) %>
-      <%= f.submit "Confirmer et payer l'acompte", class: "confirm-btn" %>
+      <%# Bouton de soumission — libellé adapté par updateRecap() selon le mode choisi
+          (acompte → "Confirmer et payer l'acompte", crédit → "Confirmer avec mon crédit"). %>
+      <%= f.submit "Confirmer et payer l'acompte",
+                   class: "confirm-btn",
+                   data: { booking_target: "submitBtn" } %>
 
-      <p class="confirm-note">
+      <%# Note sous le bouton — adaptée aussi (Stripe vs crédit) par le JS. %>
+      <p class="confirm-note" data-booking-target="confirmNote">
         Un email de confirmation + rappel 24h avant vous seront envoyés automatiquement.<br>
         Paiement sécurisé via Stripe.
       </p>

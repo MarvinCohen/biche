@@ -6,7 +6,7 @@
 .hero {
   position: relative;
   padding: 100px 24px 60px;
-  background: #e8e2d8;
+  background: var(--color-sand);
   overflow: hidden;
   text-align: center;
 }
@@ -88,7 +88,7 @@
 /* Accroche sous le titre */
 .hero-p {
   font-size: 13px;
-  color: #6e6560;
+  color: var(--color-text-soft);
   line-height: 1.7;
   margin-bottom: 32px;
 }
@@ -431,7 +431,7 @@
 .addr-line {
   text-align: center;
   font-size: 13px;
-  color: #6e6560;
+  color: var(--color-text-soft);
   line-height: 1.8;
   margin-bottom: 18px;
 }

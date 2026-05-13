@@ -49,11 +49,15 @@
       avoir à modifier les 22 fichiers qui contiennent <nav class="nav">. %>
   <body data-admin="<%= user_signed_in? && current_user.admin? %>">
     <!-- Messages flash (erreurs Devise, confirmations d'actions) -->
+    <%# `data-controller="flash"` branche le Stimulus controller qui efface la
+        pastille après quelques secondes (cf. flash_controller.js). %>
     <% if notice.present? %>
-      <div class="flash flash--notice"><%= notice %></div>
+      <div class="flash flash--notice" data-controller="flash"><%= notice %></div>
     <% end %>
     <% if alert.present? %>
-      <div class="flash flash--alert"><%= alert %></div>
+      <%# Les alerts restent un peu plus longtemps (6s) — c'est souvent une erreur
+          que la cliente doit avoir le temps de lire. %>
+      <div class="flash flash--alert" data-controller="flash" data-flash-delay-value="6000"><%= alert %></div>
     <% end %>
 
     <%# ============================================================ %>
@@ -219,9 +223,11 @@
         if (document.body.dataset.admin !== 'true') return;
 
         // -------- 1) Côté public : bouton "Admin" dans la navbar --------
-        // Cherche la zone droite de la navbar dans la page publique
+        // Cherche la zone droite de la navbar dans la page publique.
+        // Garde anti-doublon : on n'insère pas si un .nav-admin-link existe déjà
+        // (cas où le script serait ré-exécuté par Turbo sur la même page).
         var navRight = document.querySelector('.nav-right');
-        if (navRight) {
+        if (navRight && !navRight.querySelector('.nav-admin-link')) {
           var adminLink = document.createElement('a');
           adminLink.href = '/admin';
           adminLink.className = 'nav-admin-link';
@@ -233,8 +239,10 @@
         // -------- 2) Côté admin : bouton "↩ Site" dans la nav admin --------
         // Sur les pages admin, on injecte un lien retour vers le site public,
         // placé juste avant le lien "Déconnexion" (qui est à droite).
+        // Garde anti-doublon : on n'insère pas si un .admin-back-to-site existe déjà
+        // (sinon une navigation Turbo peut ajouter plusieurs boutons "↩ Site").
         var adminNav = document.querySelector('.admin-nav');
-        if (adminNav) {
+        if (adminNav && !adminNav.querySelector('.admin-back-to-site')) {
           var logoutLink = adminNav.querySelector('.admin-logout');
           var backLink = document.createElement('a');
           backLink.href = '/';

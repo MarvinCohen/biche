@@ -149,6 +149,56 @@
           </div>
         </div>
       </div>
+
+      <%# ============================================================
+          BLOC CRÉDITS DE PACK — visible uniquement si la cliente en a.
+          Preview de 3 crédits max + CTA vers la page dédiée /espace_cliente/credits.
+          Affiché dans l'onglet Fidélité car les 2 sont des "avantages cliente".
+      ============================================================ %>
+      <% if @credits_actifs_count > 0 %>
+        <div class="sec sec-cream">
+          <p class="s-tag">Packs</p>
+          <h2 class="s-h2">
+            Mes crédits
+            <%# Compteur entre parenthèses pour montrer le total tout de suite %>
+            <span style="font-size:0.6em; color: var(--color-muted, #8e8480); font-family: 'Jost', sans-serif; font-weight: 400;">
+              (<%= @credits_actifs_count %>)
+            </span>
+          </h2>
+
+          <%# Liste compacte des 3 premiers crédits actifs (FIFO sur expiration) %>
+          <% @credits_actifs_preview.each do |credit| %>
+            <%# Mini-card horizontale : compteur à gauche, infos pose à droite %>
+            <div class="rdv-card" style="margin-bottom: 10px;">
+              <%# Pastille épurée : juste le gros chiffre des remplissages restants,
+                  centré dans le carré sombre. La classe `credit-pill-solo` agrandit
+                  le chiffre et garantit un centrage parfait (la pastille .rdv-date
+                  était dimensionnée pour 2 lignes — on adapte pour 1 seule). %>
+              <div class="rdv-date credit-pill-solo">
+                <span class="credit-pill-solo-num"><%= credit.nb_restant %></span>
+              </div>
+              <div class="rdv-info">
+                <div class="rdv-name"><%= credit.prestation.nom %></div>
+                <%# Info principale : compteur explicite en toutes lettres %>
+                <div class="rdv-time">
+                  <strong><%= credit.nb_restant %> sur <%= credit.nb_total %></strong> remplissages restants
+                </div>
+                <%# Date d'expiration en dessous, plus discrète %>
+                <div class="rdv-time" style="font-size: 11px; color: var(--color-muted, #8e8480); margin-top: 2px;">
+                  Valable jusqu'au <%= I18n.l(credit.date_expiration, format: "%d %B %Y") %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <%# CTA vers la page complète des crédits (incl. l'historique) %>
+          <div style="margin-top: 14px; text-align: center;">
+            <%= link_to "Voir tous mes crédits →",
+                        espace_cliente_credits_path,
+                        class: "btn-ghost" %>
+          </div>
+        </div>
+      <% end %>
     </div>
 
     <%# ================================================================

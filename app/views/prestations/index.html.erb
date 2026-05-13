@@ -153,10 +153,12 @@
   }
 
   /* ---- SECTION OFFRE DU MOMENT ---- */
-  /* Fond crème qui contient la carte offre */
+  /* Fond blanc pour créer une cassure visuelle avec le hero beige doré
+     juste au-dessus (sinon les deux fonds beiges identiques se confondaient
+     et l'arche brune semblait flotter sans séparation). */
   .offer-sec {
     padding: 40px 20px 20px;
-    background: #f5ede2;
+    background: #fff;
   }
 
   /* Carte offre : fond brun foncé, haut arrondi en ovale */
@@ -863,8 +865,9 @@
     </div>
 
     <%# ---- CAROUSEL PRESTATIONS ---- %>
-    <%# Section nude avec filtres pills + carousel horizontal scrollable %>
-    <div class="sec sec-nude">
+    <%# Fond blanc pour créer une cassure franche avec le hero beige doré
+        juste au-dessus, et aérer la page (sinon trop de beige enchaîné). %>
+    <div class="sec">
       <p class="s-tag">Le catalogue</p>
       <h2 class="s-h2">Nos soins signatures</h2>
       <p class="s-sub">Filtrez par type pour trouver le soin qui vous correspond.</p>
@@ -967,7 +970,9 @@
         @prestations est chargé dans PrestationsController#index
         On filtre par catégorie avec .select pour grouper les sections
         ==================================================================== %>
-    <div class="sec">
+    <%# Fond beige nude pour casser avec les sections blanches qui l'entourent
+        (carousel au-dessus, bloc morpho en-dessous). %>
+    <div class="sec sec-nude">
       <p class="s-tag">Grille complète</p>
       <h2 class="s-h2">Tous les tarifs</h2>
       <p class="s-sub">Du premier rendez-vous à l'entretien régulier.</p>
@@ -1106,7 +1111,9 @@
 
     <%# ---- BLOC MORPHOLOGIE ---- %>
     <%# Encart informatif qui invite à consulter le guide par morphologie %>
-    <div class="sec sec-cream">
+    <%# Fond blanc pour créer une vraie cassure avec la section "Tous les tarifs"
+        (cream) juste au-dessus. %>
+    <div class="sec">
       <div class="info-block">
         <div class="info-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

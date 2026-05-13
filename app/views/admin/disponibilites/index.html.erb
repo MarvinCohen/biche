@@ -1,0 +1,358 @@
+<% content_for :title, "Admin — Disponibilités" %>
+
+<%#
+  ============================================================
+  VUE — Disponibilités (page unique)
+  Deux sections :
+  1. Semaine type (BusinessHour)    → 7 forms (un par jour)
+  2. Fermetures exceptionnelles (Indisponibilite) → liste + form
+  ============================================================
+%>
+
+<div class="admin-wrap">
+  <div class="admin-phone">
+
+    <%# ---- NAVIGATION ADMIN ---- %>
+    <nav class="admin-nav">
+      <%= link_to admin_root_path, class: "admin-nav-logo" do %>
+        Biche. <span>Admin</span>
+      <% end %>
+      <%= link_to "← Retour", admin_root_path, class: "admin-logout" %>
+    </nav>
+
+    <%# ---- HEADER ---- %>
+    <div class="admin-header">
+      <div class="admin-header-title">Disponibilités</div>
+      <div class="admin-header-sub">
+        Tes horaires hebdo + tes fermetures exceptionnelles
+      </div>
+    </div>
+
+    <%# ============================================================
+        SECTION 1 — SEMAINE TYPE (horaires hebdomadaires)
+        Un form par jour, PATCH vers admin_business_hour_path
+    ============================================================ %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Semaine type</div>
+      <p style="font-size:11px; color:var(--color-muted); margin:-4px 0 12px;">
+        Tes horaires habituels. Pour fermer un jour précis sans toucher
+        à la semaine, utilise la section "Fermetures exceptionnelles" ci-dessous.
+      </p>
+    </div>
+
+    <% if @business_hours.empty? %>
+      <div class="admin-sec">
+        <p style="color:var(--color-danger); font-size:13px;">
+          Aucun horaire en base. Lance <code>rails runner db/setup_business_hours.rb</code>
+          pour initialiser les 7 jours.
+        </p>
+      </div>
+    <% end %>
+
+    <% @business_hours.each do |bh| %>
+      <div class="admin-sec">
+        <%# Form local (sans Turbo) pour un redirect classique avec notice flash %>
+        <%= form_with model: bh, url: admin_business_hour_path(bh), method: :patch, local: true do |f| %>
+
+          <%# ---- TITRE DU JOUR + TOGGLE OUVERT/FERMÉ ---- %>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div style="font-family:var(--font-serif); font-size:20px; color:var(--color-dark);">
+              <%= bh.nom_jour %>
+            </div>
+            <%# f.check_box génère AUTOMATIQUEMENT un hidden value="0" en amont — pas de doublon à ajouter %>
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--color-muted);">
+              <%= f.check_box :ouvert, { checked: bh.ouvert }, "1", "0" %>
+              Ouvert
+            </label>
+          </div>
+
+          <%# ---- HEURES D'OUVERTURE ---- %>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+                Ouverture
+              </label>
+              <%= f.time_field :heure_debut, class: "admin-input" %>
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+                Fermeture
+              </label>
+              <%= f.time_field :heure_fin, class: "admin-input" %>
+            </div>
+          </div>
+
+          <%# ---- PAUSE DÉJEUNER (optionnelle) ---- %>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+                Début pause (optionnel)
+              </label>
+              <%= f.time_field :pause_debut, class: "admin-input" %>
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+                Fin pause (optionnel)
+              </label>
+              <%= f.time_field :pause_fin, class: "admin-input" %>
+            </div>
+          </div>
+
+          <%# ---- PAS ENTRE CRÉNEAUX ---- %>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+              Intervalle entre créneaux (minutes) — ex : 90 = créneaux toutes les 1h30
+            </label>
+            <%= f.number_field :pas_minutes, min: 15, max: 240, step: 15, class: "admin-input" %>
+          </div>
+
+          <%# ---- ERREURS DE VALIDATION ---- %>
+          <% if bh.errors.any? %>
+            <ul style="color:var(--color-danger); font-size:12px; margin-bottom:10px;">
+              <% bh.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          <% end %>
+
+          <%# ---- BOUTON ENREGISTRER ---- %>
+          <%= f.submit "Enregistrer #{bh.nom_jour}", class: "btn-admin-terminer" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# ============================================================
+        SECTION 2 — FERMETURES EXCEPTIONNELLES (Indisponibilite)
+        Form de création + liste des indispos à venir
+    ============================================================ %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">Fermetures exceptionnelles</div>
+      <p style="font-size:11px; color:var(--color-muted); margin:-4px 0 12px;">
+        Pour un jour précis (ex : "ce lundi je ne travaille pas") ou une pause ponctuelle.
+        N'affecte pas ta semaine type.
+      </p>
+    </div>
+
+    <%# ---- FORMULAIRE DE BLOCAGE ---- %>
+    <div class="admin-sec">
+      <%= form_with model: [:admin, @nouvelle_indisponibilite], local: true do |f| %>
+
+        <%# Erreurs de validation (si la création échoue, le controller renvoie ici) %>
+        <% if @nouvelle_indisponibilite.errors.any? %>
+          <ul style="color:var(--color-danger); font-size:12px; margin-bottom:10px;">
+            <% @nouvelle_indisponibilite.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        <% end %>
+
+        <%# ---- DATES (Du / Au) ---- %>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div>
+            <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+              Du
+            </label>
+            <%= f.date_field :date_debut,
+                             class: "admin-input",
+                             id: "indispo_date_debut",
+                             onchange: "syncDateFin(this)" %>
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+              Au
+            </label>
+            <%= f.date_field :date_fin,
+                             class: "admin-input",
+                             id: "indispo_date_fin" %>
+          </div>
+        </div>
+
+        <%# ---- CHECKBOX TOUTE LA JOURNÉE ----
+            Cochée par défaut : cache les selects d'heure et force 00:00 → 23:59 à la soumission %>
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--color-muted); margin-bottom:10px;">
+          <input type="checkbox"
+                 id="indispo_jour_entier"
+                 checked
+                 onchange="toggleJourEntier(this)">
+          Toute la journée
+        </label>
+
+        <%# ---- HEURES (cachées si "Toute la journée" est coché) ---- %>
+        <div id="indispo_heures_wrap" style="display:none; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div>
+            <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+              Début
+            </label>
+            <%= f.select :heure_debut,
+                         options_for_select(
+                           (8..19).flat_map do |h|
+                             [0, 15, 30, 45].map do |m|
+                               label = "#{h.to_s.rjust(2,'0')}h#{m.to_s.rjust(2,'0')}"
+                               value = "#{h.to_s.rjust(2,'0')}:#{m.to_s.rjust(2,'0')}"
+                               [label, value]
+                             end
+                           end
+                         ),
+                         { include_blank: "Début" },
+                         class: "admin-select",
+                         id: "indispo_heure_debut" %>
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+              Fin
+            </label>
+            <%= f.select :heure_fin,
+                         options_for_select(
+                           (8..20).flat_map do |h|
+                             [0, 15, 30, 45].filter_map do |m|
+                               next if h == 20 && m > 0
+                               next if h == 8  && m == 0
+                               label = "#{h.to_s.rjust(2,'0')}h#{m.to_s.rjust(2,'0')}"
+                               value = "#{h.to_s.rjust(2,'0')}:#{m.to_s.rjust(2,'0')}"
+                               [label, value]
+                             end
+                           end
+                         ),
+                         { include_blank: "Fin" },
+                         class: "admin-select",
+                         id: "indispo_heure_fin" %>
+          </div>
+        </div>
+
+        <%# ---- RAISON (optionnelle) ---- %>
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; color:var(--color-muted); margin-bottom:4px;">
+            Raison (optionnelle)
+          </label>
+          <%= f.text_field :raison,
+                           class: "admin-input",
+                           placeholder: "Ex: Congé, Formation, RDV médical..." %>
+        </div>
+
+        <%= f.submit "Bloquer cette date", class: "btn-admin-terminer" %>
+      <% end %>
+    </div>
+
+    <%# ---- LISTE DES INDISPOS À VENIR ---- %>
+    <div class="admin-sec">
+      <div class="admin-sec-title">À venir (<%= @indisponibilites.count %>)</div>
+
+      <% if @indisponibilites.any? %>
+        <% @indisponibilites.each do |indispo| %>
+          <div class="admin-indispo-card">
+
+            <%# Bloc date à gauche %>
+            <div class="admin-rdv-heure" style="background:#8e8480; width:54px; font-size:13px;">
+              <%= indispo.date_debut.day %><br>
+              <span style="font-size:9px; opacity:0.8;"><%= I18n.l(indispo.date_debut, format: "%b") %></span>
+            </div>
+
+            <%# Infos du blocage %>
+            <div class="admin-rdv-info">
+              <div class="admin-rdv-cliente">
+                <%= indispo.raison.present? ? indispo.raison : "Indisponible" %>
+              </div>
+              <div class="admin-rdv-prestation">
+                <%# "Toute la journée" si convention 00:00 → 23:59, sinon plage horaire %>
+                <%= indispo.jour_entier? ? "Toute la journée" : indispo.plage_horaire %>
+              </div>
+              <% if indispo.nb_jours > 1 %>
+                <div style="font-size:10px; color:var(--color-muted); margin-top:3px;">
+                  <%= indispo.plage_dates %>
+                  <span style="color:var(--color-accent); margin-left:4px;">
+                    (<%= indispo.nb_jours %> jours)
+                  </span>
+                </div>
+              <% else %>
+                <div style="font-size:10px; color:var(--color-muted); margin-top:3px;">
+                  <%= I18n.l(indispo.date_debut, format: "%-d %B %Y") %>
+                </div>
+              <% end %>
+            </div>
+
+            <%# Bouton supprimer %>
+            <%= button_to "✕",
+                          admin_indisponibilite_path(indispo),
+                          method: :delete,
+                          data: { turbo_confirm: "Débloquer cette date ?" },
+                          class: "admin-indispo-delete" %>
+          </div>
+        <% end %>
+
+      <% else %>
+        <div class="admin-empty">
+          <div class="admin-empty-text">
+            Aucune fermeture exceptionnelle.<br>
+            <span style="font-size:11px; opacity:0.7;">Utilise le formulaire ci-dessus pour bloquer une date.</span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>
+
+<%# ============================================================
+    SCRIPTS — Synchro dates + toggle "Toute la journée"
+============================================================ %>
+<script>
+  // Quand on change la date de début, on met à jour date_fin si elle est antérieure
+  function syncDateFin(inputDebut) {
+    var dateFin = document.getElementById('indispo_date_fin');
+    if (!dateFin.value || dateFin.value < inputDebut.value) {
+      dateFin.value = inputDebut.value;
+    }
+    // Empêcher de choisir une date_fin avant date_debut
+    dateFin.min = inputDebut.value;
+  }
+
+  // Toggle "Toute la journée" :
+  // - cochée  → cache les selects heure et force 00:00 → 23:59
+  // - décochée → réaffiche les selects pour saisie précise
+  function toggleJourEntier(checkbox) {
+    var wrap = document.getElementById('indispo_heures_wrap');
+    var debut = document.getElementById('indispo_heure_debut');
+    var fin   = document.getElementById('indispo_heure_fin');
+
+    if (checkbox.checked) {
+      // Mode "Toute la journée" : on cache les selects
+      wrap.style.display = 'none';
+      // Sélection forcée à 00:00 / 23:59 (valeurs ajoutées dynamiquement comme options
+      // pour que le select les accepte même si elles n'étaient pas dans la liste)
+      ensureOption(debut, '00:00', '00h00');
+      ensureOption(fin,   '23:59', '23h59');
+      debut.value = '00:00';
+      fin.value   = '23:59';
+    } else {
+      // Mode horaire précis : on réaffiche les selects
+      wrap.style.display = 'grid';
+      // Si on a forcé 00:00 / 23:59, on remet sur "rien" pour forcer un choix
+      if (debut.value === '00:00') debut.value = '';
+      if (fin.value   === '23:59') fin.value   = '';
+    }
+  }
+
+  // Ajoute une option à un select si elle n'existe pas déjà
+  // (utile pour 00:00 / 23:59 qui ne sont pas dans la liste 8h-20h)
+  function ensureOption(select, value, label) {
+    var exists = Array.from(select.options).some(function(o) { return o.value === value; });
+    if (!exists) {
+      var opt = document.createElement('option');
+      opt.value = value;
+      opt.text  = label;
+      select.appendChild(opt);
+    }
+  }
+
+  // Au chargement : la checkbox est cochée par défaut → on force 00:00 / 23:59
+  document.addEventListener('DOMContentLoaded', function() {
+    var checkbox = document.getElementById('indispo_jour_entier');
+    if (checkbox) toggleJourEntier(checkbox);
+
+    // Initialiser le min de date_fin
+    var dateDebut = document.getElementById('indispo_date_debut');
+    if (dateDebut && dateDebut.value) {
+      document.getElementById('indispo_date_fin').min = dateDebut.value;
+    }
+  });
+</script>

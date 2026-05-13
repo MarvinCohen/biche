@@ -46,7 +46,14 @@
                     <span class="admin-badge admin-badge-annule" style="margin-left:6px;">Masqué</span>
                   <% end %>
                 </div>
-                <div class="admin-rdv-prestation"><%= product.prix_euros.to_i %>€</div>
+                <div class="admin-rdv-prestation">
+                  <%# Pour les packs : on affiche aussi la pose + nb de remplissages
+                      pour que Syam s'y retrouve rapidement dans une liste de 18 packs. %>
+                  <% if product.pack? && product.prestation %>
+                    <%= product.prestation.nom %> · <%= product.nb_remplissages %> remplissages ·
+                  <% end %>
+                  <%= product.prix_euros.to_i %>€
+                </div>
               </div>
 
               <div style="color:#c8c2bc; font-size:14px;">›</div>
