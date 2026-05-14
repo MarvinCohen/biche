@@ -48,6 +48,28 @@ class PagesController < ApplicationController
 
   # GET /morphologie
   def morphologie
+    # Pré-calcule le mapping (technique + effet choisis sur le guide)
+    # → prestation_id à pré-sélectionner sur /bookings/new.
+    # On résout côté serveur par nom (les IDs en seed/prod peuvent différer)
+    # puis on passe la table en JSON au Stimulus controller via data-attribute.
+    # `index_by(&:nom)` => Hash { "Cil à cil" => Prestation, ... } pour un lookup O(1).
+    prestations = Prestation.disponibles.index_by(&:nom)
+
+    # Clés = état combiné technique[_effet] envoyé par le JS (cf. morphologie_controller).
+    # Valeurs = id de la prestation correspondante (nil si absente — le JS fallback alors
+    # sur /bookings/new sans pré-sélection).
+    @presta_map = {
+      cil_a_cil:      prestations["Cil à cil"]&.id,
+      # Volume "léger" (3 extensions, effets aérés/élégants)
+      volume_mouille: prestations["Volume léger"]&.id,
+      volume_wispy:   prestations["Volume léger"]&.id,
+      volume_3d:      prestations["Volume léger"]&.id,
+      # Volume "intense" (5 extensions, effets denses/marqués)
+      volume_manga:   prestations["Volume intense"]&.id,
+      volume_5d:      prestations["Volume intense"]&.id,
+      # Fallback si la cliente n'a pas encore choisi d'effet
+      volume_default: prestations["Volume léger"]&.id
+    }
   end
 
   # GET /avis

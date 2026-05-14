@@ -1,10 +1,31 @@
-<%# Page Morphologie — guide en 3 étapes : techniques / type d'yeux / recommandation %>
+<%# ============================================================
+    Page Morphologie — Guide en 4 étapes (parcours interactif).
+
+    Étapes :
+      1. Choix de la TECHNIQUE (Cil à cil ou Volume)
+      2. Choix de l'EFFET (uniquement si Volume → section affichée conditionnellement)
+      3. Choix de la MORPHOLOGIE (8 types d'yeux)
+      4. RECOMMANDATION dynamique (récap des choix + forme conseillée)
+
+    Toute la logique JS est dans le Stimulus controller :
+      app/javascript/controllers/morphologie_controller.js
+
+    Le controller est attaché au <div class="wrap"> via data-controller.
+    Chaque carte cliquable a une `data-action` + `data-morphologie-value-param`
+    qui transporte la valeur sélectionnée (ex: "cil_a_cil", "amande", etc.).
+============================================================ %>
 <% content_for :title, "Guide morphologie" %>
 
-<div class="wrap">
+<%# data-morphologie-presta-map-value : table de correspondance (technique+effet)
+    → prestation_id, calculée côté serveur dans PagesController#morphologie.
+    Le controller Stimulus l'utilise pour construire l'URL "Je réserve cette pose →"
+    avec ?prestation_id=X et pré-sélectionner le bon soin dans /bookings/new. %>
+<div class="wrap" data-controller="morphologie"
+     data-morphologie-presta-map-value="<%= @presta_map.to_json %>"
+     data-morphologie-booking-url-value="<%= new_booking_path %>">
   <div class="phone">
 
-    <%# ---- NAVIGATION ---- %>
+    <%# ---- NAVIGATION (inchangée par rapport aux autres pages publiques) ---- %>
     <nav class="nav">
       <%= link_to "Biche.", root_path, class: "logo-mini" %>
       <div class="nav-right">
@@ -34,316 +55,409 @@
       <div class="ph-blob-2"></div>
       <div class="ph-tag">Guide</div>
       <h1 class="ph-title">Quelle pose<br>pour vous ?</h1>
-      <p class="ph-intro">Découvrez les techniques, analysez votre morphologie et trouvez la pose idéale.</p>
+      <p class="ph-intro">Composez votre regard en 4 étapes : technique, effet, morphologie. La carte de recommandation se met à jour automatiquement.</p>
     </div>
 
-    <%# ---- INDICATEUR D'ÉTAPES ---- %>
-    <%# Barre de progression des 3 étapes de la page %>
+    <%# ---- INDICATEUR D'ÉTAPES — 4 étapes ---- %>
+    <%# Les classes (active/done/todo) sont gérées par le Stimulus controller %>
     <div class="steps-indicator">
       <div class="step-item">
-        <div class="step-circle active">1</div>
-        <div class="step-label active">Les techniques</div>
+        <div class="step-circle active" data-morphologie-target="stepCircle" data-step="1">1</div>
+        <div class="step-label active" data-morphologie-target="stepLabel" data-step="1">Technique</div>
       </div>
       <div class="step-connector"></div>
       <div class="step-item">
-        <div class="step-circle todo">2</div>
-        <div class="step-label">Morphologie</div>
+        <div class="step-circle todo" data-morphologie-target="stepCircle" data-step="2">2</div>
+        <div class="step-label" data-morphologie-target="stepLabel" data-step="2">Effet</div>
       </div>
       <div class="step-connector"></div>
       <div class="step-item">
-        <div class="step-circle todo">3</div>
-        <div class="step-label">Ma pose</div>
+        <div class="step-circle todo" data-morphologie-target="stepCircle" data-step="3">3</div>
+        <div class="step-label" data-morphologie-target="stepLabel" data-step="3">Morphologie</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item">
+        <div class="step-circle todo" data-morphologie-target="stepCircle" data-step="4">4</div>
+        <div class="step-label" data-morphologie-target="stepLabel" data-step="4">Ma pose</div>
       </div>
     </div>
 
-    <%# ---- ÉTAPE 1 : COMPRENDRE LES TECHNIQUES ---- %>
+    <%# ============================================================
+        ÉTAPE 1 — Choix de la TECHNIQUE
+        2 grosses cartes : Cil à cil / Volume.
+        Au clic → Stimulus#selectTechnique met à jour le state.
+    ============================================================ %>
     <section class="sec">
       <div class="s-num">Étape 1</div>
-      <h2 class="s-h2">Comprendre les techniques</h2>
-      <p class="s-sub">Toutes les techniques peuvent vous convenir. Le choix dépend avant tout de vos envies et du style recherché.</p>
+      <h2 class="s-h2">La technique</h2>
+      <p class="s-sub">Premier choix : la pose la plus discrète (cil à cil) ou la plus modulable (volume).</p>
 
-      <%# Citation de Syam %>
-      <div class="techniques-intro">
-        <div class="tech-intro-text">« Il n'y a pas de mauvaise technique,<br>il y a celle qui vous ressemble. »</div>
-        <div class="tech-intro-sub">Syam adapte chaque pose à vos cils naturels, votre style de vie et vos envies du moment.</div>
-      </div>
+      <div class="tech-choice-grid">
 
-      <%# Carrousel horizontal des 5 techniques %>
-      <div class="techniques-carousel">
-
-        <%# Technique Naturel %>
-        <div class="tech-card">
-          <div class="tech-card-img ti-naturel">
-            <svg width="70" height="42" viewBox="0 0 70 42" fill="none" opacity="0.45">
-              <path d="M4 21 C17 10 53 10 66 21" stroke="rgba(46,41,38,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <path d="M4 21 C17 32 53 32 66 21" stroke="rgba(46,41,38,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <circle cx="35" cy="21" r="8" stroke="rgba(46,41,38,0.6)" stroke-width="1.2" fill="none"/>
-              <g stroke="rgba(46,41,38,0.6)" stroke-width="1" stroke-linecap="round">
-                <path d="M10 16 L8 7"/><path d="M20 12 L18 4"/><path d="M35 11 L35 3"/><path d="M50 12 L52 4"/><path d="M60 16 L62 7"/>
+        <%# Carte Cil à cil — 1 cil naturel = 1 extension fine %>
+        <div class="tech-choice-card"
+             data-morphologie-target="techniqueCard"
+             data-action="click->morphologie#selectTechnique"
+             data-morphologie-value-param="cil_a_cil">
+          <div class="tech-choice-img tc-cilacil">
+            <svg width="80" height="48" viewBox="0 0 80 48" fill="none" opacity="0.55">
+              <%# Œil simple avec cils fins, espacés, un par un %>
+              <path d="M4 24 C20 10 60 10 76 24" stroke="rgba(46,41,38,0.85)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              <path d="M4 24 C20 38 60 38 76 24" stroke="rgba(46,41,38,0.85)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              <circle cx="40" cy="24" r="9" stroke="rgba(46,41,38,0.7)" stroke-width="1.4" fill="none"/>
+              <g stroke="rgba(46,41,38,0.75)" stroke-width="1.2" stroke-linecap="round">
+                <path d="M12 18 L9 8"/><path d="M24 14 L22 4"/><path d="M40 13 L40 3"/><path d="M56 14 L58 4"/><path d="M68 18 L71 8"/>
               </g>
             </svg>
           </div>
-          <div class="tech-card-body">
-            <div class="tech-card-name">Naturel</div>
-            <div class="tech-card-desc">Cil à cil classique. Légèreté et discrétion au quotidien.</div>
-            <div class="tech-card-tags">
-              <span class="tech-tag">Cil à cil</span>
-              <span class="tech-tag">Discret</span>
-            </div>
+          <div class="tech-choice-body">
+            <div class="tech-choice-name">Cil à cil</div>
+            <div class="tech-choice-desc">Une extension fine posée sur chaque cil naturel. Rendu discret et naturel.</div>
           </div>
         </div>
 
-        <%# Technique Cat eye (sélectionnée par défaut dans la maquette) %>
-        <div class="tech-card selected">
-          <div class="tech-card-img ti-cat">
-            <svg width="70" height="42" viewBox="0 0 70 42" fill="none" opacity="0.45">
-              <path d="M4 24 C17 8 50 8 66 16" stroke="rgba(247,245,242,0.8)" stroke-width="2" fill="none" stroke-linecap="round"/>
-              <path d="M4 24 C17 36 50 36 66 28" stroke="rgba(247,245,242,0.8)" stroke-width="2" fill="none" stroke-linecap="round"/>
-              <circle cx="32" cy="22" r="8" stroke="rgba(247,245,242,0.7)" stroke-width="1.5" fill="none"/>
-              <g stroke="rgba(247,245,242,0.7)" stroke-width="1.3" stroke-linecap="round">
-                <path d="M8 20 L5 9"/><path d="M18 15 L15 5"/><path d="M32 13 L32 3"/><path d="M48 11 L52 2"/><path d="M60 10 L65 2"/>
+        <%# Carte Volume — bouquets de plusieurs extensions par cil naturel %>
+        <div class="tech-choice-card"
+             data-morphologie-target="techniqueCard"
+             data-action="click->morphologie#selectTechnique"
+             data-morphologie-value-param="volume">
+          <div class="tech-choice-img tc-volume">
+            <svg width="80" height="48" viewBox="0 0 80 48" fill="none" opacity="0.55">
+              <%# Œil avec cils plus denses et bouquets — symbolise le volume %>
+              <path d="M4 24 C20 6 60 6 76 24" stroke="rgba(247,245,242,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <path d="M4 24 C20 42 60 42 76 24" stroke="rgba(247,245,242,0.9)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+              <circle cx="40" cy="24" r="10" stroke="rgba(247,245,242,0.8)" stroke-width="1.6" fill="none"/>
+              <g stroke="rgba(247,245,242,0.85)" stroke-width="1.5" stroke-linecap="round">
+                <path d="M10 17 L6 2"/><path d="M18 12 L14 0"/><path d="M26 10 L24 -2"/>
+                <path d="M40 8 L40 -3"/>
+                <path d="M54 10 L56 -2"/><path d="M62 12 L66 0"/><path d="M70 17 L74 2"/>
               </g>
             </svg>
           </div>
-          <div class="tech-card-body">
-            <div class="tech-card-name">Cat eye</div>
-            <div class="tech-card-desc">Longueur progressive vers l'extérieur. Regard relevé et séducteur.</div>
-            <div class="tech-card-tags">
-              <span class="tech-tag">Effet chat</span>
-              <span class="tech-tag">Sexy</span>
-            </div>
-          </div>
-        </div>
-
-        <%# Technique Doll eye %>
-        <div class="tech-card">
-          <div class="tech-card-img ti-doll">
-            <svg width="70" height="42" viewBox="0 0 70 42" fill="none" opacity="0.45">
-              <path d="M4 21 C17 6 53 6 66 21" stroke="rgba(46,41,38,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <path d="M4 21 C17 36 53 36 66 21" stroke="rgba(46,41,38,0.7)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <circle cx="35" cy="21" r="11" stroke="rgba(46,41,38,0.6)" stroke-width="1.5" fill="none"/>
-            </svg>
-          </div>
-          <div class="tech-card-body">
-            <div class="tech-card-name">Doll eye</div>
-            <div class="tech-card-desc">Longueur au centre. Regard ouvert, grands yeux poupée.</div>
-            <div class="tech-card-tags">
-              <span class="tech-tag">Ouvert</span>
-              <span class="tech-tag">Doux</span>
-            </div>
-          </div>
-        </div>
-
-        <%# Technique Volume intense %>
-        <div class="tech-card">
-          <div class="tech-card-img ti-intense">
-            <svg width="70" height="42" viewBox="0 0 70 42" fill="none" opacity="0.4">
-              <path d="M4 21 C17 4 53 4 66 21" stroke="rgba(247,245,242,0.8)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <path d="M4 21 C17 38 53 38 66 21" stroke="rgba(247,245,242,0.8)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <circle cx="35" cy="21" r="10" stroke="rgba(247,245,242,0.7)" stroke-width="1.8" fill="none"/>
-              <g stroke="rgba(247,245,242,0.8)" stroke-width="1.8" stroke-linecap="round">
-                <path d="M7 14 L3 2"/><path d="M17 8 L13 -2"/><path d="M35 6 L35 -3"/><path d="M53 8 L57 -2"/><path d="M63 14 L67 2"/>
-              </g>
-            </svg>
-          </div>
-          <div class="tech-card-body">
-            <div class="tech-card-name">Volume intense</div>
-            <div class="tech-card-desc">Volume russe. Regard dramatique et spectaculaire.</div>
-            <div class="tech-card-tags">
-              <span class="tech-tag">Volume russe</span>
-              <span class="tech-tag">Intense</span>
-            </div>
-          </div>
-        </div>
-
-        <%# Technique Rehaussement %>
-        <div class="tech-card">
-          <div class="tech-card-img ti-rehausse">
-            <svg width="70" height="42" viewBox="0 0 70 42" fill="none" opacity="0.45">
-              <path d="M4 22 C17 14 53 14 66 22" stroke="rgba(46,41,38,0.5)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <path d="M4 22 C17 30 53 30 66 22" stroke="rgba(46,41,38,0.5)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <circle cx="35" cy="22" r="7" stroke="rgba(46,41,38,0.4)" stroke-width="1" fill="none"/>
-            </svg>
-          </div>
-          <div class="tech-card-body">
-            <div class="tech-card-name">Rehaussement</div>
-            <div class="tech-card-desc">Zéro extension. Courbure naturelle des cils pour un effet durable.</div>
-            <div class="tech-card-tags">
-              <span class="tech-tag">Sans extension</span>
-              <span class="tech-tag">Naturel</span>
-            </div>
+          <div class="tech-choice-body">
+            <div class="tech-choice-name">Volume</div>
+            <div class="tech-choice-desc">Plusieurs extensions ultra fines en bouquet sur chaque cil. Modulable selon l'effet voulu.</div>
           </div>
         </div>
 
       </div>
     </section>
 
-    <%# ---- ÉTAPE 2 : ANALYSE MORPHOLOGIQUE ---- %>
-    <%# La cliente clique sur son type d'yeux → la recommandation se met à jour en JS %>
-    <section class="sec sec-alt">
+    <%# ============================================================
+        ÉTAPE 2 — Choix de l'EFFET (seulement si Volume)
+        La section est `hidden` par défaut, Stimulus l'affiche dès que
+        techniqueValue === "volume".
+    ============================================================ %>
+    <section class="sec sec-cream" data-morphologie-target="effetSection" hidden>
       <div class="s-num">Étape 2</div>
-      <h2 class="s-h2">Mon type d'yeux</h2>
-      <p class="s-sub">Certaines formes de pose sont plus flatteuses selon votre morphologie. Sélectionnez votre forme d'yeux.</p>
+      <h2 class="s-h2">L'effet</h2>
+      <p class="s-sub">Le volume permet 5 effets distincts. Choisissez celui qui vous parle.</p>
 
-      <div class="eye-grid">
+      <div class="effet-grid">
 
-        <%# Yeux en amande — sélectionné par défaut %>
-        <div class="eye-card active" onclick="selectEye(this, 'amande')">
-          <div class="eye-svg-wrap">
-            <svg width="80" height="36" viewBox="0 0 80 36" fill="none">
-              <path d="M4 18 C18 6 62 6 76 18" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <path d="M4 18 C18 30 62 30 76 18" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <circle cx="40" cy="18" r="8" stroke="#2e2926" stroke-width="1.4" fill="none"/>
-              <circle cx="40" cy="18" r="3" fill="#2e2926"/>
-              <circle cx="37" cy="15" r="1.2" fill="#fff"/>
-            </svg>
+        <%# Effet Mouillé %>
+        <div class="effet-card"
+             data-morphologie-target="effetCard"
+             data-action="click->morphologie#selectEffet"
+             data-morphologie-value-param="mouille">
+          <div class="effet-img-wrap">
+            <%= image_tag "effets/mouille.jpg", alt: "Effet mouillé", class: "effet-img", loading: "lazy" %>
+          </div>
+          <div class="effet-body">
+            <div class="effet-name">Effet mouillé</div>
+            <div class="effet-desc">Bouquets fins et fermés, rendu brillant et structuré. Intense tout en restant élégant.</div>
+          </div>
+        </div>
+
+        <%# Effet Wispy %>
+        <div class="effet-card"
+             data-morphologie-target="effetCard"
+             data-action="click->morphologie#selectEffet"
+             data-morphologie-value-param="wispy">
+          <div class="effet-img-wrap">
+            <%= image_tag "effets/wispy.jpg", alt: "Effet wispy", class: "effet-img", loading: "lazy" %>
+          </div>
+          <div class="effet-body">
+            <div class="effet-name">Wispy</div>
+            <div class="effet-desc">Mélange de longueurs, effet aérien et texturé avec des pics plus longs. Sophistiqué.</div>
+          </div>
+        </div>
+
+        <%# Effet Manga %>
+        <div class="effet-card"
+             data-morphologie-target="effetCard"
+             data-action="click->morphologie#selectEffet"
+             data-morphologie-value-param="manga">
+          <div class="effet-img-wrap">
+            <%= image_tag "effets/manga.jpg", alt: "Effet manga", class: "effet-img", loading: "lazy" %>
+          </div>
+          <div class="effet-body">
+            <div class="effet-name">Manga</div>
+            <div class="effet-desc">Pics bien définis et espacés. Agrandit les yeux, effet poupée très marqué.</div>
+          </div>
+        </div>
+
+        <%# Volume 3D %>
+        <div class="effet-card"
+             data-morphologie-target="effetCard"
+             data-action="click->morphologie#selectEffet"
+             data-morphologie-value-param="3d">
+          <div class="effet-img-wrap">
+            <%= image_tag "effets/3d.jpg", alt: "Volume 3D", class: "effet-img", loading: "lazy" %>
+          </div>
+          <div class="effet-body">
+            <div class="effet-name">Volume 3D</div>
+            <div class="effet-desc">3 extensions ultra fines par cil naturel. Fourni, léger et élégant.</div>
+          </div>
+        </div>
+
+        <%# Volume 5D %>
+        <div class="effet-card"
+             data-morphologie-target="effetCard"
+             data-action="click->morphologie#selectEffet"
+             data-morphologie-value-param="5d">
+          <div class="effet-img-wrap">
+            <%= image_tag "effets/5d.jpg", alt: "Volume 5D", class: "effet-img", loading: "lazy" %>
+          </div>
+          <div class="effet-body">
+            <div class="effet-name">Volume 5D</div>
+            <div class="effet-desc">5 extensions ultra fines par cil naturel. Dense, glamour et intense — sans alourdir.</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <%# ============================================================
+        ÉTAPE 3 — Choix de la MORPHOLOGIE (8 types d'yeux)
+        Chaque carte : grande photo + petit pictogramme SVG en overlay.
+    ============================================================ %>
+    <section class="sec sec-alt">
+      <div class="s-num">Étape 3</div>
+      <h2 class="s-h2">Ma morphologie</h2>
+      <p class="s-sub">Sélectionnez votre forme d'yeux. Certaines poses sont plus flatteuses selon la morphologie.</p>
+
+      <div class="eye-grid eye-grid-photos">
+
+        <%# --- Œil en amande --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="amande">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/amande.jpg", alt: "Œil en amande", class: "eye-img", loading: "lazy" %>
+            <%# Petit pictogramme SVG en overlay (coin haut-droit) — coh. screenshot %>
+            <div class="eye-picto">
+              <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                <path d="M1 7 C5 1 17 1 21 7" stroke="#2e2926" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                <path d="M1 7 C5 13 17 13 21 7" stroke="#2e2926" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                <circle cx="11" cy="7" r="2.5" fill="#2e2926"/>
+              </svg>
+            </div>
           </div>
           <div class="eye-name">En amande</div>
           <div class="eye-desc">Forme allongée et symétrique</div>
         </div>
 
-        <%# Yeux ronds %>
-        <div class="eye-card" onclick="selectEye(this, 'ronds')">
-          <div class="eye-svg-wrap">
-            <svg width="52" height="44" viewBox="0 0 52 44" fill="none">
-              <path d="M4 22 C5 6 47 6 48 22" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <path d="M4 22 C5 38 47 38 48 22" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <circle cx="26" cy="22" r="11" stroke="#2e2926" stroke-width="1.4" fill="none"/>
-              <circle cx="26" cy="22" r="4" fill="#2e2926"/>
-              <circle cx="23" cy="19" r="1.5" fill="#fff"/>
-            </svg>
+        <%# --- Yeux ronds --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="ronds">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/ronds.jpg", alt: "Yeux ronds", class: "eye-img", loading: "lazy" %>
+            <div class="eye-picto">
+              <svg width="18" height="16" viewBox="0 0 18 16" fill="none">
+                <ellipse cx="9" cy="8" rx="7" ry="6" stroke="#2e2926" stroke-width="1.2" fill="none"/>
+                <circle cx="9" cy="8" r="3" fill="#2e2926"/>
+              </svg>
+            </div>
           </div>
           <div class="eye-name">Ronds</div>
           <div class="eye-desc">Iris très visible, regard expressif</div>
         </div>
 
-        <%# Yeux tombants %>
-        <div class="eye-card" onclick="selectEye(this, 'tombants')">
-          <div class="eye-svg-wrap">
-            <svg width="80" height="36" viewBox="0 0 80 36" fill="none">
-              <path d="M4 14 C18 5 58 7 76 20" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <path d="M4 14 C18 26 58 26 76 28" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <circle cx="38" cy="18" r="8" stroke="#2e2926" stroke-width="1.4" fill="none"/>
-              <circle cx="38" cy="18" r="3" fill="#2e2926"/>
-              <circle cx="35" cy="15" r="1.2" fill="#fff"/>
-            </svg>
+        <%# --- Yeux tombants --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="tombants">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/tombants.jpg", alt: "Yeux tombants", class: "eye-img", loading: "lazy" %>
+            <div class="eye-picto">
+              <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                <path d="M1 4 C5 1 17 3 21 9" stroke="#2e2926" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                <path d="M1 4 C5 10 17 11 21 12" stroke="#2e2926" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                <circle cx="10" cy="7" r="2.2" fill="#2e2926"/>
+              </svg>
+            </div>
           </div>
           <div class="eye-name">Tombants</div>
           <div class="eye-desc">Coin externe plus bas</div>
         </div>
 
-        <%# Yeux rapprochés %>
-        <div class="eye-card" onclick="selectEye(this, 'rapproches')">
-          <div class="eye-svg-wrap">
-            <svg width="80" height="36" viewBox="0 0 80 36" fill="none">
-              <path d="M4 18 C10 8 28 8 34 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <path d="M4 18 C10 28 28 28 34 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <circle cx="19" cy="18" r="6" stroke="#2e2926" stroke-width="1.2" fill="none"/>
-              <circle cx="19" cy="18" r="2.5" fill="#2e2926"/>
-              <path d="M44 18 C50 8 68 8 74 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <path d="M44 18 C50 28 68 28 74 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <circle cx="59" cy="18" r="6" stroke="#2e2926" stroke-width="1.2" fill="none"/>
-              <circle cx="59" cy="18" r="2.5" fill="#2e2926"/>
-              <line x1="35" y1="18" x2="43" y2="18" stroke="#b8a898" stroke-width="1" stroke-dasharray="1.5 1.5"/>
-            </svg>
+        <%# --- Yeux rapprochés --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="rapproches">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/rapproches.jpg", alt: "Yeux rapprochés", class: "eye-img", loading: "lazy" %>
+            <div class="eye-picto">
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="none">
+                <ellipse cx="6" cy="6" rx="4" ry="3" stroke="#2e2926" stroke-width="1.1" fill="none"/>
+                <circle cx="6" cy="6" r="1.5" fill="#2e2926"/>
+                <ellipse cx="20" cy="6" rx="4" ry="3" stroke="#2e2926" stroke-width="1.1" fill="none"/>
+                <circle cx="20" cy="6" r="1.5" fill="#2e2926"/>
+                <line x1="11" y1="6" x2="15" y2="6" stroke="#b8a898" stroke-width="0.8" stroke-dasharray="1 1"/>
+              </svg>
+            </div>
           </div>
           <div class="eye-name">Rapprochés</div>
           <div class="eye-desc">Moins de 1 œil d'écart</div>
         </div>
 
-        <%# Yeux écartés %>
-        <div class="eye-card" onclick="selectEye(this, 'ecartes')">
-          <div class="eye-svg-wrap">
-            <svg width="80" height="36" viewBox="0 0 80 36" fill="none">
-              <path d="M2 18 C8 8 22 8 28 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <path d="M2 18 C8 28 22 28 28 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <circle cx="15" cy="18" r="6" stroke="#2e2926" stroke-width="1.2" fill="none"/>
-              <circle cx="15" cy="18" r="2.5" fill="#2e2926"/>
-              <path d="M50 18 C56 8 70 8 76 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <path d="M50 18 C56 28 70 28 76 18" stroke="#2e2926" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <circle cx="63" cy="18" r="6" stroke="#2e2926" stroke-width="1.2" fill="none"/>
-              <circle cx="63" cy="18" r="2.5" fill="#2e2926"/>
-              <line x1="30" y1="18" x2="48" y2="18" stroke="#b8a898" stroke-width="1" stroke-dasharray="2 2"/>
-            </svg>
+        <%# --- Yeux écartés --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="ecartes">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/ecartes.jpg", alt: "Yeux écartés", class: "eye-img", loading: "lazy" %>
+            <div class="eye-picto">
+              <svg width="32" height="12" viewBox="0 0 32 12" fill="none">
+                <ellipse cx="5" cy="6" rx="4" ry="3" stroke="#2e2926" stroke-width="1.1" fill="none"/>
+                <circle cx="5" cy="6" r="1.5" fill="#2e2926"/>
+                <ellipse cx="27" cy="6" rx="4" ry="3" stroke="#2e2926" stroke-width="1.1" fill="none"/>
+                <circle cx="27" cy="6" r="1.5" fill="#2e2926"/>
+                <line x1="10" y1="6" x2="22" y2="6" stroke="#b8a898" stroke-width="0.8" stroke-dasharray="1.5 1.5"/>
+              </svg>
+            </div>
           </div>
           <div class="eye-name">Écartés</div>
           <div class="eye-desc">Plus de 1 œil d'écart</div>
         </div>
 
-        <%# Yeux bridés %>
-        <div class="eye-card" onclick="selectEye(this, 'brides')">
-          <div class="eye-svg-wrap">
-            <svg width="80" height="36" viewBox="0 0 80 36" fill="none">
-              <path d="M6 18 C20 11 60 11 74 18" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <path d="M6 18 C20 28 60 28 74 18" stroke="#2e2926" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <path d="M6 18 C8 13 13 15 10 20" stroke="#2e2926" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-              <circle cx="40" cy="20" r="4" fill="#2e2926"/>
-              <circle cx="37" cy="17" r="1.2" fill="#fff"/>
-            </svg>
+        <%# --- Yeux bridés --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="brides">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/brides.jpg", alt: "Yeux bridés", class: "eye-img", loading: "lazy" %>
+            <div class="eye-picto">
+              <svg width="22" height="12" viewBox="0 0 22 12" fill="none">
+                <path d="M1 6 C5 3 17 3 21 6" stroke="#2e2926" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                <path d="M1 6 C5 9 17 9 21 6" stroke="#2e2926" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+                <circle cx="11" cy="6" r="1.8" fill="#2e2926"/>
+              </svg>
+            </div>
           </div>
           <div class="eye-name">Bridés</div>
           <div class="eye-desc">Paupière distinctive</div>
         </div>
 
+        <%# --- Petit œil --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="petit_oeil">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/petit_oeil.jpg", alt: "Petit œil", class: "eye-img", loading: "lazy" %>
+            <div class="eye-picto">
+              <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                <ellipse cx="7" cy="5" rx="5" ry="2.8" stroke="#2e2926" stroke-width="1.1" fill="none"/>
+                <circle cx="7" cy="5" r="1.6" fill="#2e2926"/>
+              </svg>
+            </div>
+          </div>
+          <div class="eye-name">Petit œil</div>
+          <div class="eye-desc">Œil court et délicat</div>
+        </div>
+
+        <%# --- Grand œil --- %>
+        <div class="eye-card eye-card-photo"
+             data-morphologie-target="morphoCard"
+             data-action="click->morphologie#selectMorpho"
+             data-morphologie-value-param="grand_oeil">
+          <div class="eye-img-wrap">
+            <%= image_tag "morphologie/grand_oeil.jpg", alt: "Grand œil", class: "eye-img", loading: "lazy" %>
+            <div class="eye-picto">
+              <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
+                <ellipse cx="14" cy="7" rx="12" ry="5" stroke="#2e2926" stroke-width="1.2" fill="none"/>
+                <circle cx="14" cy="7" r="3" fill="#2e2926"/>
+              </svg>
+            </div>
+          </div>
+          <div class="eye-name">Grand œil</div>
+          <div class="eye-desc">Œil long et expressif</div>
+        </div>
+
       </div>
     </section>
 
-    <%# ---- ÉTAPE 3 : RECOMMANDATION PERSONNALISÉE ---- %>
-    <%# Le contenu est mis à jour dynamiquement par selectEye() en JS %>
-    <%# Fond blanc (classe .sec seule) pour créer une vraie cassure visuelle
-        avec l'étape 2 qui est en beige nude — sinon les deux fonds beiges
-        très proches (--color-nude vs --color-cream) se confondaient. %>
+    <%# ============================================================
+        ÉTAPE 4 — RECOMMANDATION (carte récap dynamique)
+        Tant que rien n'est sélectionné → état vide (recapEmpty).
+        Dès qu'une option est choisie → carte récap visible.
+    ============================================================ %>
     <section class="sec" id="result-section">
-      <div class="s-num">Étape 3</div>
+      <div class="s-num">Étape 4</div>
       <h2 class="s-h2">Votre recommandation</h2>
 
-      <%# Carte de résultat — fond sombre, mise à jour par JS %>
-      <div class="result-card" id="result-card">
-        <div class="result-tag">Recommandation Biche.</div>
-        <div class="result-eye-name" id="result-eye">Yeux en amande</div>
-        <div class="result-reco" id="result-reco">
-          La forme en amande est la plus polyvalente. Tous les styles vous vont — jouez sur la courbure et la longueur selon l'effet recherché.
+      <%# État vide — affiché tant que la cliente n'a rien sélectionné %>
+      <div class="recap-empty" data-morphologie-target="recapEmpty">
+        <div class="recap-empty-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="13" stroke="#b8a898" stroke-width="1.4"/>
+            <path d="M10 16 L14 20 L22 12" stroke="#b8a898" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
         </div>
-
-        <%# Grille 2x2 des critères de la recommandation %>
-        <div class="reco-grid">
-          <div class="reco-item">
-            <div class="reco-item-label">Forme</div>
-            <div class="reco-item-values" id="reco-forme">
-              <div class="reco-value"><div class="reco-dot"></div>Cat eye</div>
-              <div class="reco-value"><div class="reco-dot"></div>Doll eye</div>
-              <div class="reco-value"><div class="reco-dot"></div>Naturel</div>
-            </div>
-          </div>
-          <div class="reco-item">
-            <div class="reco-item-label">Courbure</div>
-            <div class="reco-item-values" id="reco-courbure">
-              <div class="reco-value"><div class="reco-dot"></div>Légère</div>
-              <div class="reco-value"><div class="reco-dot"></div>Classique</div>
-              <div class="reco-value"><div class="reco-dot"></div>Intense</div>
-            </div>
-          </div>
-          <div class="reco-item">
-            <div class="reco-item-label">Longueur</div>
-            <div class="reco-item-values" id="reco-longueur">
-              <div class="reco-value"><div class="reco-dot"></div>Courte</div>
-              <div class="reco-value"><div class="reco-dot"></div>Moyenne</div>
-              <div class="reco-value"><div class="reco-dot"></div>Longue</div>
-            </div>
-          </div>
-          <div class="reco-item">
-            <div class="reco-item-label">Technique</div>
-            <div class="reco-item-values" id="reco-technique">
-              <div class="reco-value"><div class="reco-dot"></div>Au choix</div>
-            </div>
-          </div>
+        <div class="recap-empty-text">
+          Sélectionnez votre technique et votre morphologie pour découvrir la pose qui vous convient.
         </div>
-
-        <%# Bouton "Je réserve" qui redirige vers le formulaire %>
-        <%= link_to "Je réserve cette pose →", new_booking_path, class: "result-btn" %>
       </div>
 
-      <%# Encadré : le vrai diagnostic se fait lors du RDV %>
+      <%# Carte récap — masquée par défaut, affichée par Stimulus %>
+      <div class="recap-card" data-morphologie-target="recapCard" hidden>
+        <div class="recap-tag">Recommandation Biche.</div>
+
+        <%# Forme conseillée (mise à jour selon la morpho) %>
+        <div class="recap-forme-wrap">
+          <div class="recap-forme-label">Forme conseillée</div>
+          <div class="recap-forme" data-morphologie-target="recapForme">—</div>
+        </div>
+
+        <%# Description courte (mise à jour selon la morpho) %>
+        <p class="recap-description" data-morphologie-target="recapDescription">
+          Sélectionnez votre morphologie pour obtenir la forme conseillée.
+        </p>
+
+        <%# Liste des choix de la cliente %>
+        <ul class="recap-list">
+          <li class="recap-item">
+            <span class="recap-item-label">Technique</span>
+            <span class="recap-item-value" data-morphologie-target="recapTechnique">—</span>
+          </li>
+          <%# L'item "Effet" est caché si la technique n'est pas Volume %>
+          <li class="recap-item" data-morphologie-target="recapEffet" hidden>
+            <span class="recap-item-label">Effet</span>
+            <span class="recap-item-value" data-morphologie-target="recapEffetName">—</span>
+          </li>
+          <li class="recap-item">
+            <span class="recap-item-label">Morphologie</span>
+            <span class="recap-item-value" data-morphologie-target="recapMorpho">—</span>
+          </li>
+        </ul>
+
+        <%# CTA Réservation — href mis à jour par le Stimulus controller pour
+            ajouter ?prestation_id=X selon la technique/effet choisis. %>
+        <%= link_to "Je réserve cette pose →", new_booking_path,
+                    class: "result-btn",
+                    data: { morphologie_target: "reserveLink" } %>
+      </div>
+
+      <%# Encadré : le vrai diagnostic se fait lors du RDV avec Syam %>
       <div class="diagnostic-box">
         <div class="diag-icon">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -358,8 +472,7 @@
       </div>
     </section>
 
-    <%# ---- CONSEILS AVANT POSE ---- %>
-    <%# Fond crème pour créer une cassure avec l'étape 3 (blanche) juste au-dessus. %>
+    <%# ---- CONSEILS AVANT POSE (inchangé) ---- %>
     <section class="sec sec-cream">
       <p class="s-tag">Conseils</p>
       <h2 class="s-h2">Avant votre pose</h2>
@@ -426,89 +539,3 @@
 
   </div>
 </div>
-
-<%# ====================================================================
-    JavaScript de la page morphologie
-    - selectEye(el, type) : met à jour la carte de recommandation selon
-      le type d'yeux sélectionné et scroll vers la section résultat.
-    ==================================================================== %>
-<script>
-  // Table de correspondance type d'yeux → recommandation
-  const recos = {
-    amande: {
-      eye: 'Yeux en amande',
-      reco: "La forme en amande est la plus polyvalente. Tous les styles vous vont — jouez sur la courbure et la longueur selon l'effet recherché.",
-      forme: ['Cat eye', 'Doll eye', 'Naturel'],
-      courbure: ['Légère', 'Classique', 'Intense'],
-      longueur: ['Courte', 'Moyenne', 'Longue'],
-      technique: ['Au choix']
-    },
-    ronds: {
-      eye: 'Yeux ronds',
-      reco: "Pour les yeux ronds, privilégiez le cat eye pour allonger le regard et éviter d'accentuer l'ouverture. Longueur sur les côtés.",
-      forme: ['Cat eye', 'Effet chat'],
-      courbure: ['Légère', 'Classique'],
-      longueur: ['Longue en ext.'],
-      technique: ['Cil à cil', 'Volume']
-    },
-    tombants: {
-      eye: 'Yeux tombants',
-      reco: "Les extensions relevées au coin externe redressent visuellement le regard. Optez pour un effet chat prononcé avec une courbure intense.",
-      forme: ['Cat eye fort', 'Relevé ext.'],
-      courbure: ['Intense'],
-      longueur: ['Longue en ext.'],
-      technique: ['Cil à cil', 'Volume léger']
-    },
-    rapproches: {
-      eye: 'Yeux rapprochés',
-      reco: "Pour écarter visuellement le regard, concentrez la longueur sur les extrémités externes. Évitez les poses trop longues au centre.",
-      forme: ['Cat eye', 'Ouverture ext.'],
-      courbure: ['Classique', 'Intense'],
-      longueur: ['Courte centre', 'Longue ext.'],
-      technique: ['Cil à cil']
-    },
-    ecartes: {
-      eye: 'Yeux écartés',
-      reco: "Pour rapprocher visuellement le regard, favorisez la longueur au centre avec un doll eye. Évitez les extensions longues en coin externe.",
-      forme: ['Doll eye', 'Centre'],
-      courbure: ['Légère', 'Classique'],
-      longueur: ['Longue centre'],
-      technique: ['Cil à cil', 'Volume']
-    },
-    brides: {
-      eye: 'Yeux bridés',
-      reco: "Un cat eye avec des extensions fines et légèrement recourbées met en valeur la beauté des yeux bridés sans alourdir la paupière.",
-      forme: ['Cat eye', 'Naturel'],
-      courbure: ['Légère', 'Classique'],
-      longueur: ['Moyenne'],
-      technique: ['Cil à cil', 'Rehaussement']
-    }
-  };
-
-  // Construit le HTML d'une liste de valeurs avec pastille
-  function makeValues(arr) {
-    return arr.map(v => `<div class="reco-value"><div class="reco-dot"></div>${v}</div>`).join('');
-  }
-
-  // Sélectionne un type d'yeux et met à jour la carte de recommandation
-  function selectEye(el, type) {
-    // Retirer la classe active de toutes les cartes yeux
-    document.querySelectorAll('.eye-card').forEach(c => c.classList.remove('active'));
-    // Activer la carte cliquée
-    el.classList.add('active');
-
-    // Récupérer les données de recommandation
-    const r = recos[type];
-
-    // Mettre à jour le texte de la carte résultat
-    document.getElementById('result-eye').textContent   = r.eye;
-    document.getElementById('result-reco').textContent  = r.reco;
-    document.getElementById('reco-forme').innerHTML     = makeValues(r.forme);
-    document.getElementById('reco-courbure').innerHTML  = makeValues(r.courbure);
-    document.getElementById('reco-longueur').innerHTML  = makeValues(r.longueur);
-    document.getElementById('reco-technique').innerHTML = makeValues(r.technique);
-
-    // Scroll vers la section résultat (comportement fluide)
-    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-</script>
