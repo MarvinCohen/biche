@@ -68,9 +68,15 @@ class PagesController < ApplicationController
     # côté vue. On précharge :prestation (pour le nom de la pose) + photo.
     # `par_pose` trie par nom de pose puis par nb_remplissages croissant
     # → l'ordre 3/6/9 est garanti dans chaque groupe.
+    # On exclut les packs orphelins (prestation supprimée ou prestation_id nil)
+    # pour éviter de générer une clé `nil` dans @packs_par_pose, qui ferait planter
+    # la vue au moment d'appeler `.id` / `.nom` sur la pose dans les pills.
     @produits_packs = Product.actifs.packs.par_pose.includes(:prestation).with_attached_photo
+                              .where.not(prestation_id: nil)
     # Groupe par prestation (objet) pour ne pas avoir à le re-chercher dans la vue.
     # Hash : { Prestation => [Pack3, Pack6, Pack9], ... }
-    @packs_par_pose = @produits_packs.group_by(&:prestation)
+    # Double sécurité : on filtre encore les clés nil au cas où la prestation
+    # référencée existerait en base mais aurait été soft-deleted ailleurs.
+    @packs_par_pose = @produits_packs.group_by(&:prestation).reject { |pose, _| pose.nil? }
   end
 end
