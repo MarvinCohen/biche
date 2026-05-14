@@ -212,8 +212,13 @@
         </div>
       </div>
 
-      <%# Bouton Google Maps (lien externe à brancher quand disponible) %>
-      <a href="#" class="maps-btn">
+      <%# Bouton Google Maps : ouvre une recherche Google Maps centrée sur
+          l'adresse du Calao Studio. target="_blank" + rel pour sécurité
+          (évite que la page ouverte puisse manipuler window.opener). %>
+      <a href="https://www.google.com/maps/search/?api=1&query=Calao+Studio+37+Rue+Lachassaigne+33000+Bordeaux"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="maps-btn">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M7 1C4.2 1 2 3.2 2 6c0 3.5 5 7 5 7s5-3.5 5-7c0-2.8-2.2-5-5-5z" stroke="#2e2926" stroke-width="1.2" fill="none"/>
           <circle cx="7" cy="6" r="1.5" fill="#2e2926"/>
