@@ -44,9 +44,20 @@
              playsinline
              preload="metadata"
              style="max-width: 100%; width: 360px; max-height: 80vh; border-radius: 18px; background:#000;">
-        <%# rails_blob_url génère une URL Active Storage signée, valide
-            tant que le fichier existe. Pas besoin d'exposer le path. %>
-        <source src="<%= rails_blob_url(video_setting.video_file) %>" type="video/mp4">
+        <%#
+          rails_blob_url génère une URL Active Storage signée, valide
+          tant que le fichier existe. Pas besoin d'exposer le path.
+
+          ASTUCE iOS Safari : on suffixe l'URL avec `#t=0.1` (fragment
+          de temps Media Fragments URI). Sur iOS Safari, sans ça,
+          la première frame de la vidéo n'est pas toujours affichée
+          tant que l'utilisateur n'a pas tapé sur play — l'aperçu
+          apparait noir et l'utilisateur croit que la vidéo est cassée.
+          `#t=0.1` demande au navigateur de se positionner à 0.1s,
+          ce qui force le rendu d'une frame visible immédiatement.
+          Effet zéro sur les autres navigateurs.
+        %>
+        <source src="<%= rails_blob_url(video_setting.video_file) %>#t=0.1" type="video/mp4">
         Votre navigateur ne supporte pas la lecture vidéo HTML5.
       </video>
     </div>
