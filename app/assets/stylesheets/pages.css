@@ -612,7 +612,9 @@
   padding: 14px 16px;
   border: 1px solid var(--color-border);
   border-radius: 14px;
-  font-size: 13px;
+  /* 16px minimum — sinon iOS Safari zoome au focus sur les inputs */
+  /* et ne dézoome pas après le submit. */
+  font-size: 16px;
   color: var(--color-dark);
   background: #fff;
   font-family: var(--font-sans);
@@ -2558,7 +2560,8 @@
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.07);
   color: #fff;
-  font-size: 13px;
+  /* 16px minimum — sinon iOS Safari zoome au focus sur les inputs. */
+  font-size: 16px;
   font-family: var(--font-sans);
 }
 

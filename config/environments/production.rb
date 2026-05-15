@@ -46,12 +46,22 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Replace the default in-process memory cache store with a durable alternative.
-  config.cache_store = :solid_cache_store
+  # Cache en mémoire (in-process).
+  # On évite :solid_cache_store qui nécessite une DB séparée + migrations
+  # (db/cache_migrate). Pour le trafic actuel (admin Syam + quelques clientes),
+  # le cache en mémoire est largement suffisant. Inconvénient : le cache
+  # est perdu à chaque redéploiement Railway, mais ce n'est pas critique
+  # (rien de couteux à recalculer ici).
+  config.cache_store = :memory_store
 
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
+  # Active Job en mode async : les jobs tournent dans un thread pool
+  # in-process (pas de DB queue à gérer). Suffisant pour notre cas
+  # d'usage (Active Storage AnalyzeJob après upload vidéo, etc.).
+  # Limite : si Railway redémarre pendant un job, il est perdu — anodin
+  # ici (juste de l'analyse de métadonnées). Si on ajoute des emails
+  # critiques async plus tard, il faudra repasser sur Solid Queue ou
+  # un service type Sidekiq + Redis.
+  config.active_job.queue_adapter = :async
 
   # Remonte les erreurs d'envoi pour les détecter rapidement en prod
   config.action_mailer.raise_delivery_errors = true

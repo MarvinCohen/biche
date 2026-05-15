@@ -590,7 +590,10 @@ body {
   padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  font-size: 14px;
+  /* IMPORTANT : 16px minimum sur les inputs — sinon iOS Safari zoome */
+  /* automatiquement au focus (et ne dézoome pas après le submit). */
+  /* Le visuel reste très proche de 14px, gain énorme en UX mobile. */
+  font-size: 16px;
   font-family: var(--font-sans);
   color: var(--color-dark);
   background: #fff;

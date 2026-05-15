@@ -9,9 +9,8 @@ test:
   adapter: test
 
 production:
-  adapter: solid_cable
-  connects_to:
-    database:
-      writing: cable
-  polling_interval: 0.1.seconds
-  message_retention: 1.day
+  # Adapter async : Action Cable tourne in-process, pas de DB requise.
+  # On n'utilise pas Action Cable activement (pas de WebSockets dans
+  # l'app), donc on évite solid_cable qui demandait une DB "cable"
+  # séparée + ses migrations (db/cable_migrate) absentes du projet.
+  adapter: async
