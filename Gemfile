@@ -39,10 +39,15 @@ gem "devise-i18n"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
+# NOTE : les gems Solid (cache/queue/cable) ont été retirées car
+# elles nécessitent chacune une DB séparée + des migrations dédiées
+# (db/cache_migrate, db/queue_migrate, db/cable_migrate) absentes du
+# projet. Pour notre trafic actuel, on utilise des adapters in-process :
+#   - Rails.cache  → :memory_store     (production.rb)
+#   - Active Job   → :async            (production.rb)
+#   - Action Cable → :async            (cable.yml)
+# Si un jour on a besoin de queues persistantes ou de cache partagé
+# entre plusieurs serveurs, on remettra solid_queue + une vraie config DB.
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
