@@ -21,8 +21,14 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Stockage des fichiers uploadés via Cloudinary (cloud).
+  # On NE peut PAS utiliser :local sur Railway : le filesystem du
+  # container est éphémère, donc à chaque redéploiement, tous les
+  # uploads disparaitraient (photos galerie, vidéos admin, etc.).
+  # La conf du service est dans config/storage.yml (clé `cloudinary`)
+  # et les credentials sont injectés via variables d'env Railway :
+  # CLOUDINARY_CLOUD_NAME / CLOUDINARY_API_KEY / CLOUDINARY_API_SECRET.
+  config.active_storage.service = :cloudinary
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   # config.assume_ssl = true

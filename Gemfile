@@ -61,6 +61,13 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Stockage cloud des fichiers uploadés (photos prestations, vidéos…).
+# Indispensable en production sur Railway car le filesystem du container
+# est éphémère : sans Cloudinary, chaque redéploiement effacerait les
+# uploads (cf. config/storage.yml pour la conf du service).
+# Plan gratuit : 25 Go de stockage, largement suffisant pour notre cas.
+gem "cloudinary"
+
 group :development, :test do
   # Charge les variables d'environnement depuis .env (clés Stripe, etc.)
   gem "dotenv-rails"
