@@ -3,19 +3,28 @@
 <% content_for :head do %>
 <style>
   * { box-sizing: border-box; }
-  body { background: #2a1f15; }
-  .wrap { max-width: 420px; margin: 0 auto; padding: 24px 12px; }
-  .phone {
-    background: #f5ede2;
-    border-radius: 32px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+
+  /* Sur mobile (par défaut) : pas de mockup, pas de fond sombre extérieur. */
+  /* .phone occupe toute la largeur, edge-to-edge. */
+  .phone { background: #f5ede2; }
+
+  /* Preview tablette (600-767px) : on simule le téléphone avec fond sombre */
+  /* et cadre arrondi. Désactivé sur vrai mobile pour éviter les bandes brunes. */
+  @media (min-width: 600px) and (max-width: 767px) {
+    body { background: #2a1f15; }
+    .wrap { max-width: 420px; margin: 0 auto; padding: 24px 12px; }
+    .phone {
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
   }
 
   /* ---- NAV ---- */
+  /* Pas de backdrop-filter (coûteux sur mobile au scroll). */
+  /* Couleur opaque = même rendu visuel mais sans le coût GPU. */
   .nav {
-    background: rgba(245, 237, 226, 0.92);
-    backdrop-filter: blur(10px);
+    background: #f5ede2;
     padding: 16px 20px;
     display: flex;
     justify-content: space-between;

@@ -25,7 +25,8 @@
 <div class="wrap">
   <div class="phone">
 
-    <nav class="nav" style="background:rgba(247,245,242,0.94); backdrop-filter:blur(10px); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:0.5px solid #e4ddd6;">
+    <%# Pas de backdrop-filter (lag au scroll mobile). Couleur opaque alignée sur le global. %>
+    <nav class="nav" style="background:#f5ede2; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:0.5px solid #e4ddd6;">
       <%= link_to "Biche.", root_path, style:"font-family:'Cormorant Garamond',serif; font-size:22px; color:#2e2926; font-style:italic; text-decoration:none;" %>
     </nav>
 

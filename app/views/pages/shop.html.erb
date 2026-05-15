@@ -7,9 +7,9 @@
   /* Reprise exacte des styles de la maquette biche-shop-v2.html */
 
   /* Navigation — positionnée en absolu pour superposition sur le header */
-  /* Nav alignée sur le global (beige #f5ede2) pour rester cohérente */
-  /* entre les pages — évite que la nav change entre shop et prestations. */
-  .nav { background: rgba(245, 237, 226, 0.92); backdrop-filter: blur(10px); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: absolute; top: 0; left: 0; right: 0; z-index: 10; border-bottom: 0.5px solid #e4ddd6; }
+  /* Nav alignée sur le global (beige #f5ede2). Pas de backdrop-filter : */
+  /* trop coûteux sur mobile (saccades au scroll iOS/Android). */
+  .nav { background: #f5ede2; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: absolute; top: 0; left: 0; right: 0; z-index: 10; border-bottom: 0.5px solid #e4ddd6; }
   .logo-mini { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #2e2926; font-style: italic; font-weight: 500; text-decoration: none; }
   .nav-right { display: flex; gap: 12px; align-items: center; }
   .burger { display: flex; flex-direction: column; gap: 4px; cursor: pointer; width: 22px; }

@@ -129,9 +129,11 @@ body {
 .nav {
   /* Beige chaud (#f5ede2) aligné sur le hero .page-header — */
   /* évite que la nav change de couleur entre les pages. */
-  background: rgba(245, 237, 226, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* On utilise une couleur OPAQUE et plus de backdrop-filter sur mobile : */
+  /* backdrop-filter:blur() est extrêmement coûteux sur iOS Safari et Android */
+  /* — il recalcule le flou pendant le scroll et provoque des saccades. */
+  /* On retrouve l'effet flou seulement sur desktop (cf. desktop.css). */
+  background: #f5ede2;
   padding: 16px 20px;
   display: flex;
   justify-content: space-between;
