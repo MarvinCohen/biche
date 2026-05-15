@@ -26,6 +26,22 @@ module EspaceCliente
                                 .order(date: :desc)
                                 .includes(:prestation, :soin_historique)
 
+      # ---- Onglet "Historique" — section achats boutique ----
+      # Toutes les commandes payées de la cliente (cartes cadeaux, packs, routine).
+      # `includes(:product, :cartes_cadeaux)` évite les N+1 dans la vue : on accède
+      # au nom/type du produit ET aux cartes cadeaux générées (pour leur code).
+      @achats = current_user.orders
+                            .payees
+                            .order(created_at: :desc)
+                            .includes(:product, :cartes_cadeaux)
+
+      # Mapping order_id → Credit (cas des packs de remplissage).
+      # Permet d'afficher le nb de retouches restantes à côté de l'achat sans N+1.
+      # `index_by` retourne un Hash { order_id => Credit } pour un lookup O(1) dans la vue.
+      @credit_par_order = Credit.where(order_id: @achats.map(&:id))
+                                .includes(:prestation)
+                                .index_by(&:order_id)
+
       # ---- Onglet "Messages" : tous les messages de la cliente ----
       @messages = current_user.messages.recents
 

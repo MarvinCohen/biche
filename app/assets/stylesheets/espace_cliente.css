@@ -478,6 +478,41 @@
   gap: 12px;
 }
 
+/* Mode "replié" : on cache toutes les cartes au-delà de la 3ᵉ.
+   Le JS retire la classe `collapsed` au clic sur "Voir plus". */
+.history-list.collapsed > .history-card:nth-child(n+4) {
+  display: none;
+}
+
+/* Bouton "Voir plus / Voir moins" sous une liste d'historique.
+   Centré, discret, même palette que le reste du dashboard. */
+.history-show-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-dark);
+  cursor: pointer;
+}
+
+/* La flèche pivote à 180° quand la liste est dépliée (classe `expanded` sur le bouton) */
+.history-show-more svg {
+  transition: transform 0.2s ease;
+}
+.history-show-more.expanded svg {
+  transform: rotate(180deg);
+}
+
 /* Chaque carte de soin */
 .history-card {
   border: 1px solid var(--color-border);

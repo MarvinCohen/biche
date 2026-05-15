@@ -707,12 +707,14 @@
   /* ---- ACCORDÉON TARIFS ---- */
 
   /* Header cliquable d'une catégorie (Extensions, Retouches...) */
+  /* Fond blanc pour ressortir sur la section beige .sec-nude (#f5ede2) */
+  /* — avant : #f5ede2, devenu invisible car identique au fond de section. */
   .tarif-cat-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 14px 18px;
-    background: #f5ede2;
+    background: #ffffff;
     border-radius: 14px;
     cursor: pointer;
     font-family: 'Cormorant Garamond', serif;
@@ -721,9 +723,13 @@
     margin-bottom: 4px;
     user-select: none;
     transition: background 0.2s;
+    /* Bord doux pour délimiter le header même sans hover */
+    border: 1px solid #ece3d5;
   }
 
-  .tarif-cat-header:hover { background: #ede4d6; }
+  /* Hover : on garde le fond blanc, on assombrit juste le bord pour signaler */
+  /* l'interaction — pas de teinte beige qui jurait avec le fond de section. */
+  .tarif-cat-header:hover { border-color: #d8cdbb; }
 
   /* Flèche qui pivote à l'ouverture */
   .tarif-cat-arrow {

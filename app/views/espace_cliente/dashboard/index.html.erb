@@ -269,16 +269,21 @@
     </div>
 
     <%# ================================================================
-        ONGLET 3 — HISTORIQUE DES SOINS
-        Liste accordéon de tous les soins terminés avec note de Syam
+        ONGLET 3 — HISTORIQUE DES SOINS + ACHATS BOUTIQUE
+        Liste accordéon de tous les soins terminés avec note de Syam,
+        suivie d'une section regroupant les achats boutique (cartes cadeaux,
+        packs de remplissages, produits routine).
     ================================================================= %>
     <div id="tab-historique" style="display:none">
+      <%# ---- Soins passés ---- %>
       <div class="sec">
         <p class="s-tag">Suivi</p>
         <h2 class="s-h2">Historique des soins</h2>
 
         <% if @historique.any? %>
-          <div class="history-list">
+          <%# `collapsed` n'est appliqué que s'il y a plus de 3 soins : sinon
+              tout est déjà visible et le bouton "Voir plus" n'apparaît pas. %>
+          <div class="history-list <%= 'collapsed' if @historique.size > 3 %>">
             <% @historique.each do |booking| %>
               <%# Carte accordéon — cliquer sur le header ouvre les détails %>
               <div class="history-card">
@@ -351,6 +356,18 @@
               </div>
             <% end %>
           </div>
+
+          <%# Bouton "Voir plus" — affiché seulement si > 3 soins.
+              Le JS toggleMore() retire la classe `collapsed` sur la liste précédente
+              et met à jour le label + la flèche. %>
+          <% if @historique.size > 3 %>
+            <button class="history-show-more" onclick="toggleMore(this)" data-count="<%= @historique.size - 3 %>">
+              <span>Voir les <%= @historique.size - 3 %> autres</span>
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          <% end %>
         <% else %>
           <%# Aucun soin terminé pour l'instant %>
           <div class="rdv-empty">
@@ -359,6 +376,105 @@
           </div>
         <% end %>
       </div>
+
+      <%# ---- Achats boutique (cartes cadeaux, packs, produits routine) ----
+           Affiché seulement si la cliente a au moins un achat payé.
+           On réutilise les classes .history-card pour la cohérence visuelle,
+           avec la classe `open` pour que les détails soient visibles directement
+           (peu d'infos à révéler → pas d'accordéon ici). %>
+      <% if @achats.any? %>
+        <div class="sec sec-cream">
+          <p class="s-tag">Boutique</p>
+          <h2 class="s-h2">Mes achats</h2>
+
+          <%# Limité à 3 achats visibles par défaut + bouton "Voir plus" si >3
+              pour éviter une liste trop longue. %>
+          <div class="history-list <%= 'collapsed' if @achats.size > 3 %>">
+            <% @achats.each do |order| %>
+              <div class="history-card open">
+
+                <%# En-tête : produit + montant (pas d'onclick → cursor: default) %>
+                <div class="history-header" style="cursor: default;">
+                  <div class="history-left">
+                    <div class="history-name"><%= order.product.nom %></div>
+                    <div class="history-date">
+                      <%# Date d'achat en français — created_at car pas de "date d'achat" dédiée %>
+                      <%= I18n.l(order.created_at.to_date, format: "%-d %B %Y") %>
+                      ·
+                      <%# Type lisible : carte cadeau / pack / routine / autre %>
+                      <% case order.product.type_produit
+                         when 'carte_cadeau' %>Carte cadeau<% when 'pack' %>Pack remplissages<% when 'routine' %>Routine<% else %>Boutique<% end %>
+                    </div>
+                  </div>
+                  <div class="history-right">
+                    <div class="history-price"><%= order.montant_euros.to_i %>€</div>
+                  </div>
+                </div>
+
+                <%# Détails — variables selon le type de produit %>
+                <div class="history-details">
+
+                  <% if order.product.type_produit == 'carte_cadeau' && order.cartes_cadeaux.any? %>
+                    <%# Carte cadeau : code à offrir + solde restant %>
+                    <% carte = order.cartes_cadeaux.first %>
+                    <div class="detail-grid">
+                      <div class="detail-item">
+                        <div class="detail-label">Code</div>
+                        <%# code_lisible : helper du modèle CarteCadeau (sinon .code brut) %>
+                        <div class="detail-value"><%= carte.respond_to?(:code_lisible) ? carte.code_lisible : carte.code %></div>
+                      </div>
+                      <div class="detail-item">
+                        <div class="detail-label">Solde restant</div>
+                        <div class="detail-value"><%= (carte.solde_cents / 100).to_i %>€</div>
+                      </div>
+                    </div>
+
+                  <% elsif order.product.type_produit == 'pack' && @credit_par_order[order.id].present? %>
+                    <%# Pack de remplissages : nb restant / total + date d'expiration %>
+                    <% credit = @credit_par_order[order.id] %>
+                    <div class="detail-grid">
+                      <div class="detail-item">
+                        <div class="detail-label">Restant</div>
+                        <%# affichage_restant retourne "X/Y" — méthode du modèle Credit %>
+                        <div class="detail-value"><%= credit.affichage_restant %></div>
+                      </div>
+                      <div class="detail-item">
+                        <div class="detail-label">Pose</div>
+                        <div class="detail-value"><%= credit.prestation&.nom || "—" %></div>
+                      </div>
+                      <% if credit.date_expiration.present? %>
+                        <div class="detail-item">
+                          <div class="detail-label">Expire le</div>
+                          <div class="detail-value"><%= I18n.l(credit.date_expiration, format: "%-d %b %Y") %></div>
+                        </div>
+                      <% end %>
+                    </div>
+
+                  <% else %>
+                    <%# Produit routine ou autre : juste la description courte si dispo %>
+                    <% if order.product.description.present? %>
+                      <p style="font-size: 12px; color: var(--color-muted); padding: 4px 0 8px; line-height: 1.5;">
+                        <%= order.product.description %>
+                      </p>
+                    <% end %>
+                  <% end %>
+                </div>
+
+              </div>
+            <% end %>
+          </div>
+
+          <%# Bouton "Voir plus" pour les achats — même mécanique que pour les soins. %>
+          <% if @achats.size > 3 %>
+            <button class="history-show-more" onclick="toggleMore(this)" data-count="<%= @achats.size - 3 %>">
+              <span>Voir les <%= @achats.size - 3 %> autres</span>
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
     <%# ================================================================
@@ -513,5 +629,22 @@
   function toggleHistory(header) {
     var card = header.parentElement;
     card.classList.toggle('open');
+  }
+
+  // Bouton "Voir plus / Voir moins" sous une liste d'historique.
+  // Toggle la classe `collapsed` sur la liste précédente (la liste juste au-dessus
+  // du bouton dans le DOM) et met à jour le label + la rotation de la flèche.
+  function toggleMore(btn) {
+    var list = btn.previousElementSibling;
+    list.classList.toggle('collapsed');
+    // Après le toggle, on lit l'état pour décider quoi afficher.
+    var isCollapsed = list.classList.contains('collapsed');
+    // La classe `expanded` sur le bouton fait pivoter la flèche à 180° via CSS.
+    btn.classList.toggle('expanded', !isCollapsed);
+    // Met à jour le texte (data-count = nb d'items masqués au repos)
+    var label = btn.querySelector('span');
+    label.textContent = isCollapsed
+      ? 'Voir les ' + btn.dataset.count + ' autres'
+      : 'Voir moins';
   }
 </script>

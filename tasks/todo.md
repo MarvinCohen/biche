@@ -1,74 +1,58 @@
-# Refonte page /morphologie — Guide morpho en 4 étapes
+# Vidéo TikTok native — upload MP4 directement sur le site
 
 ## Objectif
 
-Transformer la page `/morphologie` actuelle (3 étapes : techniques descriptives → type d'yeux → reco) en un **parcours guidé en 4 étapes** où la cliente compose son choix, et la carte de recommandation affiche un récapitulatif + la forme conseillée selon sa morphologie.
+Remplacer l'embed TikTok (qui ne lit pas la vidéo au clic — bug TikTok côté serveur, rien à faire) par un **lecteur HTML5 natif** où Syam upload directement le fichier MP4.
 
-### Les 4 nouvelles étapes
+Bonus : pas de branding TikTok, autoplay/muted/loop possibles, lecture garantie.
 
-1. **Technique** — Cil à cil OU Volume (2 grosses cartes, choix exclusif)
-2. **Effet** — uniquement si **Volume** sélectionné à l'étape 1 → Effet mouillé / Wispy / Manga / 3D / 5D (la section est masquée si Cil à cil)
-3. **Morphologie** — 8 types d'yeux : amande, ronds, tombants, rapprochés, écartés, bridés (photos) + petit œil, grand œil (SVG en attendant photos)
-4. **Recommandation** — carte dynamique avec :
-   - Récap des choix de la cliente (technique + effet)
-   - Forme conseillée selon la morphologie sélectionnée (Cat Eyes / Doll Eyes)
-   - CTA "Je réserve cette pose →"
+---
 
-### Mapping morpho → forme conseillée (validé)
+## Choix technique
 
-| Morphologie    | Forme conseillée |
-|----------------|------------------|
-| Petit œil      | Doll Eyes        |
-| Grand œil      | Cat Eyes         |
-| En amande      | Cat Eyes         |
-| Ronds          | Cat Eyes         |
-| Tombants       | Cat Eyes (fort) |
-| Rapprochés     | Cat Eyes         |
-| Écartés        | Doll Eyes        |
-| Bridés         | Doll Eyes        |
-
-### Descriptions à reprendre (texte fourni par Syam)
-
-- **Effet mouillé** : « Une pose effet mouillé est une technique d'extensions de cils qui reproduit l'apparence de cils légèrement mouillés, grâce à des bouquets fins et fermés. Le rendu est brillant, structuré et intense, tout en restant élégant. L'intensité peut être adaptée. »
-- **Wispy** : « Mélange différentes longueurs pour créer un effet aérien, texturé et légèrement "ébouriffé", avec des pics plus longs qui donnent un regard intense et sophistiqué. »
-- **Manga** : « Inspirée du regard des personnages de manga/anime, avec des pics bien définis et espacés qui agrandissent les yeux et donnent un effet poupée très marqué. »
-- **3D** : « Bouquets de 3 extensions ultra fines sur chaque cil naturel pour un rendu fourni, léger et élégant. »
-- **5D** : « Bouquets de 5 extensions ultra fines par cil naturel pour un effet plus dense, glamour et intense, tout en gardant de la légèreté. »
+- On garde le modèle `SiteSetting` (clé/valeur) — pas besoin de nouveau modèle.
+- On y attache la vidéo via **Active Storage** (`has_one_attached :video_file`).
+- On utilise un singleton récupéré par la clé `"video_latest"` pour rattacher l'attachement.
+- On garde aussi un champ texte pour le **titre/légende** de la vidéo (ex: "Pose volume 5D").
 
 ---
 
 ## Fichiers impactés
 
-- `app/views/pages/morphologie.html.erb` — refonte complète (4 sections au lieu de 3)
-- `app/assets/stylesheets/pages.css` — nouveaux styles : cartes Technique XL, cartes Effet, eye-card mix photo+picto
-- `app/assets/images/morphologie/` — dossier à créer pour les 6 photos (action manuelle Marvin)
-- `app/javascript/controllers/morphologie_controller.js` — nouveau Stimulus controller pour gérer le state (technique, effet, morpho) et la mise à jour de la carte récap
-- Suppression du `<script>` inline `selectEye()` qui existe actuellement
+- `app/models/site_setting.rb` — ajouter `has_one_attached :video_file` + un helper `self.video_setting`
+- `app/controllers/admin/site_settings_controller.rb` — accepter le fichier `video_file` + la légende
+- `app/views/admin/site_settings/edit.html.erb` — ajouter un `file_field` + champ légende
+- `app/controllers/pages_controller.rb` — remplacer `@tiktok_url` par `@latest_video` (instance SiteSetting)
+- `app/views/shared/_tiktok_embed.html.erb` — renommer et réécrire en `_video_player.html.erb` (HTML5 `<video>`)
+- `app/views/pages/home.html.erb` — appeler le nouveau partial
+- `app/views/pages/galerie.html.erb` — appeler le nouveau partial
+- `config/routes.rb` — vérifier que les routes admin restent OK (sûrement aucun changement)
 
 ---
 
 ## Étapes
 
-- [ ] 1. Créer le dossier `app/assets/images/morphologie/` — **action manuelle Marvin** : découper le screenshot WhatsApp et y placer 6 fichiers : `amande.jpg`, `ronds.jpg`, `tombants.jpg`, `rapproches.jpg`, `ecartes.jpg`, `brides.jpg`
-- [ ] 2. Créer `app/javascript/controllers/morphologie_controller.js` (Stimulus) :
-  - values : `technique` (String), `effet` (String), `morpho` (String)
-  - targets : `techniqueCard`, `effetSection`, `effetCard`, `morphoCard`, `recapTechnique`, `recapEffet`, `recapForme`, `recapDescription`
-  - actions : `selectTechnique`, `selectEffet`, `selectMorpho`
-  - méthode `updateRecap()` qui met à jour la carte récap + affiche/masque la section Effet selon technique
-- [ ] 3. Refondre la barre `steps-indicator` : 3 étapes → 4 étapes (Technique / Effet / Morpho / Ma pose)
-- [ ] 4. Refondre **Étape 1** — remplacer le carrousel des 5 techniques par 2 grosses cartes de choix : "Cil à cil" / "Volume" + court texte explicatif
-- [ ] 5. Refondre **Étape 2** — nouvelle section "Effets" (cachée par défaut via `hidden`, affichée si Volume) avec 5 cartes : Effet mouillé, Wispy, Manga, 3D, 5D + descriptions Syam
-- [ ] 6. Refondre **Étape 3** — passer de 6 à 8 cartes type yeux. Structure mix photo+picto : `<img>` + petit pictogramme SVG dans le coin (comme le screenshot). Pour petit/grand œil → SVG en plein cadre en attendant photos
-- [ ] 7. Refondre **Étape 4** — carte récap dynamique : technique choisie, effet choisi (affiché si Volume), forme conseillée selon morpho (Doll/Cat Eyes), short description
-- [ ] 8. Ajouter les styles CSS dans `pages.css` (cartes technique XL, cartes effet, eye-card avec photo + overlay picto)
-- [ ] 9. Supprimer le `<script>` inline en bas de la vue (logique déplacée dans le Stimulus controller)
-- [ ] 10. Tester le flow complet en dev (`rails server`)
+- [ ] **1.** `SiteSetting` : ajouter `has_one_attached :video_file` + méthode `self.video_setting` qui fait `find_or_create_by(key: "video_latest")` et retourne l'instance.
+- [ ] **2.** Controller admin : accepter `params[:site_settings][:video_file]` et `params[:site_settings][:video_caption]`. Strong params + attachement via `.video_file.attach(...)`.
+- [ ] **3.** Vue admin : ajouter le `file_field` (accept video/mp4) + champ texte légende. Garder le champ TikTok URL pour transition douce (on pourra le retirer ensuite).
+- [ ] **4.** Pages controller : `@latest_video = SiteSetting.video_setting` dans `home` et `galerie` (remplace `@tiktok_url`).
+- [ ] **5.** Nouveau partial `_video_player.html.erb` : si `@latest_video.video_file.attached?`, afficher un `<video controls playsinline preload="metadata">` + `<source>` via `url_for(@latest_video.video_file)`. Garder le même design que la section TikTok (titre, tag).
+- [ ] **6.** Mettre à jour `home.html.erb` et `galerie.html.erb` pour appeler `render "shared/video_player", video_setting: @latest_video`.
+- [ ] **7.** Supprimer l'ancien partial `_tiktok_embed.html.erb` une fois que tout marche.
+- [ ] **8.** Test manuel : aller sur /admin/site_settings/edit, uploader un MP4, vérifier que la home affiche et lit la vidéo.
 
 ---
 
-## Notes
+## Points d'attention
 
-- **Style** : on garde le système de design existant (variables CSS, classes `.sec`, `.sec-alt`, `.sec-cream`, etc.)
-- **Comportement Stimulus** : on respecte CLAUDE.md → un controller par comportement, pas de JS inline ni de `onclick=""`
-- **Commentaires** : chaque méthode, chaque bloc logique commenté en français (règle absolue CLAUDE.md)
-- **Fallback photos** : tant que les 6 photos ne sont pas dans `app/assets/images/morphologie/`, prévoir un fond CSS beige (`var(--color-nude)`) sur `.eye-img-wrap` pour éviter une icône cassée disgracieuse
+- **Taille du fichier** : MP4 TikTok = 5-15 Mo généralement, OK pour Active Storage.
+- **Format** : `accept="video/mp4"` côté input, et on valide côté modèle (`content_type: ["video/mp4"]`).
+- **Storage** : en dev → `storage/`, en prod → à configurer plus tard (S3 / Cloudinary).
+- **Lecture mobile iOS** : ajouter `playsinline` sur la balise `<video>` (sinon Safari force le fullscreen au play).
+- **Autoplay** : possible seulement si `muted` aussi → on met `muted autoplay loop playsinline` pour un comportement TikTok-like, et `controls` pour que l'utilisateur puisse activer le son.
+
+---
+
+## Question pour toi
+
+OK pour partir là-dessus ? Si tu valides je commence par l'étape 1.

@@ -161,8 +161,8 @@
   .nav {
     /* Padding plus généreux pour aérer */
     padding: 20px 60px;
-    /* Sur desktop, on garde le fond légèrement opaque pour lisibilité */
-    background: rgba(247, 245, 242, 0.96);
+    /* Beige chaud aligné sur le global (#f5ede2) pour cohérence desktop. */
+    background: rgba(245, 237, 226, 0.96);
   }
 
   /* ---- Liens desktop dans la nav ---- */

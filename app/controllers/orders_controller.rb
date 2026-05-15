@@ -177,6 +177,57 @@ class OrdersController < ApplicationController
     redirect_to shop_path, alert: "Impossible de finaliser l'achat. Réessayez ou contactez Syam."
   end
 
+  # ============================================================
+  # ACHAT D'UN PRODUIT ROUTINE (nettoyant cils, sérum, etc.)
+  # ============================================================
+  # Même logique démo que les packs :
+  # - Pas de Stripe → on passe directement en `paye`.
+  # - Pas de Credit à créer (les produits routine ne donnent pas de retouches).
+  # - L'achat apparaît dans Espace cliente → Historique → Achats boutique.
+  # ============================================================
+
+  # GET /orders/new_routine?product_id=X
+  # Page de récap avant confirmation d'achat d'un produit routine
+  def new_routine
+    # Charge le produit ciblé. On filtre sur `type_produit: 'routine'`
+    # pour éviter qu'un id de pack ou de carte cadeau passe par ce flux.
+    @produit = Product.actifs.where(type_produit: 'routine', id: params[:product_id]).first
+
+    unless @produit
+      redirect_to shop_path, alert: "Ce produit n'est plus disponible." and return
+    end
+  end
+
+  # POST /orders/create_routine
+  # Finalise l'achat — crée juste l'Order avec statut `paye` (pas de Credit ici).
+  def create_routine
+    @produit = Product.actifs.where(type_produit: 'routine', id: params[:product_id]).first
+
+    unless @produit
+      redirect_to shop_path, alert: "Ce produit n'est plus disponible." and return
+    end
+
+    # TODO Stripe : remplacer ce flux par une Stripe Checkout Session.
+    # Pour la démo, on passe directement en `paye` sans paiement réel.
+    # Montant figé depuis la BDD pour éviter toute manipulation côté form.
+    @order = Order.create!(
+      user:          current_user,
+      product:       @produit,
+      montant_cents: @produit.prix_cents,
+      statut:        'paye'
+    )
+
+    # Redirige vers l'espace cliente : l'achat apparaît dans l'onglet
+    # Historique → section « Mes achats » (cf. dashboard#index).
+    redirect_to espace_cliente_root_path,
+                notice: "Achat confirmé ! #{@produit.nom} a été ajouté à votre historique."
+  rescue ActiveRecord::RecordInvalid => e
+    # En cas d'erreur de validation (très rare ici, données contrôlées serveur),
+    # on retourne en boutique avec un message générique.
+    Rails.logger.error "create_routine — erreur création Order : #{e.message}"
+    redirect_to shop_path, alert: "Impossible de finaliser l'achat. Réessayez ou contactez Syam."
+  end
+
   # GET /orders/success?session_id=cs_xxx
   # Page de confirmation après paiement Stripe réussi
   def success

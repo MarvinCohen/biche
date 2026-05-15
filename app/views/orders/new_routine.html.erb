@@ -1,13 +1,13 @@
 <%# ============================================================
-    Page de récap avant achat d'un pack de remplissages.
+    Page de récap avant achat d'un produit routine (nettoyant cils, sérum, etc.).
 
-    Reprend le DS Biche. (variables CSS globales définies dans application.css
-    + design proche de la card pack de la boutique).
+    Reprend exactement le même style que `orders/new_pack.html.erb`
+    pour conserver la cohérence visuelle dans le tunnel d'achat.
 
     Pour la démo, le bouton "Confirmer l'achat" envoie un POST direct vers
-    /orders/create_pack qui crée l'Order + le Credit sans passer par Stripe.
+    /orders/create_routine qui crée l'Order avec statut `paye` (sans Stripe).
 ============================================================ %>
-<% content_for :title, "Achat du pack" %>
+<% content_for :title, "Achat — #{@produit.nom}" %>
 
 <% content_for :head do %>
 <style>
@@ -27,7 +27,7 @@
     margin-bottom: 20px;
   }
 
-  /* En-tête : titre + sous-titre */
+  /* En-tête : tag + titre + sous-titre */
   .pack-recap-tag {
     font-size: 10px;
     letter-spacing: 4px;
@@ -50,7 +50,23 @@
     margin-bottom: 26px;
   }
 
-  /* Carte récap — détails du pack acheté */
+  /* Aperçu photo du produit (si dispo) — coins arrondis, ratio carré */
+  .routine-recap-photo {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    background: var(--color-cream, #f6f4f1);
+  }
+  .routine-recap-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Carte récap — détails de l'achat */
   .pack-recap-card {
     background: #fff;
     border: 1px solid var(--color-border, #e2dbd2);
@@ -79,6 +95,8 @@
     color: var(--color-dark, #2e2926);
     font-weight: 500;
     text-align: right;
+    /* Permet à la description longue de wrapper proprement */
+    max-width: 60%;
   }
 
   /* Ligne total — espacée du bloc du dessus, sans séparateur (trop visuel). */
@@ -142,38 +160,37 @@
 
       <%# En-tête %>
       <div class="pack-recap-tag">Récapitulatif</div>
-      <div class="pack-recap-title">
-        Pack <%= @pack.nb_remplissages %> remplissages
-      </div>
+      <div class="pack-recap-title"><%= @produit.nom %></div>
       <div class="pack-recap-sub">
-        Pour la pose <strong><%= @pack.prestation.nom %></strong>.
-        Vos crédits seront disponibles immédiatement dans votre espace cliente.
+        Votre achat sera ajouté à votre historique boutique immédiatement.
       </div>
 
-      <%# Carte récap : pose + nombre de remplissages + expiration + prix %>
+      <%# Aperçu photo si disponible — pour reconnaître le produit en un coup d'œil %>
+      <% if @produit.photo.attached? %>
+        <div class="routine-recap-photo">
+          <%= image_tag @produit.photo, alt: @produit.nom %>
+        </div>
+      <% end %>
+
+      <%# Carte récap : produit + description + prix %>
       <div class="pack-recap-card">
         <div class="pack-recap-row">
-          <div class="pack-recap-label">Pose</div>
-          <div class="pack-recap-value"><%= @pack.prestation.nom %></div>
+          <div class="pack-recap-label">Produit</div>
+          <div class="pack-recap-value"><%= @produit.nom %></div>
         </div>
-        <div class="pack-recap-row">
-          <div class="pack-recap-label">Remplissages</div>
-          <div class="pack-recap-value">
-            <%= @pack.nb_remplissages %> retouches incluses
+
+        <%# Description seulement si renseignée pour éviter une ligne vide %>
+        <% if @produit.description.present? %>
+          <div class="pack-recap-row">
+            <div class="pack-recap-label">Description</div>
+            <div class="pack-recap-value"><%= @produit.description %></div>
           </div>
-        </div>
-        <div class="pack-recap-row">
-          <div class="pack-recap-label">Valable jusqu'au</div>
-          <%# Format localisé : ex "13 novembre 2026" (locale fr dans config/locales) %>
-          <div class="pack-recap-value">
-            <%= I18n.l(@date_expiration_prevue, format: :long) %>
-          </div>
-        </div>
+        <% end %>
 
         <%# Ligne total mise en avant %>
         <div class="pack-recap-total">
           <div class="pack-recap-total-label">Total</div>
-          <div class="pack-recap-total-value"><%= @pack.prix_euros.to_i %>€</div>
+          <div class="pack-recap-total-value"><%= @produit.prix_euros.to_i %>€</div>
         </div>
       </div>
 
@@ -183,10 +200,10 @@
         Le paiement Stripe sera activé en production.
       </div>
 
-      <%# Formulaire de soumission — POST vers create_pack avec le product_id %>
+      <%# Formulaire de soumission — POST vers create_routine avec le product_id %>
       <%# CSRF inclus automatiquement par Rails via button_to %>
       <%= button_to "Confirmer l'achat",
-                    create_pack_orders_path(product_id: @pack.id),
+                    create_routine_orders_path(product_id: @produit.id),
                     method: :post,
                     class: "pack-recap-btn" %>
 

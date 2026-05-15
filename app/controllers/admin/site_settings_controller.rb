@@ -13,20 +13,39 @@ module Admin
     # GET /admin/site_settings/edit
     # Prépare les valeurs actuelles pour pré-remplir le formulaire.
     def edit
-      # On lit chaque clé qu'on veut afficher dans le formulaire.
-      # Si la clé n'existe pas encore, `get` renvoie nil → champ vide.
-      @tiktok_latest_url = SiteSetting.get("tiktok_latest_url")
+      # Singleton de la vidéo native (clé "video_latest").
+      # On expose l'instance complète à la vue pour pouvoir afficher
+      # la légende (value) et l'éventuel fichier déjà uploadé.
+      @video_setting = SiteSetting.video_setting
     end
 
     # PATCH /admin/site_settings
     # Reçoit les valeurs depuis le formulaire et les enregistre.
     def update
-      # On strip pour enlever espaces accidentels en début/fin (copier-coller).
-      url = params.dig(:site_settings, :tiktok_latest_url).to_s.strip
+      # Légende texte de la vidéo (stockée dans `value` du SiteSetting).
+      # `to_s.strip` pour gérer le cas nil + enlever espaces accidentels.
+      caption = params.dig(:site_settings, :video_caption).to_s.strip
 
-      # `set` fait un find_or_initialize_by + save → un seul enregistrement
-      # par clé, créé si besoin, mis à jour sinon.
-      SiteSetting.set("tiktok_latest_url", url)
+      # Singleton récupéré (ou créé au premier passage).
+      video_setting = SiteSetting.video_setting
+      video_setting.value = caption
+
+      # Si un nouveau fichier MP4 est uploadé, on l'attache.
+      # On ne purge l'ancien que si un nouveau est fourni —
+      # sinon on garde celui déjà en place (utile pour modifier
+      # juste la légende sans re-uploader).
+      if params.dig(:site_settings, :video_file).present?
+        video_setting.video_file.attach(params[:site_settings][:video_file])
+      end
+
+      # Permet de supprimer la vidéo actuelle via une case à cocher.
+      # `==` au lieu de `present?` car "0" est falsy côté form mais
+      # truthy en Ruby — on veut explicitement la valeur "1".
+      if params.dig(:site_settings, :remove_video) == "1"
+        video_setting.video_file.purge
+      end
+
+      video_setting.save
 
       redirect_to edit_admin_site_settings_path, notice: "Réglages enregistrés."
     end

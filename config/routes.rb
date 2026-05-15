@@ -45,9 +45,6 @@ Rails.application.routes.draw do
     # Rendez-vous à venir
     resources :rdvs, only: [:index]
 
-    # Historique des soins passés
-    resources :historique, only: [:index, :show]
-
     # Messages / newsletters reçus
     resources :messages, only: [:index, :show] do
       member do
@@ -162,6 +159,13 @@ Rails.application.routes.draw do
       # et un Credit est créé pour la cliente. TODO : brancher Stripe plus tard.
       get  :new_pack    # GET  /orders/new_pack?product_id=X — page de récap
       post :create_pack # POST /orders/create_pack          — finalise l'achat
+
+      # ----- Achat d'un produit routine (nettoyant, sérum, etc.) -----
+      # Flux démo : pas de Stripe, pas de Credit à créer (juste un Order paye).
+      # L'achat apparaîtra automatiquement dans l'espace cliente → Historique → Achats boutique.
+      # TODO : brancher Stripe plus tard (même logique que carte cadeau).
+      get  :new_routine    # GET  /orders/new_routine?product_id=X — page de récap
+      post :create_routine # POST /orders/create_routine          — finalise l'achat
     end
   end
 

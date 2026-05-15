@@ -29,7 +29,9 @@
     </nav>
 
     <%# ---- EN-TÊTE ---- %>
-    <div class="page-header" style="background: #e8e2d8;">
+    <%# Hero — hérite du .page-header global (fond var(--color-nude) = #f5ede2) %>
+    <%# pour rester cohérent avec les autres pages du site (prestations, faq…) %>
+    <div class="page-header">
       <div class="ph-blob"></div>
       <div class="ph-blob-2"></div>
       <div class="ph-tag">Galerie</div>
@@ -276,10 +278,10 @@
       </section>
     <% end %>
 
-    <%# ---- DERNIÈRE VIDÉO TIKTOK ---- %>
+    <%# ---- DERNIÈRE VIDÉO (player natif, plus d'embed TikTok) ---- %>
     <%# Affichée juste avant la section Instagram.
-        Le partial ne rend rien si @tiktok_url est vide. %>
-    <%= render "shared/tiktok_embed", tiktok_url: @tiktok_url %>
+        Le partial ne rend rien si aucun fichier MP4 n'est attaché. %>
+    <%= render "shared/video_player", video_setting: @latest_video %>
 
     <%# ---- INSTAGRAM ---- %>
     <%# Carte invitation : icône avec dégradé brand Instagram + titre + handle + CTA.

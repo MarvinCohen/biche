@@ -10,7 +10,7 @@
 :root {
   /* Couleurs principales */
   --color-dark:    #2e2926;   /* Brun foncé — boutons, textes, footer */
-  --color-nude:    #f7f5f2;   /* Beige nude — fond principal */
+  --color-nude:    #f5ede2;   /* Beige chaud — fond principal (aligné sur le hero Prestations) */
   --color-cream:   #f6f4f1;   /* Crème légèrement plus sombre */
   --color-sand:    #e8e2d8;   /* Sable — hero accueil */
   --color-accent:  #b8a898;   /* Beige rosé — accents, étoiles, fidélité */
@@ -106,7 +106,9 @@ body {
    NAVIGATION — barre du haut fixée
    ============================================================ */
 .nav {
-  background: rgba(247, 245, 242, 0.94);
+  /* Beige chaud (#f5ede2) aligné sur le hero .page-header — */
+  /* évite que la nav change de couleur entre les pages. */
+  background: rgba(245, 237, 226, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 16px 20px;
@@ -260,8 +262,10 @@ body {
 }
 
 .nav-menu-link:hover {
-  /* On utilise la variable --color-cream au lieu du hex hardcodé */
-  background: var(--color-cream);
+  /* Hover beige légèrement plus foncé que le drawer (--color-nude #f5ede2) */
+  /* pour rester dans la palette chaude — avant on utilisait --color-cream */
+  /* qui apparaissait blanc/froid sur le fond beige du drawer. */
+  background: #ece2d3;
 }
 
 /* Séparateur visuel entre sections */
@@ -362,8 +366,10 @@ body {
   background: #fff;
 }
 
+/* Alternance 2 couleurs : .sec = blanc, toutes les variantes = beige chaud --color-nude.
+   .sec-cream est aliasé sur --color-nude pour éviter une 3ᵉ teinte intermédiaire. */
 .sec-alt   { background: var(--color-nude); }
-.sec-cream { background: var(--color-cream); }
+.sec-cream { background: var(--color-nude); }
 .sec-nude  { background: var(--color-nude); }
 .sec-dark  { background: var(--color-dark); }
 

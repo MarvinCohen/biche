@@ -3,10 +3,13 @@
    ============================================================ */
 
 /* HERO */
+/* Fond aligné sur var(--color-nude) (#f5ede2) pour rester cohérent */
+/* avec le hero de prestations et le reste du site (option A : on garde */
+/* la photo, le grand « B. » et le blob .hero-accent, on adapte juste le fond). */
 .hero {
   position: relative;
   padding: 100px 24px 60px;
-  background: var(--color-sand);
+  background: var(--color-nude);
   overflow: hidden;
   text-align: center;
 }

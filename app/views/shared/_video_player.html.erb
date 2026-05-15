@@ -1,0 +1,69 @@
+<%#
+  ============================================================
+  PARTIAL — Lecteur vidéo natif (remplace l'ancien embed TikTok)
+
+  Réutilisé sur la home et la galerie.
+
+  Variable attendue :
+    `video_setting` — instance SiteSetting (singleton "video_latest")
+                      avec ou sans fichier attaché.
+
+  Comportement :
+    - Si aucun fichier MP4 n'est attaché → on n'affiche RIEN (pas de
+      section vide à l'écran).
+    - Sinon → on affiche un lecteur HTML5 standard, sans branding
+      TikTok, avec contrôles classiques (play, mute, fullscreen).
+      `playsinline` est crucial pour iOS Safari (sinon il force le
+      fullscreen automatique au play, mauvaise UX sur mobile).
+  ============================================================
+%>
+
+<% if video_setting&.video_file&.attached? %>
+  <section class="tiktok-sec">
+    <%# Tag éditorial au-dessus du titre — on garde l'identité @atelier_b.iche
+        car la vidéo vient bien du TikTok de Syam (juste hébergée localement). %>
+    <p class="tiktok-tag">@atelier_b.iche</p>
+    <h2 class="tiktok-title">Dernière vidéo</h2>
+
+    <%# Conteneur centré qui limite la largeur (cohérence avec l'ancien embed). %>
+    <div class="tiktok-wrap" style="display:flex; justify-content:center;">
+      <%#
+        Player HTML5 :
+          - controls           → barre de lecture native du navigateur
+          - playsinline        → pas de fullscreen forcé sur iOS Safari
+          - preload="metadata" → on télécharge juste la 1ʳᵉ frame + durée
+                                  (pas la vidéo entière) tant que l'user
+                                  n'a pas cliqué play → léger sur la bande passante.
+          - poster (optionnel) → image affichée avant le play. Pas géré ici
+                                  pour rester simple (le navigateur prend
+                                  la 1ʳᵉ frame du MP4 grâce à preload=metadata).
+        Style inline : ratio portrait 9/16 type TikTok, hauteur limitée à 80vh
+        pour éviter de scroller sur grand écran.
+      %>
+      <video controls
+             playsinline
+             preload="metadata"
+             style="max-width: 100%; width: 360px; max-height: 80vh; border-radius: 18px; background:#000;">
+        <%# rails_blob_url génère une URL Active Storage signée, valide
+            tant que le fichier existe. Pas besoin d'exposer le path. %>
+        <source src="<%= rails_blob_url(video_setting.video_file) %>" type="video/mp4">
+        Votre navigateur ne supporte pas la lecture vidéo HTML5.
+      </video>
+    </div>
+
+    <%# Légende texte sous la vidéo (champ `value` du SiteSetting).
+        Affichée seulement si Syam a saisi quelque chose. %>
+    <% if video_setting.value.present? %>
+      <p style="text-align:center; font-size:13px; color:var(--color-muted); margin-top:14px;">
+        <%= video_setting.value %>
+      </p>
+    <% end %>
+
+    <%# Lien vers le compte TikTok complet — gardé pour pousser le trafic. %>
+    <%= link_to "Voir le compte TikTok",
+                "https://www.tiktok.com/@atelier_b.iche",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                class: "tiktok-link" %>
+  </section>
+<% end %>
