@@ -1,8 +1,17 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
+# Si on démarre le serveur Rails :
+#   1. db:prepare → crée la DB si absente, joue les migrations en attente
+#   2. setup_business_hours → s'assure que les 7 horaires hebdo existent
+#      (idempotent grâce à find_or_create_by! — n'écrase pas les valeurs
+#      éditées par Syam depuis l'admin, ne crée pas de doublons)
+#
+# Ces deux étapes ne tournent QUE pour la commande `bin/rails server` :
+# on évite ainsi de relancer ce setup pour des commandes ponctuelles
+# (rake tasks, console, etc.) qui n'en ont pas besoin.
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
+  ./bin/rails runner db/setup_business_hours.rb
 fi
 
 exec "${@}"
