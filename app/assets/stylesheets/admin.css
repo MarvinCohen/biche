@@ -6,18 +6,31 @@
 
 /* ---- LAYOUT GLOBAL ---- */
 
-/* Fond légèrement différent du fond espace cliente pour distinguer l'admin */
+/* Mobile-first : sur vrai mobile, l'admin est plein écran (pas de cadre). */
+/* Le mockup arrondi est réactivé uniquement en preview tablette (600-767px). */
 .admin-wrap {
-  max-width: 420px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
 .admin-phone {
   background: #faf9f7;
-  border-radius: 32px;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: none;
   min-height: 100vh;
+}
+
+/* Preview tablette : on simule le téléphone (cadre arrondi + ombre) */
+@media (min-width: 600px) and (max-width: 767px) {
+  .admin-wrap {
+    max-width: 420px;
+  }
+  .admin-phone {
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    min-height: auto;
+  }
 }
 
 /* ---- NAVIGATION ADMIN ---- */

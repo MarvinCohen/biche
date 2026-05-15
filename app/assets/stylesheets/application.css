@@ -47,58 +47,79 @@
 
 html, body {
   overflow-x: hidden;
+  /* iOS Safari utilise le background du <html> pour la zone de bounce/overscroll. */
+  /* On l'aligne sur le fond beige du site pour éviter une bande sombre quand */
+  /* l'utilisateur scrolle au-delà du haut/bas sur mobile. */
+  background: var(--color-nude);
 }
 
+/* ============================================================
+   STRATÉGIE MOBILE-FIRST :
+   Par défaut (mobile et tout en dessous de 768px), le site est
+   edge-to-edge — pas de mockup téléphone, pas de fond sombre.
+   Le cadre simulant un téléphone (.phone arrondi + ombre + fond
+   sombre autour) est ensuite réactivé UNIQUEMENT sur tablette/
+   desktop via une media query plus bas, pour la prévisualisation.
+
+   Avant : on définissait le mockup en base et on l'annulait via
+   @media (max-width:480px) → certains vrais téléphones tombaient
+   dans la zone 481-767px et voyaient le mockup. Inversion → +safe.
+   ============================================================ */
 body {
   font-family: var(--font-sans);
-  background: var(--color-bg-dark);
+  /* Fond beige par défaut (pas le sombre du mockup) */
+  background: var(--color-nude);
   min-height: 100vh;
-  padding: 24px 12px;
+  /* Pas de padding extérieur — le contenu prend toute la largeur */
+  padding: 0;
   color: var(--color-dark);
   -webkit-font-smoothing: antialiased;
 }
 
 /* ============================================================
-   LAYOUT — conteneur phone (max 420px, mockup mobile)
+   LAYOUT — conteneur principal
+   Par défaut, .wrap prend toute la largeur (mobile-first).
+   .phone n'a plus de cadre/ombre/coin arrondi par défaut.
    ============================================================ */
 .wrap {
-  max-width: 420px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
 .phone {
   background: var(--color-nude);
-  border-radius: 32px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  /* Pas de coin arrondi / ombre / cadre par défaut — on est sur mobile */
+  border-radius: 0;
+  box-shadow: none;
+  min-height: 100vh;
   position: relative;
 }
 
 /* ============================================================
-   Mode "plein écran" sur mobile réel (< 480px) :
-   sur desktop on garde l'effet mockup téléphone (cadre arrondi
-   + ombre sur fond sombre), mais sur un VRAI téléphone ce cadre
-   est inutile et moche → on supprime padding, ombre, radius et
-   on aligne la couleur de fond pour que le rendu soit edge-to-edge.
-============================================================ */
-@media (max-width: 480px) {
+   MOCKUP TÉLÉPHONE — réactivé sur écran moyen+ (tablette / desktop
+   en preview) pour les designers qui veulent voir le rendu mobile
+   sur un grand écran. À partir de 600px, on simule à nouveau le
+   téléphone (fond sombre, cadre arrondi, ombre).
+
+   Au-dessus de 768px, le bloc desktop.css prend le relais et
+   désactive à nouveau le mockup pour un vrai layout plein écran.
+   ============================================================ */
+@media (min-width: 600px) and (max-width: 767px) {
   body {
-    /* Plus de padding extérieur sombre — la page touche les bords */
-    padding: 0;
-    /* Le fond du body doit matcher celui du .phone pour éviter
-       toute bande visible si le contenu ne couvre pas tout l'écran. */
-    background: var(--color-nude);
-  }
-  .phone {
-    /* Les coins arrondis et l'ombre n'ont plus de sens sur un vrai écran */
-    border-radius: 0;
-    box-shadow: none;
-    /* On laisse le téléphone occuper toute la hauteur disponible */
-    min-height: 100vh;
+    /* Fond sombre pour faire ressortir le mockup au centre */
+    background: var(--color-bg-dark);
+    padding: 24px 12px;
   }
   .wrap {
-    /* On lève la contrainte de largeur pour aller jusqu'aux bords */
-    max-width: 100%;
+    /* Largeur d'un téléphone simulé */
+    max-width: 420px;
+  }
+  .phone {
+    /* Cadre arrondi + ombre pour le rendu mockup */
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    min-height: auto;
   }
 }
 
